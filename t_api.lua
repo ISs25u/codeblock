@@ -28,8 +28,12 @@ function turtleminer.show_formspec(name, pos, formname, params)
   -- if form name is main, show main
   if formname == "main" then
 		local formspec =
-			"size[6,4]" ..
+			"size[6,6]" ..
 		"label[0,0;Cliquez les boutons pour déplacer la tortue !]" .. --JP traduction
+		"field[0.3,3;6,5;script_jp;Script :;"..sequence.."]"..
+		"label[0,5.3;D ou G = tourner à Droite ou à Gauche]" ..
+		"label[0,5.6;A ou R = Avancer ou Reculer]" ..
+		"label[0,5.9;H ou B = aller en Haut ou en Bas]" ..
 			"button_exit[4,1;1,1;exit;Exit]" ..
 			"image_button[0,1;1,1;turtleminer_remote_arrow_up.png;up;]" ..
 			"image_button[1,1;1,1;turtleminer_remote_arrow_fw.png;forward;]" ..
@@ -434,6 +438,10 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 
 	local name = sender:get_player_name()
 	local pos = positions[name]
+	local form_script = fields.script_jp
+	if form_script ~= sequence then 
+		sequence = form_script
+	end
 
 	if not pos then return end -- if not position, return - something is wrong
 
@@ -444,56 +452,67 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 		turtleminer.rotate(pos, "right", name) -- elseif turn right button, rotate right
 		if recording then 
 			sequence = sequence .. 'D'
+			turtleminer.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.turnleft then 
 		turtleminer.rotate(pos, "left", name) -- elseif turn left button, rotate left
 		if recording then 
 			sequence = sequence .. 'G'
+			turtleminer.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.forward then 
 		turtleminer.move(pos, "forward", name) -- elseif move forward button, move forward
 		if recording then 
 			sequence = sequence .. 'A'
+			turtleminer.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.backward then 
 		turtleminer.move(pos, "backward", name) -- elseif move backward button, move backward
 		if recording then 
 			sequence = sequence .. 'R'
+			turtleminer.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.up then 
 		turtleminer.move(pos, "up", name) -- elseif move up button, move up
 		if recording then 
 			sequence = sequence .. 'H'
+			turtleminer.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.down then 
 		turtleminer.move(pos, "down", name) -- elseif move down button, move down
 		if recording then 
 			sequence = sequence .. 'B'
+			turtleminer.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.digfront then 
 		turtleminer.dig(pos, "front", name) -- elseif dig in front button, dig in front
 		if recording then 
 			sequence = sequence .. 'C'
+			turtleminer.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.digbottom then 
 		turtleminer.dig(pos, "below", name) -- elseif dig bottom button, dig below
 		if recording then 
 			sequence = sequence .. 'c'
+			turtleminer.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.buildfront then 
 		turtleminer.build(pos, "front", name) -- elseif build in front button, build in front
 		if recording then 
 			sequence = sequence .. 'p'
+			turtleminer.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.buildbottom then 
 		turtleminer.build(pos, "below", name) -- elseif build bottom button, build below
 		if recording then 
 			sequence = sequence .. 'P'
+			turtleminer.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.buildforward then 
 		turtleminer.buildforwardJP(pos, name) -- JP TEST
 		if recording then 
 			sequence = sequence .. 'a'
+			turtleminer.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.play then turtleminer.playJP(pos, name) -- JP TEST
 	elseif fields.stopplay then -- JP TEST 
@@ -502,10 +521,12 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 	elseif fields.record then 
 		recording = true
 		sequence = '' -- je pourrais continuer l'ancien enregistrement mais il faudrait alors ajouter un bouton pour vider l'enregistrement
+		turtleminer.show_formspec(name, positions[name], "main")
 	elseif fields.fourmi then 
 		turtleminer.langtonJP(pos, "below", name) 
 		if recording then 
 			sequence = sequence .. 'L'
+			turtleminer.show_formspec(name, positions[name], "main")
 		end
 	end -- JP TEST
 end)
