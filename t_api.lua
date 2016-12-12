@@ -1,6 +1,7 @@
 -- turtleminer/t_api.lua
 
 local  sequence = ''
+local  sequence2 = '' -- a enlever apres test script
 local  recording = false
 local  playing = false
 
@@ -361,6 +362,70 @@ function turtleminer.buildforwardJP(pos, name)
 	turtle_move(pos, new_pos) -- call local function
 end
 
+-- [function] buildbelowJP
+function turtleminer.buildbelowJP(pos, name)
+
+	local function build(pos)
+		if minetest.get_node_or_nil(pos) then -- if node, dig
+			minetest.set_node(pos, { name = "mesecons_lightstone:lightstone_red_off" }) --JP modification
+			nodeupdate(pos)
+			-- minetest.sound_play("moveokay", {to_player = name, gain = 1.0,}) -- play sound
+		else -- minetest.sound_play("moveerror", {to_player = name, gain = 1.0,}) 
+		end -- else, play error sound
+	end
+
+	local node = minetest.get_node(pos) -- get node ref
+	local dir = minetest.facedir_to_dir(node.param2) -- get facedir
+	local build_pos = vector.new(pos) -- dig position
+
+	build_pos.y = build_pos.y - 1 -- remove 1 from dig_pos y axis
+	build(build_pos) -- dig node below
+
+	local oldmeta = minetest.get_meta(pos):to_table() -- get meta
+	local new_pos = vector.new(pos) -- new pos vector
+	local entity_pos = vector.new(pos) -- entity position vector
+
+	local function turtle_move(pos, new_pos, entity_pos)
+		-- if not walkable, proceed
+		if not minetest.registered_nodes[minetest.get_node(new_pos).name].walkable then
+			minetest.remove_node(pos) -- remote old node
+			minetest.set_node(new_pos, node) -- create new node
+			positions[name] = new_pos -- update position
+			minetest.get_meta(new_pos):from_table(oldmeta) -- set new meta
+
+			-- if not walkable, move player
+			if not minetest.registered_nodes[minetest.get_node(entity_pos).name].walkable then
+				local objects_to_move = {}
+
+				local objects = minetest.get_objects_inside_radius(new_pos, 1) -- get objects
+				for _, obj in ipairs(objects) do -- for every object, add to table
+					table.insert(objects_to_move, obj) -- add to table
+				end
+
+				for _, obj in ipairs(objects_to_move) do
+					local entity = obj:get_luaentity()
+					if not entity then
+							obj:setpos(entity_pos)
+					end
+				end
+			end
+
+			-- minetest.sound_play("moveokay", { player = name, gain = 1.0 }) -- play sound
+		else -- else, return false
+			-- minetest.sound_play("moveerror", { player = name, gain = 1.0 }) -- play sound
+			return false
+		end
+	end
+
+	-- if direction is forward, move forward
+	-- calculate new coords
+	new_pos.z = new_pos.z - dir.z
+	new_pos.x = new_pos.x - dir.x
+	entity_pos.z = entity_pos.z - dir.z * 2
+	entity_pos.x = entity_pos.x - dir.x * 2
+	turtle_move(pos, new_pos, entity_pos) -- call local function
+end
+
 -- [function] langtonJP
 function turtleminer.langtonJP(pos, where, name)
 
@@ -403,31 +468,82 @@ function turtleminer.recordJP(pos, name)
 end
 
 -- [function] playJP
-function turtleminer.playJP(pos, name)
-	local newpos = pos
-	playing = true 
-	for compteur = 1, #sequence do
-		if playing then 
-			if string.sub(sequence, compteur, compteur) == 'D' then	turtleminer.rotate(newpos, "right", name) -- elseif turn right button, rotate right
-			elseif string.sub(sequence, compteur, compteur) == 'G' then turtleminer.rotate(newpos, "left", name) -- elseif turn left button, rotate left
-			elseif string.sub(sequence, compteur, compteur) == 'A' then turtleminer.move(newpos, "forward", name) -- elseif move forward button, move forward
-			elseif string.sub(sequence, compteur, compteur) == 'R' then turtleminer.move(newpos, "backward", name) -- elseif move backward button, move backward
-			elseif string.sub(sequence, compteur, compteur) == 'H' then turtleminer.move(newpos, "up", name) -- elseif move up button, move up
-			elseif string.sub(sequence, compteur, compteur) == 'B' then turtleminer.move(newpos, "down", name) -- elseif move down button, move down
-			elseif string.sub(sequence, compteur, compteur) == 'C' then turtleminer.dig(newpos, "front", name) -- elseif dig in front button, dig in front
-			elseif string.sub(sequence, compteur, compteur) == 'c' then turtleminer.dig(newpos, "below", name) -- elseif dig bottom button, dig below
-			elseif string.sub(sequence, compteur, compteur) == 'p' then turtleminer.build(newpos, "front", name) -- elseif build in front button, build in front
-			elseif string.sub(sequence, compteur, compteur) == 'L' then turtleminer.langtonJP(newpos, "below", name) -- JP TEST
-			elseif string.sub(sequence, compteur, compteur) == 'a' then turtleminer.buildforwardJP(newpos, name) -- JP TEST
-			elseif string.sub(sequence, compteur, compteur) == 'P' then turtleminer.build(newpos, "below", name)  end -- JP TEST
-			newpos = positions[name]
-		end
-	end
-	if recording then 
-		sequence = sequence .. sequence
-	end
+function firstIndexOf(str, substr)
+  local i = string.find(str, substr, 1, true)
+  if i == nil then
+    return 0
+  else
+    return i
+  end
 end
 
+function turtleminer.playJP_seq(pos, name, seq)
+	-- local newpos = pos VOIR NOTE quelques lignes plus bas dans le if playing
+	local compteur = 1
+	local nf_fois = 1
+	if firstIndexOf('1234567890', string.sub(seq, 1, 1)) ~= 0 then
+		nf_fois = 0
+		local seq1_est_nombre = firstIndexOf('1234567890', string.sub(seq, 1, 1))
+		while not (seq1_est_nombre == 0) do
+			if seq1_est_nombre == 10 then
+				nf_fois = nf_fois * 10
+			else
+				nf_fois = nf_fois * 10 + seq1_est_nombre
+			end
+			compteur = compteur + 1
+			seq1_est_nombre = firstIndexOf('1234567890', string.sub(seq, compteur, compteur))
+		end
+	end
+	if string.sub(seq, compteur, compteur) == '(' then
+		local compteur_par = compteur
+		local nb_parenth = 1
+		while not ((string.sub(seq, compteur_par, compteur_par) == ')' and nb_parenth == 0) or (#seq == compteur_par)) do -- ajouter ici un test du genre OR la fin de seq est atteinte
+			compteur_par = compteur_par + 1
+			if string.sub(seq, compteur_par, compteur_par) == '(' then
+				nb_parenth = nb_parenth + 1
+			elseif string.sub(seq, compteur_par, compteur_par) == ')' then
+				nb_parenth = nb_parenth - 1
+			end
+		end
+		if (string.sub(seq, compteur_par, compteur_par) == ')' and nb_parenth == 0) then
+			for i = 1, nf_fois do
+				turtleminer.playJP_seq(pos, name, string.sub(seq, compteur + 1, compteur_par - 1))
+			end
+			if #seq > compteur_par then
+				turtleminer.playJP_seq(pos, name, string.sub(seq, compteur_par + 1, #seq))
+			end
+		else
+			play = false
+			sequence = sequence .. " error ) missing !" 
+		end
+	else
+		for i = 1, nf_fois do
+			if playing then 
+				if string.sub(seq, compteur, compteur) == 'D' then	turtleminer.rotate(positions[name], "right", name) -- elseif turn right button, rotate right
+				elseif string.sub(seq, compteur, compteur) == 'G' then turtleminer.rotate(positions[name], "left", name) -- elseif turn left button, rotate left
+				elseif string.sub(seq, compteur, compteur) == 'A' then turtleminer.move(positions[name], "forward", name) -- elseif move forward button, move forward
+				elseif string.sub(seq, compteur, compteur) == 'R' then turtleminer.move(positions[name], "backward", name) -- elseif move backward button, move backward
+				elseif string.sub(seq, compteur, compteur) == 'H' then turtleminer.move(positions[name], "up", name) -- elseif move up button, move up
+				elseif string.sub(seq, compteur, compteur) == 'B' then turtleminer.move(positions[name], "down", name) -- elseif move down button, move down
+				elseif string.sub(seq, compteur, compteur) == 'C' then turtleminer.dig(positions[name], "front", name) -- elseif dig in front button, dig in front
+				elseif string.sub(seq, compteur, compteur) == 'c' then turtleminer.dig(positions[name], "below", name) -- elseif dig bottom button, dig below
+				elseif string.sub(seq, compteur, compteur) == 'p' then turtleminer.build(positions[name], "front", name) -- elseif build in front button, build in front
+				elseif string.sub(seq, compteur, compteur) == 'L' then turtleminer.langtonJP(positions[name], "below", name) -- JP TEST
+				elseif string.sub(seq, compteur, compteur) == 'a' then turtleminer.buildbelowJP(positions[name], name) -- JP TEST
+				elseif string.sub(seq, compteur, compteur) == 'P' then turtleminer.build(positions[name], "below", name) -- JP TEST
+				elseif string.sub(seq, compteur, compteur) == ' ' then play = true -- JP TEST
+				else 
+					play = false
+					sequence = sequence .. " instruction " .. string.sub(seq, compteur, compteur) .. " unknown !" 
+				end -- JP TEST
+				-- newpos = positions[name] NOTE j'ai enlevé cette gestion de la position qui posait probleme en passant directement la position sans passer par cette variable local
+			end
+		end
+		if #seq > compteur then
+			turtleminer.playJP_seq(pos, name, string.sub(seq, compteur + 1, #seq))
+		end
+	end
+end
 --------------------- https://blockly-demo.appspot.com/static/demos/code/index.html?lang=fr
 -- FIN TEST JP DEF ---------------------------------------------------------------------------------------------------------
 ---------------------
@@ -509,12 +625,18 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 			turtleminer.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.buildforward then 
-		turtleminer.buildforwardJP(pos, name) -- JP TEST
+		turtleminer.buildbelowJP(pos, name) -- JP TEST
 		if recording then 
 			sequence = sequence .. 'a'
 			turtleminer.show_formspec(name, positions[name], "main")
 		end
-	elseif fields.play then turtleminer.playJP(pos, name) -- JP TEST
+	elseif fields.play then 
+		playing = true 
+		turtleminer.playJP_seq(pos, name, sequence)
+		if (recording and playing) then 
+			sequence = sequence .. sequence
+		end
+		turtleminer.show_formspec(name, positions[name], "main")
 	elseif fields.stopplay then -- JP TEST 
 		recording = false 
 		playing = false 
