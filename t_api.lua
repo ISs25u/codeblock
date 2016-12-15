@@ -1,10 +1,9 @@
 -- turtleminer/t_api.lua
 
 local  sequence = ''
-local  sequence2 = '' -- a enlever apres test script
 local  recording = false
 local  playing = false
-
+local  nom_bloc = "lightstone_red_off"
 ---------------
 -- FUNCTIONS --
 ---------------
@@ -14,6 +13,28 @@ local positions = {} -- form positions
 --------------
 -- FORMSPEC --
 --------------
+
+--NOTE JP : come from WorldEdit MOD determines whether `nodename` is a valid node name, returning a boolean
+function turtleminer.normalize_nodename(nodename)
+	nodename = nodename:gsub("^%s*(.-)%s*$", "%1")
+	if nodename == "" then return nil end
+	local fullname = ItemStack({name=nodename}):get_name() --resolve aliases of node names to full names
+	if minetest.registered_nodes[fullname] or fullname == "air" then --directly found node name or alias of nodename
+		return fullname
+	end
+	for key, value in pairs(minetest.registered_nodes) do
+		if key:find(":" .. nodename, 1, true) then --found in mod
+			return key
+		end
+	end
+	nodename = nodename:lower() --lowercase both for case insensitive comparison
+	for key, value in pairs(minetest.registered_nodes) do
+		if value.description:lower() == nodename then --found in description
+			return key
+		end
+	end
+	return nil
+end
 
 -- [function] show formspec
 function turtleminer.show_formspec(name, pos, formname, params)
@@ -28,9 +49,15 @@ function turtleminer.show_formspec(name, pos, formname, params)
 
   -- if form name is main, show main
   if formname == "main" then
+		local node = nom_bloc
+		local nodename = turtleminer.normalize_nodename(node)
 		local formspec =
 			"size[6,6]" ..
-		"label[0,0;Cliquez les boutons pour déplacer la tortue !]" .. --JP traduction
+			string.format("field[0.2,0.4;4.5,0.8;form_nom_bloc;;%s]", minetest.formspec_escape(node)) ..
+			"button[4.3,0.4;1.1,0.1;form_nom_bloc_search;Search]" ..
+			(nodename and string.format("item_image[5.2,0;1,1;%s]", nodename)
+				or "image[5.2,0;1,1;unknown_node.png]") ..
+		--"label[0,0;Cliquez les boutons pour déplacer la tortue !]" .. --JP traduction
 		"field[0.3,3;6,5;script_jp;Script :;"..sequence.."]"..
 		"label[0,5.3;D ou G = tourner à Droite ou à Gauche]" ..
 		"label[0,5.6;A ou R = Avancer ou Reculer]" ..
@@ -49,7 +76,7 @@ function turtleminer.show_formspec(name, pos, formname, params)
 			"image_button[5,1;1,1;turtleminer_record.png;record;]"  .. --JP nouveau
 			"image_button[5,2;1,1;turtleminer_stop.png;stopplay;]"  .. --JP nouveau
 			"image_button[5,3;1,1;turtleminer_play.png;play;]" .. --JP nouveau
-			"image_button[4,2;1,1;turtleminer_fourmi.png;fourmi;]" .. --JP nouveau
+			--"image_button[4,2;1,1;turtleminer_fourmi.png;fourmi;]" .. --JP nouveau
 			"image_button[1,2;1,1;turtleminer_remote_arrow_fw_build.png;buildforward;]" --JP nouveau
 		show(formspec) -- show
 	elseif formname == "set_name" then -- elseif form name is set_name, show set name formspec
@@ -210,7 +237,7 @@ function turtleminer.build(pos, where, name)
 	-- [function] build
 	local function build(pos)
 		if minetest.get_node_or_nil(pos) then -- if node, dig
-			minetest.set_node(pos, { name = "mesecons_lightstone:lightstone_red_off" }) --JP modification
+			minetest.set_node(pos, { name = turtleminer.normalize_nodename(nom_bloc) }) --JP modification
 			nodeupdate(pos)
 			-- minetest.sound_play("moveokay", {to_player = name, gain = 1.0,}) -- play sound
 		else -- minetest.sound_play("moveerror", {to_player = name, gain = 1.0,}) 
@@ -344,7 +371,7 @@ function turtleminer.buildforwardJP(pos, name)
 	local function turtle_move(pos, new_pos)
 		-- if not walkable, proceed
 		if not minetest.registered_nodes[minetest.get_node(new_pos).name].walkable then
-			minetest.set_node(pos, { name = "mesecons_lightstone:lightstone_red_off" }) --JP modification
+			minetest.set_node(pos, { name = turtleminer.normalize_nodename(nom_bloc) }) --JP modification
 			minetest.set_node(new_pos, node) -- create new node
 			positions[name] = new_pos -- update position
 			minetest.get_meta(new_pos):from_table(oldmeta) -- set new meta
@@ -367,7 +394,7 @@ function turtleminer.buildbelowJP(pos, name)
 
 	local function build(pos)
 		if minetest.get_node_or_nil(pos) then -- if node, dig
-			minetest.set_node(pos, { name = "mesecons_lightstone:lightstone_red_off" }) --JP modification
+			minetest.set_node(pos, { name = turtleminer.normalize_nodename(nom_bloc) }) --JP modification
 			nodeupdate(pos)
 			-- minetest.sound_play("moveokay", {to_player = name, gain = 1.0,}) -- play sound
 		else -- minetest.sound_play("moveerror", {to_player = name, gain = 1.0,}) 
@@ -435,7 +462,7 @@ function turtleminer.langtonJP(pos, where, name)
 
 	build_pos.y = build_pos.y - 1 -- remove 1 from dig_pos y axis
 	if not minetest.registered_nodes[minetest.get_node(build_pos).name].walkable then -- si vide alors je place un bloc
-		minetest.set_node(build_pos, { name = "mesecons_lightstone:lightstone_red_off" })
+		minetest.set_node(build_pos, { name = turtleminer.normalize_nodename(nom_bloc) })
 		nodeupdate(build_pos)
 		-- minetest.sound_play("moveokay", {to_player = name, gain = 1.0,}) -- play sound
 		turtleminer.rotate(pos, "right", name)
@@ -513,8 +540,8 @@ function turtleminer.playJP_seq(pos, name, seq)
 				turtleminer.playJP_seq(pos, name, string.sub(seq, compteur_par + 1, #seq))
 			end
 		else
-			play = false
-			sequence = sequence .. " error ) missing !" 
+			playing = false
+			sequence = sequence .. " error : ) missing !" 
 		end
 	else
 		for i = 1, nf_fois do
@@ -531,10 +558,13 @@ function turtleminer.playJP_seq(pos, name, seq)
 				elseif string.sub(seq, compteur, compteur) == 'L' then turtleminer.langtonJP(positions[name], "below", name) -- JP TEST
 				elseif string.sub(seq, compteur, compteur) == 'a' then turtleminer.buildbelowJP(positions[name], name) -- JP TEST
 				elseif string.sub(seq, compteur, compteur) == 'P' then turtleminer.build(positions[name], "below", name) -- JP TEST
-				elseif string.sub(seq, compteur, compteur) == ' ' then play = true -- JP TEST
+				elseif string.sub(seq, compteur, compteur) == ')' then 
+					playing = false
+					sequence = sequence .. " error : ( missing !" 
+				elseif string.sub(seq, compteur, compteur) == ' ' then 
 				else 
-					play = false
-					sequence = sequence .. " instruction " .. string.sub(seq, compteur, compteur) .. " unknown !" 
+					playing = false
+					sequence = sequence .. " error : instruction " .. string.sub(seq, compteur, compteur) .. " unknown !" 
 				end -- JP TEST
 				-- newpos = positions[name] NOTE j'ai enlevé cette gestion de la position qui posait probleme en passant directement la position sans passer par cette variable local
 			end
@@ -650,6 +680,9 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 			sequence = sequence .. 'L'
 			turtleminer.show_formspec(name, positions[name], "main")
 		end
+	elseif fields.form_nom_bloc_search then
+		nom_bloc = tostring(fields.form_nom_bloc)
+		turtleminer.show_formspec(name, positions[name], "main")
 	end -- JP TEST
 end)
 
