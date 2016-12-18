@@ -3,7 +3,7 @@
 local  sequence = ''
 local  recording = false
 local  playing = false
-local  nom_bloc = "lightstone_red_off"
+local  nom_bloc = "dirt" --lightstone_red_off
 ---------------
 -- FUNCTIONS --
 ---------------
@@ -53,6 +53,7 @@ function turtleminer.show_formspec(name, pos, formname, params)
 		local nodename = turtleminer.normalize_nodename(node)
 		local formspec =
 			"size[6,6]" ..
+			cadre_if_recording() ..
 			string.format("field[0.2,0.4;4.5,0.8;form_nom_bloc;;%s]", minetest.formspec_escape(node)) ..
 			"button[4.3,0.4;1.1,0.1;form_nom_bloc_search;Search]" ..
 			(nodename and string.format("item_image[5.2,0;1,1;%s]", nodename)
@@ -485,13 +486,12 @@ function turtleminer.langtonJPcent(pos, name)
 	end
 end
 
--- [function] recordJP
-function turtleminer.recordJP(pos, name)
-	local newpos = pos
-	for count = 1, 100 do
-		turtleminer.langtonJP(newpos, "below", name)
-		newpos = positions[name]
-	end
+function cadre_if_recording()
+  if recording then
+    return "image[-0.4,-0.4;8.2,7.9;turtleminer_cadre.png]"
+  else
+    return ""
+  end
 end
 
 -- [function] playJP
@@ -503,7 +503,6 @@ function firstIndexOf(str, substr)
     return i
   end
 end
-
 function turtleminer.playJP_seq(pos, name, seq)
 	-- local newpos = pos VOIR NOTE quelques lignes plus bas dans le if playing
 	local compteur = 1
@@ -668,11 +667,15 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 		end
 		turtleminer.show_formspec(name, positions[name], "main")
 	elseif fields.stopplay then -- JP TEST 
-		recording = false 
-		playing = false 
+		if (recording or playing) then 
+			recording = false 
+			playing = false 
+		else
+			sequence = '' -- un double stop permet ainsi de remettre à zéro le script
+		end
+		turtleminer.show_formspec(name, positions[name], "main")
 	elseif fields.record then 
 		recording = true
-		sequence = '' -- je pourrais continuer l'ancien enregistrement mais il faudrait alors ajouter un bouton pour vider l'enregistrement
 		turtleminer.show_formspec(name, positions[name], "main")
 	elseif fields.fourmi then 
 		turtleminer.langtonJP(pos, "below", name) 
