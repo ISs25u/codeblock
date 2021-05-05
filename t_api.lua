@@ -1,4 +1,4 @@
--- turtleminer/t_api.lua
+-- codeblock/t_api.lua
 
 local  sequence = ''
 local  recording = false
@@ -15,7 +15,7 @@ local positions = {} -- form positions
 --------------
 
 --NOTE JP : come from WorldEdit MOD determines whether `nodename` is a valid node name, returning a boolean
-function turtleminer.normalize_nodename(nodename)
+function codeblock.normalize_nodename(nodename)
 	nodename = nodename:gsub("^%s*(.-)%s*$", "%1")
 	if nodename == "" then return nil end
 	local fullname = ItemStack({name=nodename}):get_name() --resolve aliases of node names to full names
@@ -37,20 +37,20 @@ function turtleminer.normalize_nodename(nodename)
 end
 
 -- [function] show formspec
-function turtleminer.show_formspec(name, pos, formname, params)
+function codeblock.show_formspec(name, pos, formname, params)
 	local meta = minetest.get_meta(pos) -- get meta
   if not meta then return false end -- if not meta, something is wrong
   positions[name] = pos -- set position (for receive fields)
 
 	local function show(formspec)
 		meta:set_string("formname", formname) -- set meta
-		minetest.show_formspec(name, "turtleminer:"..formname, formspec) -- show formspec
+		minetest.show_formspec(name, "codeblock:"..formname, formspec) -- show formspec
 	end
 
   -- if form name is main, show main
   if formname == "main" then
 		local node = nom_bloc
-		local nodename = turtleminer.normalize_nodename(node)
+		local nodename = codeblock.normalize_nodename(node)
 		local formspec =
 			"size[6,6]" ..
 			cadre_if_recording() ..
@@ -92,7 +92,7 @@ function turtleminer.show_formspec(name, pos, formname, params)
 end
 
 -- [function] rotate
-function turtleminer.rotate(pos, direction, player)
+function codeblock.rotate(pos, direction, player)
 	-- [function] calculate dir
 	local function calculate_dir(x, turn)
 		if turn == "right" then
@@ -142,7 +142,7 @@ function turtleminer.rotate(pos, direction, player)
 end
 
 -- [function] move
-function turtleminer.move(pos, direction, name)
+function codeblock.move(pos, direction, name)
 	local oldmeta = minetest.get_meta(pos):to_table() -- get meta
 	local node = minetest.get_node(pos) -- get node ref
 	local dir = minetest.facedir_to_dir(node.param2) -- get facedir
@@ -207,12 +207,12 @@ function turtleminer.move(pos, direction, name)
 end
 
 -- [function] dig
-function turtleminer.dig(pos, where, name)
+function codeblock.dig(pos, where, name)
 	-- [function] dig
 	local function dig(pos)
 		if minetest.get_node_or_nil(pos) then -- if node, dig
 			minetest.set_node(pos, { name = "air" })
-			nodeupdate(pos)
+			minetest.check_for_falling(pos)
 			-- minetest.sound_play("moveokay", {to_player = name, gain = 1.0,}) -- play sound
 		else -- minetest.sound_play("moveerror", {to_player = name, gain = 1.0,}) 
 		end -- else, play error sound
@@ -234,12 +234,12 @@ function turtleminer.dig(pos, where, name)
 end
 
 -- [function] build
-function turtleminer.build(pos, where, name)
+function codeblock.build(pos, where, name)
 	-- [function] build
 	local function build(pos)
 		if minetest.get_node_or_nil(pos) then -- if node, dig
-			minetest.set_node(pos, { name = turtleminer.normalize_nodename(nom_bloc) }) --JP modification
-			nodeupdate(pos)
+			minetest.set_node(pos, { name = codeblock.normalize_nodename(nom_bloc) }) --JP modification
+			minetest.check_for_falling(pos)
 			-- minetest.sound_play("moveokay", {to_player = name, gain = 1.0,}) -- play sound
 		else -- minetest.sound_play("moveerror", {to_player = name, gain = 1.0,}) 
 		end -- else, play error sound
@@ -261,20 +261,14 @@ function turtleminer.build(pos, where, name)
 end
 
 
-
 --------------
 -- NODE DEF --
 --------------
 
--- remote
-minetest.register_craftitem("turtleminer:remotecontrol", {
-	description = "Turtle Remote Control",
-	inventory_image = "turtleminer_remotecontrol.png",
-})
 
 -- [function] register turtle
-function turtleminer.register_turtle(turtlestring, desc)
-	minetest.register_node("turtleminer:"..turtlestring, {
+function codeblock.register_turtle(turtlestring, desc)
+	minetest.register_node("codeblock:"..turtlestring, {
 		drawtype = "nodebox",
 		description = desc.description,
 		tiles = desc.tiles,
@@ -287,7 +281,7 @@ function turtleminer.register_turtle(turtlestring, desc)
 		},
 		after_place_node = function(pos, placer)
 			local meta = minetest.get_meta(pos) -- get meta
-			--meta:set_string("formspec", turtleminer.formspec()) -- set formspec
+			--meta:set_string("formspec", codeblock.formspec()) -- set formspec
 			meta:set_string("owner", placer:get_player_name()) -- set owner
 			meta:set_string("infotext", "Unnamed turtle\n(owned by "..placer:get_player_name()..")") -- set infotext
 		end,
@@ -296,18 +290,18 @@ function turtleminer.register_turtle(turtlestring, desc)
 			local meta = minetest.get_meta(pos)
 			-- if name not set, show name form
 			if not meta:get_string("name") or meta:get_string("name") == "" then
-				turtleminer.show_formspec(name, pos, "set_name", "") -- show set name formspec
+				codeblock.show_formspec(name, pos, "set_name", "") -- show set name formspec
 			elseif meta:get_string("formname") ~= "" then -- elseif formname is set, show specific form
 				-- if wielding remote control, show formspec
-				if clicker:get_wielded_item():get_name() == "turtleminer:remotecontrol" then
-					turtleminer.show_formspec(name, pos, meta:get_string("formname")) -- show formspec (note: no params)
+				if clicker:get_wielded_item():get_name() == "codeblock:remotecontrol" then
+					codeblock.show_formspec(name, pos, meta:get_string("formname")) -- show formspec (note: no params)
 				else
 					minetest.chat_send_player(name, "Use a remote controller to access the turtle.")
 				end
 			else -- else, show normal formspec
 				-- if wielding remote control, show formspec
-				if clicker:get_wielded_item():get_name() == "turtleminer:remotecontrol" then
-					turtleminer.show_formspec(name, pos, "main") -- show main formspec
+				if clicker:get_wielded_item():get_name() == "codeblock:remotecontrol" then
+					codeblock.show_formspec(name, pos, "main") -- show main formspec
 				else
 					minetest.chat_send_player(name, "Use a remote controller to access the turtle.")
 				end
@@ -322,7 +316,7 @@ end
 -----------------------
 
 -- [function] moveJP
-function turtleminer.moveJP(pos, direction, name)
+function codeblock.moveJP(pos, direction, name)
 	local oldmeta = minetest.get_meta(pos):to_table() -- get meta
 	local node = minetest.get_node(pos) -- get node ref
 	local dir = minetest.facedir_to_dir(node.param2) -- get facedir
@@ -363,7 +357,7 @@ function turtleminer.moveJP(pos, direction, name)
 end
 
 -- [function] buildforwardJP
-function turtleminer.buildforwardJP(pos, name)
+function codeblock.buildforwardJP(pos, name)
 	local oldmeta = minetest.get_meta(pos):to_table() -- get meta
 	local node = minetest.get_node(pos) -- get node ref
 	local dir = minetest.facedir_to_dir(node.param2) -- get facedir
@@ -372,7 +366,7 @@ function turtleminer.buildforwardJP(pos, name)
 	local function turtle_move(pos, new_pos)
 		-- if not walkable, proceed
 		if not minetest.registered_nodes[minetest.get_node(new_pos).name].walkable then
-			minetest.set_node(pos, { name = turtleminer.normalize_nodename(nom_bloc) }) --JP modification
+			minetest.set_node(pos, { name = codeblock.normalize_nodename(nom_bloc) }) --JP modification
 			minetest.set_node(new_pos, node) -- create new node
 			positions[name] = new_pos -- update position
 			minetest.get_meta(new_pos):from_table(oldmeta) -- set new meta
@@ -391,12 +385,12 @@ function turtleminer.buildforwardJP(pos, name)
 end
 
 -- [function] buildbelowJP
-function turtleminer.buildbelowJP(pos, name)
+function codeblock.buildbelowJP(pos, name)
 
 	local function build(pos)
 		if minetest.get_node_or_nil(pos) then -- if node, dig
-			minetest.set_node(pos, { name = turtleminer.normalize_nodename(nom_bloc) }) --JP modification
-			nodeupdate(pos)
+			minetest.set_node(pos, { name = codeblock.normalize_nodename(nom_bloc) }) --JP modification
+			minetest.check_for_falling(pos)
 			-- minetest.sound_play("moveokay", {to_player = name, gain = 1.0,}) -- play sound
 		else -- minetest.sound_play("moveerror", {to_player = name, gain = 1.0,}) 
 		end -- else, play error sound
@@ -455,7 +449,7 @@ function turtleminer.buildbelowJP(pos, name)
 end
 
 -- [function] langtonJP
-function turtleminer.langtonJP(pos, where, name)
+function codeblock.langtonJP(pos, where, name)
 
 	local node = minetest.get_node(pos) -- get node ref
 	local dir = minetest.facedir_to_dir(node.param2) -- get facedir
@@ -463,25 +457,25 @@ function turtleminer.langtonJP(pos, where, name)
 
 	build_pos.y = build_pos.y - 1 -- remove 1 from dig_pos y axis
 	if not minetest.registered_nodes[minetest.get_node(build_pos).name].walkable then -- si vide alors je place un bloc
-		minetest.set_node(build_pos, { name = turtleminer.normalize_nodename(nom_bloc) })
-		nodeupdate(build_pos)
+		minetest.set_node(build_pos, { name = codeblock.normalize_nodename(nom_bloc) })
+		minetest.check_for_falling(build_pos)
 		-- minetest.sound_play("moveokay", {to_player = name, gain = 1.0,}) -- play sound
-		turtleminer.rotate(pos, "right", name)
+		codeblock.rotate(pos, "right", name)
 	else -- sinon j'enlève le bloc
 		minetest.set_node(build_pos, { name = "air" })
-		nodeupdate(build_pos)
+		minetest.check_for_falling(build_pos)
 		-- minetest.sound_play("moveerror", {to_player = name, gain = 1.0,}) 
-		turtleminer.rotate(pos, "left", name)
+		codeblock.rotate(pos, "left", name)
 	end
-	turtleminer.move(pos, "forward", name)
+	codeblock.move(pos, "forward", name)
 	
 end
 
 -- [function] langtonJPcent
-function turtleminer.langtonJPcent(pos, name)
+function codeblock.langtonJPcent(pos, name)
 	local newpos = pos
 	for count = 1, 100 do
-		turtleminer.langtonJP(newpos, "below", name)
+		codeblock.langtonJP(newpos, "below", name)
 		newpos = positions[name]
 	end
 end
@@ -503,7 +497,7 @@ function firstIndexOf(str, substr)
     return i
   end
 end
-function turtleminer.playJP_seq(pos, name, seq)
+function codeblock.playJP_seq(pos, name, seq)
 	-- local newpos = pos VOIR NOTE quelques lignes plus bas dans le if playing
 	local compteur = 1
 	local nf_fois = 1
@@ -533,10 +527,10 @@ function turtleminer.playJP_seq(pos, name, seq)
 		end
 		if (string.sub(seq, compteur_par, compteur_par) == ')' and nb_parenth == 0) then
 			for i = 1, nf_fois do
-				turtleminer.playJP_seq(pos, name, string.sub(seq, compteur + 1, compteur_par - 1))
+				codeblock.playJP_seq(pos, name, string.sub(seq, compteur + 1, compteur_par - 1))
 			end
 			if #seq > compteur_par then
-				turtleminer.playJP_seq(pos, name, string.sub(seq, compteur_par + 1, #seq))
+				codeblock.playJP_seq(pos, name, string.sub(seq, compteur_par + 1, #seq))
 			end
 		else
 			playing = false
@@ -545,18 +539,18 @@ function turtleminer.playJP_seq(pos, name, seq)
 	else
 		for i = 1, nf_fois do
 			if playing then 
-				if string.sub(seq, compteur, compteur) == 'D' then	turtleminer.rotate(positions[name], "right", name) -- elseif turn right button, rotate right
-				elseif string.sub(seq, compteur, compteur) == 'G' then turtleminer.rotate(positions[name], "left", name) -- elseif turn left button, rotate left
-				elseif string.sub(seq, compteur, compteur) == 'A' then turtleminer.move(positions[name], "forward", name) -- elseif move forward button, move forward
-				elseif string.sub(seq, compteur, compteur) == 'R' then turtleminer.move(positions[name], "backward", name) -- elseif move backward button, move backward
-				elseif string.sub(seq, compteur, compteur) == 'H' then turtleminer.move(positions[name], "up", name) -- elseif move up button, move up
-				elseif string.sub(seq, compteur, compteur) == 'B' then turtleminer.move(positions[name], "down", name) -- elseif move down button, move down
-				elseif string.sub(seq, compteur, compteur) == 'C' then turtleminer.dig(positions[name], "front", name) -- elseif dig in front button, dig in front
-				elseif string.sub(seq, compteur, compteur) == 'c' then turtleminer.dig(positions[name], "below", name) -- elseif dig bottom button, dig below
-				elseif string.sub(seq, compteur, compteur) == 'p' then turtleminer.build(positions[name], "front", name) -- elseif build in front button, build in front
-				elseif string.sub(seq, compteur, compteur) == 'L' then turtleminer.langtonJP(positions[name], "below", name) -- JP TEST
-				elseif string.sub(seq, compteur, compteur) == 'a' then turtleminer.buildbelowJP(positions[name], name) -- JP TEST
-				elseif string.sub(seq, compteur, compteur) == 'P' then turtleminer.build(positions[name], "below", name) -- JP TEST
+				if string.sub(seq, compteur, compteur) == 'D' then	codeblock.rotate(positions[name], "right", name) -- elseif turn right button, rotate right
+				elseif string.sub(seq, compteur, compteur) == 'G' then codeblock.rotate(positions[name], "left", name) -- elseif turn left button, rotate left
+				elseif string.sub(seq, compteur, compteur) == 'A' then codeblock.move(positions[name], "forward", name) -- elseif move forward button, move forward
+				elseif string.sub(seq, compteur, compteur) == 'R' then codeblock.move(positions[name], "backward", name) -- elseif move backward button, move backward
+				elseif string.sub(seq, compteur, compteur) == 'H' then codeblock.move(positions[name], "up", name) -- elseif move up button, move up
+				elseif string.sub(seq, compteur, compteur) == 'B' then codeblock.move(positions[name], "down", name) -- elseif move down button, move down
+				elseif string.sub(seq, compteur, compteur) == 'C' then codeblock.dig(positions[name], "front", name) -- elseif dig in front button, dig in front
+				elseif string.sub(seq, compteur, compteur) == 'c' then codeblock.dig(positions[name], "below", name) -- elseif dig bottom button, dig below
+				elseif string.sub(seq, compteur, compteur) == 'p' then codeblock.build(positions[name], "front", name) -- elseif build in front button, build in front
+				elseif string.sub(seq, compteur, compteur) == 'L' then codeblock.langtonJP(positions[name], "below", name) -- JP TEST
+				elseif string.sub(seq, compteur, compteur) == 'a' then codeblock.buildbelowJP(positions[name], name) -- JP TEST
+				elseif string.sub(seq, compteur, compteur) == 'P' then codeblock.build(positions[name], "below", name) -- JP TEST
 				elseif string.sub(seq, compteur, compteur) == ')' then 
 					playing = false
 					sequence = sequence .. " error : ( missing !" 
@@ -569,7 +563,7 @@ function turtleminer.playJP_seq(pos, name, seq)
 			end
 		end
 		if #seq > compteur then
-			turtleminer.playJP_seq(pos, name, string.sub(seq, compteur + 1, #seq))
+			codeblock.playJP_seq(pos, name, string.sub(seq, compteur + 1, #seq))
 		end
 	end
 end
@@ -579,7 +573,7 @@ end
 
 -- on player fields received
 minetest.register_on_player_receive_fields(function(sender, formname, fields)
-	if formname ~= "turtleminer:main" then return end -- if not right formspec, return
+	if formname ~= "codeblock:main" then return end -- if not right formspec, return
 
 	local name = sender:get_player_name()
 	local pos = positions[name]
@@ -594,78 +588,78 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 
 	-- check fields
 	if fields.turnright then 
-		turtleminer.rotate(pos, "right", name) -- elseif turn right button, rotate right
+		codeblock.rotate(pos, "right", name) -- elseif turn right button, rotate right
 		if recording then 
 			sequence = sequence .. 'D'
-			turtleminer.show_formspec(name, positions[name], "main")
+			codeblock.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.turnleft then 
-		turtleminer.rotate(pos, "left", name) -- elseif turn left button, rotate left
+		codeblock.rotate(pos, "left", name) -- elseif turn left button, rotate left
 		if recording then 
 			sequence = sequence .. 'G'
-			turtleminer.show_formspec(name, positions[name], "main")
+			codeblock.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.forward then 
-		turtleminer.move(pos, "forward", name) -- elseif move forward button, move forward
+		codeblock.move(pos, "forward", name) -- elseif move forward button, move forward
 		if recording then 
 			sequence = sequence .. 'A'
-			turtleminer.show_formspec(name, positions[name], "main")
+			codeblock.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.backward then 
-		turtleminer.move(pos, "backward", name) -- elseif move backward button, move backward
+		codeblock.move(pos, "backward", name) -- elseif move backward button, move backward
 		if recording then 
 			sequence = sequence .. 'R'
-			turtleminer.show_formspec(name, positions[name], "main")
+			codeblock.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.up then 
-		turtleminer.move(pos, "up", name) -- elseif move up button, move up
+		codeblock.move(pos, "up", name) -- elseif move up button, move up
 		if recording then 
 			sequence = sequence .. 'H'
-			turtleminer.show_formspec(name, positions[name], "main")
+			codeblock.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.down then 
-		turtleminer.move(pos, "down", name) -- elseif move down button, move down
+		codeblock.move(pos, "down", name) -- elseif move down button, move down
 		if recording then 
 			sequence = sequence .. 'B'
-			turtleminer.show_formspec(name, positions[name], "main")
+			codeblock.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.digfront then 
-		turtleminer.dig(pos, "front", name) -- elseif dig in front button, dig in front
+		codeblock.dig(pos, "front", name) -- elseif dig in front button, dig in front
 		if recording then 
 			sequence = sequence .. 'C'
-			turtleminer.show_formspec(name, positions[name], "main")
+			codeblock.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.digbottom then 
-		turtleminer.dig(pos, "below", name) -- elseif dig bottom button, dig below
+		codeblock.dig(pos, "below", name) -- elseif dig bottom button, dig below
 		if recording then 
 			sequence = sequence .. 'c'
-			turtleminer.show_formspec(name, positions[name], "main")
+			codeblock.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.buildfront then 
-		turtleminer.build(pos, "front", name) -- elseif build in front button, build in front
+		codeblock.build(pos, "front", name) -- elseif build in front button, build in front
 		if recording then 
 			sequence = sequence .. 'p'
-			turtleminer.show_formspec(name, positions[name], "main")
+			codeblock.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.buildbottom then 
-		turtleminer.build(pos, "below", name) -- elseif build bottom button, build below
+		codeblock.build(pos, "below", name) -- elseif build bottom button, build below
 		if recording then 
 			sequence = sequence .. 'P'
-			turtleminer.show_formspec(name, positions[name], "main")
+			codeblock.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.buildforward then 
-		turtleminer.buildbelowJP(pos, name) -- JP TEST
+		codeblock.buildbelowJP(pos, name) -- JP TEST
 		if recording then 
 			sequence = sequence .. 'a'
-			turtleminer.show_formspec(name, positions[name], "main")
+			codeblock.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.play then 
 		playing = true 
-		turtleminer.playJP_seq(pos, name, sequence)
+		codeblock.playJP_seq(pos, name, sequence)
 		if (recording and playing) then 
 			sequence = sequence .. sequence
 		end
-		turtleminer.show_formspec(name, positions[name], "main")
+		codeblock.show_formspec(name, positions[name], "main")
 	elseif fields.stopplay then -- JP TEST 
 		if (recording or playing) then 
 			recording = false 
@@ -673,25 +667,25 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 		else
 			sequence = '' -- un double stop permet ainsi de remettre à zéro le script
 		end
-		turtleminer.show_formspec(name, positions[name], "main")
+		codeblock.show_formspec(name, positions[name], "main")
 	elseif fields.record then 
 		recording = true
-		turtleminer.show_formspec(name, positions[name], "main")
+		codeblock.show_formspec(name, positions[name], "main")
 	elseif fields.fourmi then 
-		turtleminer.langtonJP(pos, "below", name) 
+		codeblock.langtonJP(pos, "below", name) 
 		if recording then 
 			sequence = sequence .. 'L'
-			turtleminer.show_formspec(name, positions[name], "main")
+			codeblock.show_formspec(name, positions[name], "main")
 		end
 	elseif fields.form_nom_bloc_search then
 		nom_bloc = tostring(fields.form_nom_bloc)
-		turtleminer.show_formspec(name, positions[name], "main")
+		codeblock.show_formspec(name, positions[name], "main")
 	end -- JP TEST
 end)
 
 -- on player fields received
 minetest.register_on_player_receive_fields(function(sender, formname, fields)
-	if formname ~= "turtleminer:set_name" then return end -- if not right formspec, return
+	if formname ~= "codeblock:set_name" then return end -- if not right formspec, return
 
 	local name = sender:get_player_name()
 	local meta = minetest.get_meta(positions[name])
@@ -699,5 +693,5 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 
 	meta:set_string("name", tname) -- set name
 	meta:set_string("infotext", tname .. "\n(owned by "..name..")") -- set infotext
-	turtleminer.show_formspec(name, positions[name], "main") -- show main formspec
+	codeblock.show_formspec(name, positions[name], "main") -- show main formspec
 end)

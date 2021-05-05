@@ -1,6 +1,6 @@
-turtleminer = {}
-turtleminer.modpath = minetest.get_modpath("turtleminer")
+codeblock = {}
+codeblock.modpath = minetest.get_modpath("codeblock")
 
 -- load turtle resources
-dofile(turtleminer.modpath.."/t_api.lua") -- load turtle api
-dofile(turtleminer.modpath.."/turtles.lua") -- turtle register
+dofile(codeblock.modpath.."/t_api.lua") -- load turtle api
+dofile(codeblock.modpath.."/turtles.lua") -- turtle register
