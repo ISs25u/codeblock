@@ -1,3 +1,7 @@
 # textdomain: default
 Drone Placer=Drone placer
-@1 placing a drone at @2=@1 placing a drone at @2
+@1 placing a drone at @2='@1' placed a drone at @2
+not your drone=This drone is not yours!
+Please target node=Please target a node
+drone does not exist=Error, this drone does not exist
+Starting drone @1/@2=Starting drone @1/@2
