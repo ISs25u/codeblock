@@ -186,22 +186,77 @@ function codeblock.commands.drone_turn_right(name)
 
 end
 
-function codeblock.commands.drone_place_block(name, block)
+function codeblock.commands.drone_place_block(name, block_identifier)
 
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
     end
 
+    local real_block_name = codeblock.Drone.blocks[block_identifier]
+
+    if not real_block_name then
+        minetest.chat_send_player(name, S('block not allowed'))
+        return
+    end
+
     codeblock.events.handle_place_block({x = drone.x, y = drone.y, z = drone.z},
-                                        block)
+                                        real_block_name)
+
+end
+
+function codeblock.commands.drone_save_checkpoint(name, label)
+
+    local drone = codeblock.drones[name]
+    if not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+    end
+
+    if not label then
+        minetest.chat_send_player(name, S("no checkpoint name"))
+    end
+
+    drone.checkpoints[label] = {x = drone.x, y = drone.y, z = drone.z}
+
+end
+
+function codeblock.commands.drone_goto_checkpoint(name, label)
+
+    local drone = codeblock.drones[name]
+    if not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+    end
+
+    if not label or not drone.checkpoints[label] then
+        minetest.chat_send_player(name, S("no checkpoint @1", label or ""))
+    end
+
+    local cp = drone.checkpoints[label]
+    drone.x = cp.x
+    drone.y = cp.y
+    drone.z = cp.z
+
+    codeblock.events.handle_update_drone_entity(drone)
 
 end
 
 --
---
+-- 
 
-function codeblock.commands.run_safe(untrusted_code, name)
+function codeblock.commands.run_safe(name, file)
+
+    if not file then
+        minetest.chat_send_player(name, S("Empty drone file"))
+        return
+    end
+
+    local path = codeblock.datapath .. name .. '/' .. file
+    local untrusted_code = codeblock.filesystem.read(path)
+
+    if not untrusted_code then
+        minetest.chat_send_player(name, S('@1 not found', file))
+        return
+    end
 
     local command_env = {
         forward = function(n)
@@ -240,37 +295,47 @@ function codeblock.commands.run_safe(untrusted_code, name)
             codeblock.commands.drone_place_block(name, block)
             return
         end,
-        blocks = {stone = 'stone', dirt = 'dirt', sand='sand'}
+        save = function(label)
+            codeblock.commands.drone_save_checkpoint(name, label)
+        end,
+        go = function(label)
+            codeblock.commands.drone_goto_checkpoint(name, label)
+        end,
+        blocks = codeblock.Drone.cubes_names,
+        plants = codeblock.Drone.plants_names,
+        wools = codeblock.Drone.wools_names,
+        ipairs = ipairs,
+        pairs = pairs,
+        floor = function(x) return math.floor(x) end,
+        sin = function(x) return math.sin(x) end,
+        cos = function(x) return math.cos(x) end,
+        pi = math.pi,
+        print = function(msg)
+            minetest.chat_send_player(name, '> ' .. tostring(msg))
+            return
+        end
     }
 
     if untrusted_code:byte(1) == 27 then
-        return nil, "binary bytecode prohibited"
+        minetest.chat_send_player(name, S("Error in @1", file) ..
+                                      S("binary bytecode prohibited"))
     end
+
     local untrusted_function, message = loadstring(untrusted_code)
-    if not untrusted_function then return nil, message end
-    setfenv(untrusted_function, command_env)
-    return pcall(untrusted_function)
-
-end
-
---
---
-
-function codeblock.commands.print_lists(name)
-
-    local s_drones = "DRONES: "
-    for k in pairs(codeblock.drones) do s_drones = s_drones .. k .. " " end
-
-    local s_entities = "ENTITIES: "
-    for k in pairs(codeblock.drone_entities) do
-        s_entities = s_entities .. k .. " "
-
+    if not untrusted_function then
+        minetest.chat_send_player(name, S("Error in @1", file))
+        minetest.chat_send_player(name, message)
+        return
     end
 
-    -- minetest.chat_send_player(name, dump(codeblock.drones))
-    -- minetest.chat_send_player(name, dump(codeblock.drone_entities))
+    setfenv(untrusted_function, command_env)
 
-    minetest.chat_send_player(name, s_entities)
-    minetest.chat_send_player(name, s_drones)
+    local status, err = pcall(untrusted_function)
+
+    if not status then
+        minetest.chat_send_player(name, S("Error in @1", file))
+        minetest.chat_send_player(name, err)
+        return
+    end
 
 end

@@ -1,7 +1,6 @@
 codeblock.events = {}
 local S = default.get_translator
 
-
 --
 -- FUNCTIONS
 --
@@ -31,19 +30,10 @@ function codeblock.events.handle_start_drone(user)
 
     minetest.chat_send_player(name, S("Starting drone @1/@2", name, file))
 
-    local file = codeblock.datapath .. name .. '/' .. file
-    local content = codeblock.filesystem.read(file)
-
-    if not content then
-        minetest.chat_send_player(name, S('@1 not found', file))
-        return {}
-    end
-
     -- EXECUTION
 
-    assert(codeblock.commands.run_safe(content, name))
-
-    codeblock.commands.remove_drone(user:get_player_name())
+    codeblock.commands.run_safe(name, file)
+    codeblock.commands.remove_drone(name)
 
 end
 

@@ -5,10 +5,10 @@ local S = default.get_translator
 minetest.register_tool("codeblock:drone_placer", {
     description = S("Drone Placer"),
     inventory_image = "drone_placer.png",
-    range = 32,
+    range = 64,
     stack_max = 1,
     on_use = function(itemstack, user, pointed_thing)
-        -- 
+        codeblock.events.handle_start_drone(user) -- TODO temp
     end,
     on_place = function(itemstack, placer, pointed_thing)
         codeblock.events.handle_place_drone(placer, pointed_thing)
