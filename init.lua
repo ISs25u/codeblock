@@ -10,7 +10,9 @@ end
 codeblock.drones = {}
 codeblock.drone_entities = {}
 
+dofile(codeblock.modpath .. "/register.lua")
 dofile(codeblock.modpath .. "/drone.lua")
 dofile(codeblock.modpath .. "/events.lua")
 dofile(codeblock.modpath .. "/commands.lua")
+dofile(codeblock.modpath .. "/filesystem.lua")
 
