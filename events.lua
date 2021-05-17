@@ -32,7 +32,7 @@ function codeblock.events.handle_start_drone(user)
 
     -- EXECUTION
 
-    codeblock.commands.run_safe(name, file)
+    codeblock.sandbox.run_safe(name, file)
     codeblock.commands.remove_drone(name)
 
 end

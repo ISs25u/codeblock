@@ -5,6 +5,9 @@ CodeBlock allows coding structures in Minetest
 
 ### TODO
 
+- [ ] relative positioning
+- [ ] default drone move by 1
+
 - [ ] User associated filesystem to store programs (high priority)
 - [ ] Allow to set drone's file with in-game interface + remember last program started (high priority)
 - [ ] Blockly web-based editor (high priority)
