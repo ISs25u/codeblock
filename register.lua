@@ -85,8 +85,6 @@ minetest.register_on_newplayer(function(player)
 
     player:get_meta():set_int('codeblock:last_index', 1)
 
-    codeblock:drone_starter
-
 end)
 
 -- Events
