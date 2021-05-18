@@ -65,8 +65,8 @@ function codeblock.sandbox.run_safe(name, file)
         wools = codeblock.sandbox.wools_names,
         ipairs = ipairs,
         pairs = pairs,
-        time = function() return minetest.get_us_time() end,
-        seed = function(s) return math.randomseed(s) end,
+        -- time = function() return minetest.get_us_time() end,
+        -- seed = function(s) return math.randomseed(s) end,
         random = function(a, b)
             if not a and not b then
                 return math.random()
