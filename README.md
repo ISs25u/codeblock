@@ -1,11 +1,12 @@
 CodeBlock
 =========================
 
+![screenshot](screenshot.png)
+
 CodeBlock allows creating oniric sturctures in Minetest using `lua` code.
 
-_License: _ GNU GENERAL PUBLIC LICENSE V3
-    
-_Credits_: inspired by [Gnancraft](http://gnancraft.net/), [ComputerCraft](http://www.computercraft.info/), [Visual Bots](https://content.minetest.net/packages/Nigel/vbots/), [TurtleMiner](https://content.minetest.net/packages/BirgitLachner/turtleminer/)
+**License:** GNU GENERAL PUBLIC LICENSE V3   
+**Credits:** inspired by [Gnancraft](http://gnancraft.net/), [ComputerCraft](http://www.computercraft.info/), [Visual Bots](https://content.minetest.net/packages/Nigel/vbots/), [TurtleMiner](https://content.minetest.net/packages/BirgitLachner/turtleminer/)
 
 
 ### TODO
