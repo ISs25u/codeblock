@@ -8,7 +8,8 @@ minetest.register_tool("codeblock:drone_placer", {
     range = 64,
     stack_max = 1,
     on_use = function(itemstack, user, pointed_thing)
-        codeblock.events.handle_start_drone(user) -- TODO temp
+        codeblock.events.handle_start_drone(user)
+        return itemstack
     end,
     on_place = function(itemstack, placer, pointed_thing)
         codeblock.events.handle_place_drone(placer, pointed_thing)
@@ -19,13 +20,14 @@ minetest.register_tool("codeblock:drone_placer", {
 minetest.register_tool("codeblock:drone_starter", {
     description = S("Drone Starter"),
     inventory_image = "drone_starter.png",
-    range = 0,
+    range = 64,
     stack_max = 1,
     on_use = function(itemstack, user, pointed_thing)
-        codeblock.events.handle_start_drone(user)
+        codeblock.events.handle_show_set_drone(user)
+        return itemstack
     end,
     on_place = function(itemstack, placer, pointed_thing)
-        --
+        -- codeblock.commands.remove_drone(user:get_player_name())
         return itemstack
     end
 })
@@ -44,10 +46,7 @@ local DroneEntity = {
         physical = false,
         static_save = false
     },
-    on_rightclick = function(self, clicker)
-        -- codeblock.events.handle_start_drone(self.drone_owner, clicker)
-        -- TODO set code
-    end,
+    on_rightclick = function(self, clicker) end,
     on_punch = function(self, puncher, time_from_last_punch, tool_capabilities,
                         dir) return {} end,
     on_blast = function(self, damage) return false, false, {} end,
@@ -59,8 +58,35 @@ function DroneEntity:set_drone_owner(name) self.drone_owner = name end
 minetest.register_entity("codeblock:drone", DroneEntity)
 
 minetest.register_on_joinplayer(function(player)
+
     local name = player:get_player_name()
-    -- il_editor:create_player(name) -- 
+    local path = codeblock.datapath .. name
+
+    if not minetest.mkdir(codeblock.datapath .. name) then
+        minetest.chat_send_player(name, S('Cannot create @1', path))
+    end
+
+    player:get_meta():set_int('codeblock:last_index', 0)
+
+end)
+
+minetest.register_on_newplayer(function(player)
+
+    local name = player:get_player_name()
+    local path = codeblock.datapath .. name
+
+    if not minetest.mkdir(codeblock.datapath .. name) then
+        minetest.chat_send_player(name, S('Cannot create @1', path))
+    end
+
+    local file_path = path .. '/' .. 'example_1.lua'
+
+    codeblock.filesystem.write(file_path, codeblock.sandbox.example_1)
+
+    player:get_meta():set_int('codeblock:last_index', 1)
+
+    codeblock:drone_starter
+
 end)
 
 -- Events
@@ -76,8 +102,8 @@ minetest.register_on_player_receive_fields(
             if res.type == "DCL" then
 
                 minetest.close_formspec(name, 'codeblock:choose_file')
-                codeblock.events.handle_set_drone(player, res.index)
-                -- TODO here
+                codeblock.commands.set_drone_file_from_index(name, res.index)
+
             end
 
         end

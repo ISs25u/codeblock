@@ -16,17 +16,36 @@ function codeblock.commands.add_drone(pos, dir, name, file)
     return drone
 end
 
-function codeblock.commands.set_drone_file(name, file)
+function codeblock.commands.set_drone_file_from_index(name, index)
 
-    if not file then
+    local path = codeblock.datapath .. name
+
+    if not path then
         return minetest.chat_send_player(name, S("no file selected"))
     end
+
+    local files = codeblock.filesystem.get_files(path)
+
+    if not files or #files == 0 then
+        minetest.chat_send_player(name, S('no files'))
+        return
+    end
+
+    local file = files[index]
+
+    if not file then
+        minetest.chat_send_player(name, S('no file selected')) -- annoying
+        return
+    end
+
+    minetest.get_player_by_name(name):get_meta():set_int('codeblock:last_index',
+                                                         index)
 
     local drone = codeblock.drones[name]
 
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
-        return 
+        return
     end
 
     codeblock.drones[name]:set_file(file)
@@ -36,7 +55,7 @@ end
 function codeblock.commands.remove_drone(name)
 
     local drone_entity = codeblock.drone_entities[name];
-    drone_entity:remove()
+    if drone_entity then drone_entity:remove() end
     codeblock.drones[name] = nil;
     codeblock.drone_entities[name] = nil;
 

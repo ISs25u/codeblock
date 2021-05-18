@@ -16,3 +16,6 @@ Empty drone file=Fichier drone absent
 no checkpoint @1=Le checkpoint @1 n'existe pas
 no checkpoint name=Le checkpoint n'a pas de nom
 no file selected=Fichier non valide
+no files=Vous n'avez aucun fichier
+cannot read file=Impossible de lire le fichier
+Cannot create @1=Impossible de créer le répertoire @1

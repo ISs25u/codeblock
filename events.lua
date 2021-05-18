@@ -28,7 +28,12 @@ function codeblock.events.handle_start_drone(user)
 
     local file = drone.file
 
-    minetest.chat_send_player(name, S("Starting drone @1/@2", name, file))
+    if not file then
+        minetest.chat_send_player(name, S("no file selected"))
+        return
+    end
+
+    -- minetest.chat_send_player(name, S("Starting drone @1/@2", name, file))
 
     -- EXECUTION
 
@@ -47,9 +52,7 @@ function codeblock.events.handle_place_drone(placer, pointed_thing)
     local dir = math.floor((placer:get_look_horizontal() + math.pi / 4) /
                                math.pi * 2) * math.pi / 2
 
-    local files = codeblock.filesystem.dirs(codeblock.datapath .. name);
-
-    local code = 'test.lua' -- TODO
+    local code = nil
 
     if not pos then
         minetest.chat_send_player(name, S("Please target node"))
@@ -57,15 +60,31 @@ function codeblock.events.handle_place_drone(placer, pointed_thing)
     end
 
     local drone = codeblock.commands.add_drone(pos, dir, name, code)
-    minetest.chat_send_player(name, S("@1 placing a drone at @2", name,
-                                      minetest.pos_to_string(pos)))
 
-    -- only if not already set ? file is not persisted yet !!
-    codeblock.events.handle_set_drone(placer)
+    -- minetest.chat_send_player(name, S("@1 placing a drone at @2", name, minetest.pos_to_string(pos)))
+
+    local meta = placer:get_meta()
+    local last_index = meta:get_int('codeblock:last_index')
+    if not last_index or last_index == 0 then
+        codeblock.events.handle_show_set_drone(placer)
+
+    else
+        codeblock.commands.set_drone_file_from_index(name, last_index)
+    end
 
 end
 
-function codeblock.events.handle_set_drone(player)
+function codeblock.events.handle_show_set_drone(player)
+
+    local name = player:get_player_name()
+    local path = codeblock.datapath .. name
+
+    local files = codeblock.filesystem.get_files(path)
+
+    if not files or #files == 0 then
+        minetest.chat_send_player(name, S('no files'))
+        return
+    end
 
     minetest.show_formspec(name, 'codeblock:choose_file',
                            codeblock.formspecs.choose_file(files))

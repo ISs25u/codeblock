@@ -16,3 +16,6 @@ Empty drone file=Empty drone file
 no checkpoint @1=Checkpoint @1 does not exists
 no checkpoint name=Checkpoint name is Empty
 no file selected=Not a valid file
+no files=You don't have any files
+cannot read file=Cannot read file
+Cannot create @1=Cannot create directory @1
