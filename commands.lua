@@ -63,6 +63,8 @@ end
 
 function codeblock.commands.drone_forward(name, n)
 
+    n = n or 1
+
     local drone = codeblock.drones[name]
 
     if not drone then
@@ -88,6 +90,8 @@ end
 
 function codeblock.commands.drone_back(name, n)
 
+    n = n or 1
+
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
@@ -111,6 +115,8 @@ function codeblock.commands.drone_back(name, n)
 end
 
 function codeblock.commands.drone_right(name, n)
+
+    n = n or 1
 
     local drone = codeblock.drones[name]
     if not drone then
@@ -136,6 +142,8 @@ end
 
 function codeblock.commands.drone_left(name, n)
 
+    n = n or 1
+
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
@@ -160,6 +168,8 @@ end
 
 function codeblock.commands.drone_up(name, n)
 
+    n = n or 1
+
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
@@ -173,6 +183,8 @@ function codeblock.commands.drone_up(name, n)
 end
 
 function codeblock.commands.drone_down(name, n)
+
+    n = n or 1
 
     local drone = codeblock.drones[name]
     if not drone then
@@ -215,6 +227,8 @@ function codeblock.commands.drone_turn_right(name)
 end
 
 function codeblock.commands.drone_place_block(name, block_identifier)
+
+    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
 
     local drone = codeblock.drones[name]
     if not drone then

@@ -20,7 +20,7 @@ minetest.register_tool("codeblock:drone_placer", {
 minetest.register_tool("codeblock:drone_starter", {
     description = S("Drone Starter"),
     inventory_image = "drone_starter.png",
-    range = 64,
+    range = 128,
     stack_max = 1,
     on_use = function(itemstack, user, pointed_thing)
         codeblock.events.handle_show_set_drone(user)
