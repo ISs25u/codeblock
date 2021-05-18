@@ -46,6 +46,9 @@ function codeblock.events.handle_place_drone(placer, pointed_thing)
     local pos = minetest.get_pointed_thing_position(pointed_thing)
     local dir = math.floor((placer:get_look_horizontal() + math.pi / 4) /
                                math.pi * 2) * math.pi / 2
+
+    local files = codeblock.filesystem.dirs(codeblock.datapath .. name);
+
     local code = 'test.lua' -- TODO
 
     if not pos then
@@ -56,6 +59,16 @@ function codeblock.events.handle_place_drone(placer, pointed_thing)
     local drone = codeblock.commands.add_drone(pos, dir, name, code)
     minetest.chat_send_player(name, S("@1 placing a drone at @2", name,
                                       minetest.pos_to_string(pos)))
+
+    -- only if not already set ? file is not persisted yet !!
+    codeblock.events.handle_set_drone(placer)
+
+end
+
+function codeblock.events.handle_set_drone(player)
+
+    minetest.show_formspec(name, 'codeblock:choose_file',
+                           codeblock.formspecs.choose_file(files))
 
 end
 

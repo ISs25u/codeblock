@@ -15,5 +15,6 @@ dofile(codeblock.modpath .. "/drone.lua")
 dofile(codeblock.modpath .. "/events.lua")
 dofile(codeblock.modpath .. "/commands.lua")
 dofile(codeblock.modpath .. "/sandbox.lua")
+dofile(codeblock.modpath .. "/formspecs.lua")
 dofile(codeblock.modpath .. "/filesystem.lua")
 

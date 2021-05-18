@@ -3,7 +3,8 @@ codeblock.commands = {}
 local S = default.get_translator
 
 function codeblock.commands.add_drone(pos, dir, name, file)
-    local drone = codeblock.Drone:new(pos, dir, name, file) -- TODO: Change this later
+
+    local drone = codeblock.Drone:new(pos, dir, name, file)
     codeblock.drones[name] = drone
 
     local drone_entity = minetest.add_entity(pos, "codeblock:drone", nil)
@@ -13,6 +14,23 @@ function codeblock.commands.add_drone(pos, dir, name, file)
     codeblock.drone_entities[name] = drone_entity
 
     return drone
+end
+
+function codeblock.commands.set_drone_file(name, file)
+
+    if not file then
+        return minetest.chat_send_player(name, S("no file selected"))
+    end
+
+    local drone = codeblock.drones[name]
+
+    if not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+        return 
+    end
+
+    codeblock.drones[name]:set_file(file)
+
 end
 
 function codeblock.commands.remove_drone(name)
@@ -27,8 +45,10 @@ end
 function codeblock.commands.drone_forward(name, n)
 
     local drone = codeblock.drones[name]
+
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
+        return
     end
 
     local angle = (drone.dir % (2 * math.pi)) / (math.pi / 2)
@@ -52,6 +72,7 @@ function codeblock.commands.drone_back(name, n)
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
+        return
     end
 
     local angle = (drone.dir % (2 * math.pi)) / (math.pi / 2)
@@ -75,6 +96,7 @@ function codeblock.commands.drone_right(name, n)
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
+        return
     end
 
     local angle = (drone.dir % (2 * math.pi)) / (math.pi / 2)
@@ -98,6 +120,7 @@ function codeblock.commands.drone_left(name, n)
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
+        return
     end
 
     local angle = (drone.dir % (2 * math.pi)) / (math.pi / 2)
@@ -121,6 +144,7 @@ function codeblock.commands.drone_up(name, n)
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
+        return
     end
 
     drone.y = drone.y + n
@@ -134,6 +158,7 @@ function codeblock.commands.drone_down(name, n)
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
+        return
     end
 
     drone.y = drone.y - n
@@ -147,6 +172,7 @@ function codeblock.commands.drone_turn_left(name)
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
+        return
     end
 
     drone.dir = (drone.dir + math.pi / 2) % (2 * math.pi)
@@ -160,6 +186,7 @@ function codeblock.commands.drone_turn_right(name)
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
+        return
     end
 
     drone.dir = (drone.dir - math.pi / 2) % (2 * math.pi)
@@ -173,6 +200,7 @@ function codeblock.commands.drone_place_block(name, block_identifier)
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
+        return
     end
 
     local real_block_name = codeblock.sandbox.blocks[block_identifier]
@@ -192,10 +220,12 @@ function codeblock.commands.drone_save_checkpoint(name, label)
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
+        return
     end
 
     if not label then
         minetest.chat_send_player(name, S("no checkpoint name"))
+        return
     end
 
     drone.checkpoints[label] = {x = drone.x, y = drone.y, z = drone.z}
@@ -207,10 +237,12 @@ function codeblock.commands.drone_goto_checkpoint(name, label)
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
+        return
     end
 
     if not label or not drone.checkpoints[label] then
         minetest.chat_send_player(name, S("no checkpoint @1", label or ""))
+        return
     end
 
     local cp = drone.checkpoints[label]

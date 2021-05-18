@@ -73,7 +73,7 @@ function codeblock.sandbox.run_safe(name, file)
             elseif not a or not b then
                 return math.random(a or b)
             else
-                return math.random(a,b)
+                return math.random(a, b)
             end
         end,
         floor = function(x) return math.floor(x) end,
@@ -160,9 +160,6 @@ codeblock.sandbox.blocks = {
     permafrost = 'default:permafrost',
     permafrost_with_stones = 'default:permafrost_with_stones',
     permafrost_with_moss = 'default:permafrost_with_moss',
-    sand = 'default:sand',
-    desert_sand = 'default:desert_sand',
-    silver_sand = 'default:silver_sand',
     clay = 'default:clay',
     snowblock = 'default:snowblock',
     ice = 'default:ice',
@@ -289,9 +286,6 @@ codeblock.sandbox.cubes_names = {
     permafrost = 'permafrost',
     permafrost_with_stones = 'permafrost_with_stones',
     permafrost_with_moss = 'permafrost_with_moss',
-    sand = 'sand',
-    desert_sand = 'desert_sand',
-    silver_sand = 'silver_sand',
     clay = 'clay',
     snowblock = 'snowblock',
     ice = 'ice',

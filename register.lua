@@ -1,6 +1,6 @@
 local S = default.get_translator
 
--- Drone Placer
+-- Tools
 
 minetest.register_tool("codeblock:drone_placer", {
     description = S("Drone Placer"),
@@ -30,7 +30,7 @@ minetest.register_tool("codeblock:drone_starter", {
     end
 })
 
--- Drone Entity
+-- Entities
 
 local DroneEntity = {
     initial_properties = {
@@ -62,3 +62,24 @@ minetest.register_on_joinplayer(function(player)
     local name = player:get_player_name()
     -- il_editor:create_player(name) -- 
 end)
+
+-- Events
+
+minetest.register_on_player_receive_fields(
+    function(player, formname, fields)
+
+        if formname == "codeblock:choose_file" then
+
+            local name = player:get_player_name()
+            local res = minetest.explode_textlist_event(fields.file)
+
+            if res.type == "DCL" then
+
+                minetest.close_formspec(name, 'codeblock:choose_file')
+                codeblock.events.handle_set_drone(player, res.index)
+                -- TODO here
+            end
+
+        end
+
+    end)
