@@ -89,6 +89,13 @@ minetest.register_on_newplayer(function(player)
 
 end)
 
+minetest.register_on_leaveplayer(function(player, timed_out)
+
+    local name = player:get_player_name()
+    codeblock.commands.remove_drone(name)
+
+end)
+
 -- Events
 
 minetest.register_on_player_receive_fields(
