@@ -12,7 +12,7 @@ function codeblock.Drone:new(pos, dir, name, file)
         file = file
     }
 
-    drone.checkpoints['start'] = {x = drone.x, y = drone.y, z = drone.z}
+    drone.checkpoints['start'] = {x = drone.x, y = drone.y, z = drone.z, dir= drone.dir}
     setmetatable(drone, self)
     self.__index = self
     return drone

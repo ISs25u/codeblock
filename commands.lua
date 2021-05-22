@@ -40,7 +40,7 @@ function codeblock.commands.set_drone_file_from_index(name, index)
 
     minetest.get_player_by_name(name):get_meta():set_int('codeblock:last_index',
                                                          index)
-    
+
     local drone = codeblock.drones[name]
 
     if not drone then
@@ -263,7 +263,12 @@ function codeblock.commands.drone_save_checkpoint(name, label)
         return
     end
 
-    drone.checkpoints[label] = {x = drone.x, y = drone.y, z = drone.z}
+    drone.checkpoints[label] = {
+        x = drone.x,
+        y = drone.y,
+        z = drone.z,
+        dir = drone.dir
+    }
 
 end
 
@@ -284,6 +289,7 @@ function codeblock.commands.drone_goto_checkpoint(name, label)
     drone.x = cp.x
     drone.y = cp.y
     drone.z = cp.z
+    drone.dir = cp.dir
 
     codeblock.events.handle_update_drone_entity(drone)
 

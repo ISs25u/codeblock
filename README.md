@@ -21,7 +21,7 @@ CodeBlock allows creating oniric sturctures in Minetest using `lua` code.
 - [ ] relative positioning
 - [ ] safe formspecs
 - [ ] check compatible versions of minetest
-- [ ] checkpoint saves drone dir
+- [x] checkpoint saves drone dir
 - [x] use minetest.write
 - [x] remove error() when possible
 - [x] default drone move by 1
