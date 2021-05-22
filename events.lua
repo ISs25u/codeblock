@@ -1,5 +1,5 @@
 codeblock.events = {}
-local S = default.get_translator("codeblock")
+local S = codeblock.S
 
 --
 -- FUNCTIONS
@@ -9,10 +9,17 @@ function codeblock.events.handle_update_drone_entity(drone)
     local name = drone.name
     local drone_entity = codeblock.drone_entities[name]
 
-    if not drone_entity or not drone then error(S("drone does not exist")) end
+    if not drone_entity or not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+        return
+    end
 
     drone_entity:move_to({x = drone.x, y = drone.y, z = drone.z})
     drone_entity:set_rotation({x = 0, y = drone.dir, z = 0})
+
+    local attr = drone_entity:get_nametag_attributes()
+    attr.text = drone.file
+    drone_entity:set_nametag_attributes(attr)
 
 end
 
@@ -33,10 +40,6 @@ function codeblock.events.handle_start_drone(user)
         return
     end
 
-    -- minetest.chat_send_player(name, S("Starting drone @1/@2", name, file))
-
-    -- EXECUTION
-
     codeblock.sandbox.run_safe(name, file)
     codeblock.commands.remove_drone(name)
 
@@ -52,22 +55,17 @@ function codeblock.events.handle_place_drone(placer, pointed_thing)
     local dir = math.floor((placer:get_look_horizontal() + math.pi / 4) /
                                math.pi * 2) * math.pi / 2
 
-    local code = nil
-
     if not pos then
         minetest.chat_send_player(name, S("Please target node"))
         return {}
     end
 
-    local drone = codeblock.commands.add_drone(pos, dir, name, code)
-
-    -- minetest.chat_send_player(name, S("@1 placing a drone at @2", name, minetest.pos_to_string(pos)))
+    local drone = codeblock.commands.add_drone(pos, dir, name, nil)
 
     local meta = placer:get_meta()
     local last_index = meta:get_int('codeblock:last_index')
     if not last_index or last_index == 0 then
         codeblock.events.handle_show_set_drone(placer)
-
     else
         codeblock.commands.set_drone_file_from_index(name, last_index)
     end

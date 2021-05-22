@@ -1,4 +1,4 @@
-local S = default.get_translator("codeblock")
+local S = codeblock.S
 
 -- Tools
 
@@ -50,10 +50,12 @@ local DroneEntity = {
     on_punch = function(self, puncher, time_from_last_punch, tool_capabilities,
                         dir) return {} end,
     on_blast = function(self, damage) return false, false, {} end,
-    drone_owner = nil
+    drone_owner = nil,
+    nametag = '?'
 }
 
 function DroneEntity:set_drone_owner(name) self.drone_owner = name end
+
 
 minetest.register_entity("codeblock:drone", DroneEntity)
 

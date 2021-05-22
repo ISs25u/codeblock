@@ -1,6 +1,6 @@
 codeblock.commands = {}
 
-local S = default.get_translator("codeblock")
+local S = codeblock.S
 
 function codeblock.commands.add_drone(pos, dir, name, file)
 
@@ -40,7 +40,7 @@ function codeblock.commands.set_drone_file_from_index(name, index)
 
     minetest.get_player_by_name(name):get_meta():set_int('codeblock:last_index',
                                                          index)
-
+    
     local drone = codeblock.drones[name]
 
     if not drone then
@@ -49,6 +49,8 @@ function codeblock.commands.set_drone_file_from_index(name, index)
     end
 
     codeblock.drones[name]:set_file(file)
+
+    codeblock.events.handle_update_drone_entity(drone)
 
 end
 

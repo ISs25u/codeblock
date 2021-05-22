@@ -13,8 +13,6 @@ function codeblock.filesystem.read(file)
 end
 
 function codeblock.filesystem.write(filepath, content)
-    local file = io.open(filepath, "wb")
-    file:write(content)
-    file:close()
+    minetest.safe_file_write(filepath, content)
     return content
 end

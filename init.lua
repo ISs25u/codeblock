@@ -9,6 +9,7 @@ end
 
 codeblock.drones = {}
 codeblock.drone_entities = {}
+codeblock.S = minetest.get_translator("codeblock")
 
 dofile(codeblock.modpath .. "/register.lua")
 dofile(codeblock.modpath .. "/drone.lua")

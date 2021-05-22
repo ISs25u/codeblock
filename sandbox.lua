@@ -1,6 +1,6 @@
 codeblock.sandbox = {}
 
-local S = default.get_translator("codeblock")
+local S = codeblock.S
 
 function codeblock.sandbox.run_safe(name, file)
 

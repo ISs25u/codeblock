@@ -26,6 +26,8 @@ CodeBlock allows creating oniric sturctures in Minetest using `lua` code.
 - [ ] register player join/leaver gives drone, etc
 - [ ] safe formspecs
 - [ ] check compatible versions of minetest
+- [x] drone label with program
+- [ ] remove drone on leave
 
 ## Tools usage
 
