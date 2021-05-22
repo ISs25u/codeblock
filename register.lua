@@ -5,7 +5,7 @@ local S = codeblock.S
 minetest.register_tool("codeblock:drone_placer", {
     description = S("Drone Placer"),
     inventory_image = "drone_placer.png",
-    range = 64,
+    range = 128,
     stack_max = 1,
     on_use = function(itemstack, user, pointed_thing)
         codeblock.events.handle_start_drone(user)
@@ -56,7 +56,6 @@ local DroneEntity = {
 
 function DroneEntity:set_drone_owner(name) self.drone_owner = name end
 
-
 minetest.register_entity("codeblock:drone", DroneEntity)
 
 minetest.register_on_joinplayer(function(player)
@@ -81,11 +80,12 @@ minetest.register_on_newplayer(function(player)
         minetest.chat_send_player(name, S('Cannot create @1', path))
     end
 
-    local file_path = path .. '/' .. 'example_1.lua'
+    for ename, content in pairs(codeblock.examples) do
+        local file_path = path .. '/' .. ename .. '.lua'
+        codeblock.filesystem.write(file_path, content)
+    end
 
-    codeblock.filesystem.write(file_path, codeblock.sandbox.example_1)
-
-    player:get_meta():set_int('codeblock:last_index', 1)
+    player:get_meta():set_int('codeblock:last_index', 0)
 
 end)
 

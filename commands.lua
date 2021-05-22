@@ -230,14 +230,13 @@ end
 
 function codeblock.commands.drone_place_block(name, block_identifier)
 
-    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
-
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
         return
     end
 
+    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
     local real_block_name = codeblock.sandbox.blocks[block_identifier]
 
     if not real_block_name then
@@ -245,6 +244,61 @@ function codeblock.commands.drone_place_block(name, block_identifier)
         return
     end
 
+    codeblock.events.handle_place_block({x = drone.x, y = drone.y, z = drone.z},
+                                        real_block_name)
+
+end
+
+function codeblock.commands.drone_place_relative(name, x, y, z,
+                                                 block_identifier,
+                                                 checkpoint_name)
+
+    local drone = codeblock.drones[name]
+    if not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+        return
+    end
+
+    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
+    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+
+    if not real_block_name then
+        minetest.chat_send_player(name, S('block not allowed'))
+        return
+    end
+
+    local cp_name = checkpoint_name or 'start'
+    if not drone.checkpoints[cp_name] then
+        codeblock.commands.drone_save_checkpoint(name, cp_name)
+    end
+
+    local cp = drone.checkpoints[cp_name]
+
+    local angle = (drone.dir % (2 * math.pi)) / (math.pi / 2)
+
+    if angle == 0 then
+        drone.x = cp.x + (x or 0)
+        drone.y = cp.y + (y or 0)
+        drone.z = cp.z + (z or 0)
+        drone.dir = cp.dir
+    elseif angle == 1 then
+        drone.x = cp.x - (z or 0)
+        drone.y = cp.y + (y or 0)
+        drone.z = cp.z + (x or 0)
+        drone.dir = cp.dir
+    elseif angle == 2 then
+        drone.x = cp.x - (x or 0)
+        drone.y = cp.y + (y or 0)
+        drone.z = cp.z - (z or 0)
+        drone.dir = cp.dir
+    elseif angle == 3 then
+        drone.x = cp.x + (z or 0)
+        drone.y = cp.y + (y or 0)
+        drone.z = cp.z - (x or 0)
+        drone.dir = cp.dir
+    end
+
+    codeblock.events.handle_update_drone_entity(drone)
     codeblock.events.handle_place_block({x = drone.x, y = drone.y, z = drone.z},
                                         real_block_name)
 

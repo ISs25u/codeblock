@@ -18,4 +18,4 @@ dofile(codeblock.modpath .. "/commands.lua")
 dofile(codeblock.modpath .. "/sandbox.lua")
 dofile(codeblock.modpath .. "/formspecs.lua")
 dofile(codeblock.modpath .. "/filesystem.lua")
-
+dofile(codeblock.modpath .. "/examples.lua")
