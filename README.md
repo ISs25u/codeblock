@@ -1,3 +1,5 @@
+[![ContentDB](https://content.minetest.net/packages/giga-turbo/codeblock/shields/downloads/)](https://content.minetest.net/packages/giga-turbo/codeblock/)
+
 CodeBlock
 =========================
 
