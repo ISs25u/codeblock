@@ -1,0 +1,21 @@
+# textdomain: codeblock
+Drone Placer=
+@1 placing a drone at @2=
+not your drone=
+Please target node=
+drone does not exist=
+Starting drone @1/@2=
+Unknown position=
+Drone Starter=
+@1 not found=
+forward=
+block not allowed=
+binary bytecode prohibited=
+Error in @1=
+Empty drone file=
+no checkpoint @1=
+no checkpoint name=
+no file selected=
+no files=
+cannot read file=
+Cannot create @1=

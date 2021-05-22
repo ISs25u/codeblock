@@ -1,4 +1,4 @@
-# textdomain: default
+# textdomain: codeblock
 Drone Placer=Drone placer
 @1 placing a drone at @2='@1' placed a drone at @2
 not your drone=This drone is not yours!
