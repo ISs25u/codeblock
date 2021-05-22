@@ -1,5 +1,5 @@
 codeblock.events = {}
-local S = default.get_translator
+local S = default.get_translator("codeblock")
 
 --
 -- FUNCTIONS

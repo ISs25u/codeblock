@@ -1,5 +1,5 @@
 codeblock.formspecs = {}
-local S = default.get_translator
+local S = default.get_translator("codeblock")
 
 function codeblock.formspecs.choose_file(files)
 

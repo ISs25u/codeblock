@@ -1,6 +1,6 @@
 codeblock.commands = {}
 
-local S = default.get_translator
+local S = default.get_translator("codeblock")
 
 function codeblock.commands.add_drone(pos, dir, name, file)
 

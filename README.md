@@ -19,6 +19,10 @@ CodeBlock allows creating oniric sturctures in Minetest using `lua` code.
 - [ ] In-game lua code editor (low priority)
 - [ ] relative positioning
 - [ ] default drone move by 1
+- [ ] use minetest.write
+- [ ] remove error() when possible
+- [ ] only 1 drone per player and always exists
+- [ ] register player join/leaver gives drone, etc
 
 
 ## Tools usage
