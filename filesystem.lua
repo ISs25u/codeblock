@@ -1,7 +1,9 @@
 codeblock.filesystem = {}
 
 function codeblock.filesystem.get_files(directory_path)
-    return minetest.get_dir_list(directory_path)
+    local dirs =  minetest.get_dir_list(directory_path)
+    table.sort(dirs)
+    return dirs
 end
 
 function codeblock.filesystem.read(file)
