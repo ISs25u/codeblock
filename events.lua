@@ -95,7 +95,11 @@ function codeblock.events.handle_place_block(pos, block)
 
     block = block or "default:dirt"
 
-    minetest.set_node({x = pos.x, y = pos.y, z = pos.z}, {name = block})
+    minetest.set_node({
+        x = math.ceil(pos.x),
+        y = math.ceil(pos.y),
+        z = math.ceil(pos.z)
+    }, {name = block})
 
 end
 
