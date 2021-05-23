@@ -1,6 +1,6 @@
 codeblock.examples = {}
 
-codeblock.examples.example1 = [[
+codeblock.examples.recursion = [[
     function recursion(checkpoint, block_list, MAX_DEPTH, depth)
 
         local depth = depth or 1
@@ -34,7 +34,7 @@ codeblock.examples.example1 = [[
     recursion('origin', mblocks, #mblocks)    
 ]]
 
-codeblock.examples.example2 = [[
+codeblock.examples.density = [[
 local R = 10
 local YMAX = 100
 
@@ -61,7 +61,7 @@ for x = -R, R do
 end
 ]]
 
-codeblock.examples.example3 = [[
+codeblock.examples.spirals = [[
     function spiral(TURNS, MAX_RADIUS, MAX_Y, BLOCK, ORIGIN)
 
         local increment = 0.01
@@ -101,7 +101,7 @@ codeblock.examples.example3 = [[
 ]]
 
 
-codeblock.examples.example4 = [[
+codeblock.examples.plot2D = [[
     function plot2D(XMIN, XMAX, ZMIN, ZMAX, FMIN, FMAX, NPOINTS, f)
 
         local increment = (XMAX - XMIN) / (NPOINTS - 1)
@@ -125,7 +125,7 @@ codeblock.examples.example4 = [[
     plot2D(-2 * pi, 2 * pi, -2 * pi, 2 * pi, -1, 1, 100, f)    
 ]]
 
-codeblock.examples.example5 = [[
+codeblock.examples.plot3D = [[
     function plot3D(XMIN, XMAX, ZMIN, ZMAX, FMIN, FMAX, NPOINTS, H, f)
 
         local increment = (XMAX - XMIN) / (NPOINTS - 1)
