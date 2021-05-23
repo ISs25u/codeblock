@@ -19,8 +19,9 @@ CodeBlock allows creating oniric sturctures in Minetest using `lua` code.
 - [x] Allow to set drone's file with in-game interface + remember last program started (high priority)
 - [ ] Blockly web-based editor (high priority)
 - [ ] Control drone operating speed (medium priority)
-- [ ] Only use 1 tool to manage the drone (medium priority)
 - [ ] In-game lua code editor (low priority)
+
+### v1.2
 
 - [ ] safe formspecs
 - [ ] check compatible versions of minetest
