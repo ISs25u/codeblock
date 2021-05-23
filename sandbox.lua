@@ -66,10 +66,9 @@ function codeblock.sandbox.run_safe(name, file)
         blocks = codeblock.sandbox.cubes_names,
         plants = codeblock.sandbox.plants_names,
         wools = codeblock.sandbox.wools_names,
+        iwools = codeblock.sandbox.iwools_names,
         ipairs = ipairs,
         pairs = pairs,
-        -- time = function() return minetest.get_us_time() end,
-        -- seed = function(s) return math.randomseed(s) end,
         random = function(a, b)
             if not a and not b then
                 return math.random()
@@ -238,21 +237,21 @@ codeblock.sandbox.blocks = {
     acacia_bush_sapling = 'default:acacia_bush_sapling',
     pine_bush_stem = 'default:pine_bush_stem',
     pine_bush_sapling = 'default:pine_bush_sapling',
-    white_wool = 'wool:white',
-    grey_wool = 'wool:grey',
-    dark_grey_wool = 'wool:dark_grey',
-    black_wool = 'wool:black',
-    violet_wool = 'wool:violet',
-    blue_wool = 'wool:blue',
-    cyan_wool = 'wool:cyan',
-    dark_green_wool = 'wool:dark_green',
-    green_wool = 'wool:green',
-    yellow_wool = 'wool:yellow',
-    brown_wool = 'wool:brown',
-    orange_wool = 'wool:orange',
-    red_wool = 'wool:red',
-    magenta_wool = 'wool:magenta',
-    pink_wool = 'wool:pink'
+    wool_white = 'wool:white',
+    wool_grey = 'wool:grey',
+    wool_dark_grey = 'wool:dark_grey',
+    wool_black = 'wool:black',
+    wool_violet = 'wool:violet',
+    wool_blue = 'wool:blue',
+    wool_cyan = 'wool:cyan',
+    wool_dark_green = 'wool:dark_green',
+    wool_green = 'wool:green',
+    wool_yellow = 'wool:yellow',
+    wool_brown = 'wool:brown',
+    wool_orange = 'wool:orange',
+    wool_red = 'wool:red',
+    wool_magenta = 'wool:magenta',
+    wool_pink = 'wool:pink'
 }
 
 codeblock.sandbox.cubes_names = {
@@ -385,4 +384,11 @@ codeblock.sandbox.wools_names = {
     red_wool = 'wool_red',
     magenta_wool = 'wool_magenta',
     pink_wool = 'wool_pink'
+}
+
+codeblock.sandbox.iwools_names = {
+    'wool_magenta', 'wool_red', 'wool_pink', 'wool_brown', 'wool_orange',
+    'wool_yellow', 'wool_green', 'wool_dark_green', 'wool_cyan', 'wool_blue',
+    'wool_violet'
+
 }
