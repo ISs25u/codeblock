@@ -1,7 +1,9 @@
-[![ContentDB](https://content.minetest.net/packages/giga-turbo/codeblock/shields/downloads/)](https://content.minetest.net/packages/giga-turbo/codeblock/)
-
 CodeBlock
 =========================
+
+![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
+[![ContentDB](https://content.minetest.net/packages/giga-turbo/codeblock/shields/downloads/)](https://content.minetest.net/packages/giga-turbo/codeblock/)
+
 
 ![screenshot](screenshot.png)
 
