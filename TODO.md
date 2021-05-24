@@ -6,7 +6,7 @@
 - [ ] Control drone operating speed (medium priority)
 - [ ] In-game lua code editor (low priority)
 
-### v1.2
+### v0.2
 
 - [ ] safe formspecs
 - [ ] check compatible versions of minetest
