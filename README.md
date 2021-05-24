@@ -4,49 +4,25 @@ CodeBlock
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 [![ContentDB](https://content.minetest.net/packages/giga-turbo/codeblock/shields/downloads/)](https://content.minetest.net/packages/giga-turbo/codeblock/)
 
+**CodeBlock allows creating oniric sturctures in Minetest using `lua` code.**
+
+**License:** GPLv3   
+**Credits:** inspired by [Gnancraft](http://gnancraft.net/), [ComputerCraft](http://www.computercraft.info/), [Visual Bots](https://content.minetest.net/packages/Nigel/vbots/), [TurtleMiner](https://content.minetest.net/packages/BirgitLachner/turtleminer/), [basic_robot](https://github.com/ac-minetest/basic_robot)
+
 
 ![screenshot](screenshot.png)
 
-CodeBlock allows creating oniric sturctures in Minetest using `lua` code.
-
-**License:** GNU GENERAL PUBLIC LICENSE V3   
-**Credits:** inspired by [Gnancraft](http://gnancraft.net/), [ComputerCraft](http://www.computercraft.info/), [Visual Bots](https://content.minetest.net/packages/Nigel/vbots/), [TurtleMiner](https://content.minetest.net/packages/BirgitLachner/turtleminer/)
-
-
-## TODO
-
-- [x] User associated filesystem to store programs (high priority)
-- [x] Allow to set drone's file with in-game interface + remember last program started (high priority)
-- [ ] Blockly web-based editor (high priority)
-- [ ] Control drone operating speed (medium priority)
-- [ ] In-game lua code editor (low priority)
-
-### v1.2
-
-- [ ] safe formspecs
-- [ ] check compatible versions of minetest
-- [ ] add move({abs={x,y,z}, rel={f,r,u}}) or 2 functions
-- [ ] add orient(N,E,S,W) ?
-- [ ] add functions for cubes & spheres
-- [x] relative positioning
-- [x] checkpoint saves drone dir
-- [x] use minetest.write
-- [x] remove error() when possible
-- [x] default drone move by 1
-- [x] drone label with program
-- [x] remove drone on leave
-
 ## Tools usage
 
-1. Create an empty (flat) world and activate `codeblock` mod
-2. Enable creative mode and give yourself the tools `codeblock:drone_placer` and `codeblock:drone_starter`
-3. Right click with the drone_placer tool on a block, choose a `lua` file to run, then left click to start the drone (you should have `example_1.lua` available)
-4. Create your own lua file in `~/.minetest/worlds/<worldname>/codeblock_lua_files/<newfile.lua>`
-4. Left click with the drone_starter to change wich file your are using
+1. Create an empty (flat) world and enable `codeblock` mod
+2. Enable creative mode or give yourself the tools `codeblock:drone_placer` and `codeblock:drone_starter`
+3. Right click with the `drone_placer` tool on a block, choose a `lua` program to run, then left click to start the drone
+4. Left click with the `drone_starter` to change wich program your are using
+5. Write your own programs in `~/.minetest/worlds/<worldname>/codeblock_lua_files/<user>/<filename.lua>`
 
 ## Lua api
 
-### Moves
+### Movements
 
 ```lua
 up(n)
@@ -63,6 +39,7 @@ Example: `forward(5)`
 
 ```lua
 place(block)
+place_relative(x, y, z, block, checkpoint_name)
 ```
 
 ```lua
