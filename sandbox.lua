@@ -63,6 +63,9 @@ function codeblock.sandbox.run_safe(name, file)
         go = function(label)
             codeblock.commands.drone_goto_checkpoint(name, label)
         end,
+        cube = function(w, h, l, block, hollow)
+            codeblock.commands.drone_place_cube(name, w, h, l, block, hollow)
+        end,
         blocks = codeblock.sandbox.cubes_names,
         plants = codeblock.sandbox.plants_names,
         wools = codeblock.sandbox.wools_names,

@@ -349,6 +349,53 @@ function codeblock.commands.drone_goto_checkpoint(name, label)
 
 end
 
+function codeblock.commands.drone_place_cube(name, w, h, l, block_identifier,
+                                             hollow)
+
+    local drone = codeblock.drones[name]
+    if not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+        return
+    end
+
+    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
+    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+
+    if not real_block_name then
+        minetest.chat_send_player(name, S('block not allowed'))
+        return
+    end
+
+    local angle = (drone.dir % (2 * math.pi)) / (math.pi / 2)
+
+    local hollow = hollow and true or false
+    local h = h or 10
+    local x
+    local y = drone.y
+    local z
+
+    if angle == 0 then
+        w, l = w or 10, l or 10
+        x = drone.x + math.floor(w / 2)
+        z = drone.z + math.floor(l / 2)
+    elseif angle == 1 then
+        w, l = l or 10, w or 10
+        x = drone.x - math.floor((w - 1) / 2)
+        z = drone.z - math.floor((l - 1) / 2) + l -1
+    elseif angle == 2 then
+        w, l = w or 10, l or 10
+        x = drone.x - math.floor((w - 1) / 2)
+        z = drone.z - math.floor((l - 1) / 2)
+    elseif angle == 3 then
+        w, l = l or 10, w or 10
+        x = drone.x + math.floor(w / 2)
+        z = drone.z + math.floor(l / 2) - l + 1
+    end
+
+    worldedit.cube({x = x, y = y, z = z}, w, h, l, real_block_name, hollow)
+
+end
+
 function codeblock.commands.test_sequence(name)
 
     for l = 1, 10 do
