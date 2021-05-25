@@ -150,6 +150,53 @@ codeblock.examples.plot3D = [[
     plot3D(-2 * pi, 2 * pi, -2 * pi, 2 * pi, -1, 1, 100, 100, f)    
 ]]
 
+codeblock.examples.menger = [[
+    function menger(size, block)
+
+        local function recursion(size, x, y, z)
+    
+            local inc = floor(size / 3)
+    
+            save(size)
+    
+            if size == 1 then return end
+    
+            for nx = 0, size - 1, inc do
+                for ny = 0, size - 1, inc do
+                    for nz = 0, size - 1, inc do
+    
+                        if (nx == ny and nx == inc) or (ny == nz and nz == inc) or
+                            (nz == nx and nx == inc) then
+                            go(size)
+                            move(x + nx, y + ny, z + nz)
+                            cube(inc, inc, inc, blocks.air)
+                        else
+                            go(size)
+                            recursion(inc, x + nx, y + ny, z + nz)
+                        end
+    
+                    end
+                end
+            end
+    
+        end
+    
+        cube(size, size, size, block)
+        recursion(size, 0, 0, 0)
+    
+    end
+    
+    --
+    
+    local sizes = {pow(3, 1), pow(3, 2), pow(3, 3), pow(3, 4)}
+    
+    up()
+    for i, s in ipairs(sizes) do
+        menger(s, iwools[i])
+        right(s + 3)
+    end  
+]]
+
 -- codeblock.examples.exampleN = [[
   
 -- ]]
