@@ -29,6 +29,9 @@ up(n)
 down(n)
 forward(n)
 back(n)
+left(n)
+right(n)
+move(right,forward,up)
 turn_right()
 turn_left()
 ```
@@ -49,11 +52,17 @@ blocks = {air, stone, cobble, stonebrick, stone_block, mossycobble, desert_stone
 ```lua
 plants = {sapling, apple, junglesapling, emergent_jungle_sapling, pine_sapling, acacia_sapling, aspen_sapling, large_cactus_seedling, dry_shrub, grass_1, grass_2, grass_3, grass_4, grass_5, dry_grass_1, dry_grass_2, dry_grass_3, dry_grass_4, dry_grass_5, fern_1, fern_2, fern_3, marram_grass_1, marram_grass_2, marram_grass_3, bush_stem, bush_sapling, acacia_bush_stem, acacia_bush_sapling, pine_bush_stem, pine_bush_needles, pine_bush_sapling}
 ```
+
 ```lua
 wools = {white, grey, dark_grey, black, violet, blue, cyan, dark_green, green, yellow, brown, orange, red, magenta, pink}
 ```
 
-Example: `place(blocks.stone)`
+Example: 
+```lua
+place(blocks.stone)
+up(1)
+place(wools.blue)
+```
 
 ### Checkpoints
 
@@ -64,8 +73,12 @@ go(name)
 
 Example:
 ```lua
-save('place1') 
+save('place1')
+move(0,1,1)
+place(wools.obsidian)
 go('place1')
+move(0,-1,-1)
+place(wools.glass)
 ```
 
 ### Math 
