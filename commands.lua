@@ -2,6 +2,17 @@ codeblock.commands = {}
 
 local S = codeblock.S
 
+-------------------------------------------------------------------------------
+-- local
+-------------------------------------------------------------------------------
+
+local floor = math.floor
+local pi = math.pi
+
+-------------------------------------------------------------------------------
+-- utilities
+-------------------------------------------------------------------------------
+
 function codeblock.commands.add_drone(pos, dir, name, file)
 
     local drone = codeblock.Drone:new(pos, dir, name, file)
@@ -63,9 +74,15 @@ function codeblock.commands.remove_drone(name)
 
 end
 
-function codeblock.commands.drone_forward(name, n)
+-------------------------------------------------------------------------------
+-- movements
+-------------------------------------------------------------------------------
 
-    n = n or 1
+function codeblock.commands.drone_move(name, nx, ny, nz)
+
+    local nx = nx or 0
+    local ny = ny or 0
+    local nz = nz or 0
 
     local drone = codeblock.drones[name]
 
@@ -74,7 +91,42 @@ function codeblock.commands.drone_forward(name, n)
         return
     end
 
-    local angle = (drone.dir % (2 * math.pi)) / (math.pi / 2)
+    local angle = 2 / pi * (drone.dir % (2 * pi))
+
+    if angle == 0 then
+        drone.x = drone.x + nx
+        drone.y = drone.y + ny
+        drone.z = drone.z + nz
+    elseif angle == 1 then
+        drone.x = drone.x - nz
+        drone.y = drone.y + ny
+        drone.z = drone.z + nx
+    elseif angle == 2 then
+        drone.x = drone.x - nx
+        drone.y = drone.y + ny
+        drone.z = drone.z - nz
+    elseif angle == 3 then
+        drone.x = drone.x + nz
+        drone.y = drone.y + ny
+        drone.z = drone.z - nx
+    end
+
+    codeblock.events.handle_update_drone_entity(drone)
+
+end
+
+function codeblock.commands.drone_forward(name, n)
+
+    local n = n or 1
+
+    local drone = codeblock.drones[name]
+
+    if not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+        return
+    end
+
+    local angle = 2 / pi * (drone.dir % (2 * pi))
 
     if angle == 0 then
         drone.z = drone.z + n
@@ -92,33 +144,15 @@ end
 
 function codeblock.commands.drone_back(name, n)
 
-    n = n or 1
+    local n = n or 1
 
-    local drone = codeblock.drones[name]
-    if not drone then
-        minetest.chat_send_player(name, S("drone does not exist"))
-        return
-    end
-
-    local angle = (drone.dir % (2 * math.pi)) / (math.pi / 2)
-
-    if angle == 0 then
-        drone.z = drone.z - n
-    elseif angle == 1 then
-        drone.x = drone.x + n
-    elseif angle == 2 then
-        drone.z = drone.z + n
-    elseif angle == 3 then
-        drone.x = drone.x - n
-    end
-
-    codeblock.events.handle_update_drone_entity(drone)
+    codeblock.commands.drone_forward(name, -n)
 
 end
 
 function codeblock.commands.drone_right(name, n)
 
-    n = n or 1
+    local n = n or 1
 
     local drone = codeblock.drones[name]
     if not drone then
@@ -126,7 +160,7 @@ function codeblock.commands.drone_right(name, n)
         return
     end
 
-    local angle = (drone.dir % (2 * math.pi)) / (math.pi / 2)
+    local angle = 2 / pi * (drone.dir % (2 * pi))
 
     if angle == 0 then
         drone.x = drone.x + n
@@ -144,33 +178,15 @@ end
 
 function codeblock.commands.drone_left(name, n)
 
-    n = n or 1
+    local n = n or 1
 
-    local drone = codeblock.drones[name]
-    if not drone then
-        minetest.chat_send_player(name, S("drone does not exist"))
-        return
-    end
-
-    local angle = (drone.dir % (2 * math.pi)) / (math.pi / 2)
-
-    if angle == 0 then
-        drone.x = drone.x - n
-    elseif angle == 1 then
-        drone.z = drone.z - n
-    elseif angle == 2 then
-        drone.x = drone.x + n
-    elseif angle == 3 then
-        drone.z = drone.z + n
-    end
-
-    codeblock.events.handle_update_drone_entity(drone)
+    codeblock.commands.drone_right(name, -n)
 
 end
 
 function codeblock.commands.drone_up(name, n)
 
-    n = n or 1
+    local n = n or 1
 
     local drone = codeblock.drones[name]
     if not drone then
@@ -186,17 +202,9 @@ end
 
 function codeblock.commands.drone_down(name, n)
 
-    n = n or 1
+    local n = n or 1
 
-    local drone = codeblock.drones[name]
-    if not drone then
-        minetest.chat_send_player(name, S("drone does not exist"))
-        return
-    end
-
-    drone.y = drone.y - n
-
-    codeblock.events.handle_update_drone_entity(drone)
+    codeblock.commands.drone_up(name, -n)
 
 end
 
@@ -208,7 +216,7 @@ function codeblock.commands.drone_turn_left(name)
         return
     end
 
-    drone.dir = (drone.dir + math.pi / 2) % (2 * math.pi)
+    drone.dir = (drone.dir + pi * 0.5) % (2 * pi)
 
     codeblock.events.handle_update_drone_entity(drone)
 
@@ -222,11 +230,15 @@ function codeblock.commands.drone_turn_right(name)
         return
     end
 
-    drone.dir = (drone.dir - math.pi / 2) % (2 * math.pi)
+    drone.dir = (drone.dir - pi * 0.5) % (2 * pi)
 
     codeblock.events.handle_update_drone_entity(drone)
 
 end
+
+-------------------------------------------------------------------------------
+-- blocks
+-------------------------------------------------------------------------------
 
 function codeblock.commands.drone_place_block(name, block_identifier)
 
@@ -274,7 +286,7 @@ function codeblock.commands.drone_place_relative(name, x, y, z,
 
     local cp = drone.checkpoints[cp_name]
 
-    local angle = (drone.dir % (2 * math.pi)) / (math.pi / 2)
+    local angle = 2 / pi * (drone.dir % (2 * pi))
 
     if angle == 0 then
         drone.x = cp.x + (x or 0)
@@ -303,6 +315,63 @@ function codeblock.commands.drone_place_relative(name, x, y, z,
                                         real_block_name)
 
 end
+
+function codeblock.commands.drone_place_cube(name, w, h, l, block_identifier,
+                                             hollow)
+
+    local drone = codeblock.drones[name]
+    if not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+        return
+    end
+
+    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
+    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+
+    if not real_block_name then
+        minetest.chat_send_player(name, S('block not allowed'))
+        return
+    end
+
+    local angle = 2 / pi * (drone.dir % (2 * pi))
+
+    local hollow = hollow and true or false
+    local w = w or 10
+    local h = h or 10
+    local l = l or 10
+    local x
+    local y
+    local z
+
+    if angle == 0 then
+        w, l = w, l
+        x = drone.x + floor(w * 0.5)
+        y = drone.y
+        z = drone.z + floor(l * 0.5)
+    elseif angle == 1 then
+        w, l = l, w
+        x = drone.x - floor((w - 1) * 0.5)
+        y = drone.y
+        z = drone.z - floor((l - 1) * 0.5) + l - 1
+    elseif angle == 2 then
+        w, l = w, l
+        x = drone.x - floor((w - 1) * 0.5)
+        y = drone.y
+        z = drone.z - floor((l - 1) * 0.5)
+    elseif angle == 3 then
+        w, l = l, w
+        x = drone.x + floor(w * 0.5)
+        y = drone.y
+        z = drone.z + floor(l * 0.5) - l + 1
+    end
+
+    worldedit.cube({x = x, y = y, z = z}, w, h, l, real_block_name, hollow)
+
+end
+
+-------------------------------------------------------------------------------
+-- checkpoints
+-------------------------------------------------------------------------------
 
 function codeblock.commands.drone_save_checkpoint(name, label)
 
@@ -347,69 +416,4 @@ function codeblock.commands.drone_goto_checkpoint(name, label)
 
     codeblock.events.handle_update_drone_entity(drone)
 
-end
-
-function codeblock.commands.drone_place_cube(name, w, h, l, block_identifier,
-                                             hollow)
-
-    local drone = codeblock.drones[name]
-    if not drone then
-        minetest.chat_send_player(name, S("drone does not exist"))
-        return
-    end
-
-    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
-    local real_block_name = codeblock.sandbox.blocks[block_identifier]
-
-    if not real_block_name then
-        minetest.chat_send_player(name, S('block not allowed'))
-        return
-    end
-
-    local angle = (drone.dir % (2 * math.pi)) / (math.pi / 2)
-
-    local hollow = hollow and true or false
-    local h = h or 10
-    local x
-    local y = drone.y
-    local z
-
-    if angle == 0 then
-        w, l = w or 10, l or 10
-        x = drone.x + math.floor(w / 2)
-        z = drone.z + math.floor(l / 2)
-    elseif angle == 1 then
-        w, l = l or 10, w or 10
-        x = drone.x - math.floor((w - 1) / 2)
-        z = drone.z - math.floor((l - 1) / 2) + l -1
-    elseif angle == 2 then
-        w, l = w or 10, l or 10
-        x = drone.x - math.floor((w - 1) / 2)
-        z = drone.z - math.floor((l - 1) / 2)
-    elseif angle == 3 then
-        w, l = l or 10, w or 10
-        x = drone.x + math.floor(w / 2)
-        z = drone.z + math.floor(l / 2) - l + 1
-    end
-
-    worldedit.cube({x = x, y = y, z = z}, w, h, l, real_block_name, hollow)
-
-end
-
-function codeblock.commands.test_sequence(name)
-
-    for l = 1, 10 do
-        for k = 1, 5 do
-            for j = 1, 4 do
-                for i = 1, 10 do
-                    codeblock.commands.drone_forward(name, 1)
-                    codeblock.commands.drone_place_block(name, "default:stone")
-                end
-                codeblock.commands.drone_turn_right(name)
-            end
-            codeblock.commands.drone_up(name, 1)
-        end
-        codeblock.commands.drone_right(name, 1)
-        codeblock.commands.drone_back(name, 1)
-    end
 end

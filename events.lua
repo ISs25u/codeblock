@@ -1,9 +1,15 @@
 codeblock.events = {}
 local S = codeblock.S
 
---
--- FUNCTIONS
---
+-------------------------------------------------------------------------------
+-- local
+-------------------------------------------------------------------------------
+
+local ceil = math.ceil
+
+-------------------------------------------------------------------------------
+-- handles
+-------------------------------------------------------------------------------
 
 function codeblock.events.handle_update_drone_entity(drone)
     local name = drone.name
@@ -93,12 +99,12 @@ function codeblock.events.handle_place_block(pos, block)
 
     assert(pos)
 
-    block = block or "default:dirt"
+    local block = block or "default:dirt"
 
     minetest.set_node({
-        x = math.ceil(pos.x),
-        y = math.ceil(pos.y),
-        z = math.ceil(pos.z)
+        x = ceil(pos.x),
+        y = ceil(pos.y),
+        z = ceil(pos.z)
     }, {name = block})
 
 end

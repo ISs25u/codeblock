@@ -18,6 +18,10 @@ function codeblock.sandbox.run_safe(name, file)
     end
 
     local command_env = {
+        move = function(x, y, z)
+            codeblock.commands.drone_move(name, x, y, z)
+            return
+        end,
         forward = function(n)
             codeblock.commands.drone_forward(name, n)
             return
@@ -132,6 +136,7 @@ end
 --
 
 codeblock.sandbox.blocks = {
+    air = 'air',
     stone = 'default:stone',
     cobble = 'default:cobble',
     stonebrick = 'default:stonebrick',
@@ -258,6 +263,7 @@ codeblock.sandbox.blocks = {
 }
 
 codeblock.sandbox.cubes_names = {
+    air = 'air',
     stone = 'stone',
     cobble = 'cobble',
     stonebrick = 'stonebrick',
@@ -372,26 +378,25 @@ codeblock.sandbox.plants_names = {
 }
 
 codeblock.sandbox.wools_names = {
-    white_wool = 'wool_white',
-    grey_wool = 'wool_grey',
-    dark_grey_wool = 'wool_dark_grey',
-    black_wool = 'wool_black',
-    violet_wool = 'wool_violet',
-    blue_wool = 'wool_blue',
-    cyan_wool = 'wool_cyan',
-    dark_green_wool = 'wool_dark_green',
-    green_wool = 'wool_green',
-    yellow_wool = 'wool_yellow',
-    brown_wool = 'wool_brown',
-    orange_wool = 'wool_orange',
-    red_wool = 'wool_red',
-    magenta_wool = 'wool_magenta',
-    pink_wool = 'wool_pink'
+    white = 'wool_white',
+    grey = 'wool_grey',
+    dark_grey = 'wool_dark_grey',
+    black = 'wool_black',
+    violet = 'wool_violet',
+    blue = 'wool_blue',
+    cyan = 'wool_cyan',
+    dark_green = 'wool_dark_green',
+    green = 'wool_green',
+    yellow = 'wool_yellow',
+    brown = 'wool_brown',
+    orange = 'wool_orange',
+    red = 'wool_red',
+    magenta = 'wool_magenta',
+    pink = 'wool_pink'
 }
 
 codeblock.sandbox.iwools_names = {
     'wool_magenta', 'wool_red', 'wool_pink', 'wool_brown', 'wool_orange',
     'wool_yellow', 'wool_green', 'wool_dark_green', 'wool_cyan', 'wool_blue',
     'wool_violet'
-
 }
