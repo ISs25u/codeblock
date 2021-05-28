@@ -210,27 +210,27 @@ end
 
 function codeblock.commands.drone_turn_left(name)
 
-    local drone = codeblock.drones[name]
-    if not drone then
-        minetest.chat_send_player(name, S("drone does not exist"))
-        return
-    end
-
-    drone.dir = (drone.dir + pi * 0.5) % (2 * pi)
-
-    codeblock.events.handle_update_drone_entity(drone)
+    codeblock.commands.drone_turn(name, 1)
 
 end
 
 function codeblock.commands.drone_turn_right(name)
 
+    codeblock.commands.drone_turn(name, -1)
+
+end
+
+function codeblock.commands.drone_turn(name, quarters)
+
     local drone = codeblock.drones[name]
     if not drone then
         minetest.chat_send_player(name, S("drone does not exist"))
         return
     end
 
-    drone.dir = (drone.dir - pi * 0.5) % (2 * pi)
+    local quarters = quarters or 0
+
+    drone.dir = (drone.dir + floor(quarters) * pi * 0.5) % (2 * pi)
 
     codeblock.events.handle_update_drone_entity(drone)
 
@@ -369,6 +369,53 @@ function codeblock.commands.drone_place_cube(name, w, h, l, block_identifier,
 
 end
 
+function codeblock.commands.drone_place_sphere(name, radius, block_identifier,
+                                               hollow)
+
+    local drone = codeblock.drones[name]
+    if not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+        return
+    end
+
+    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
+    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+
+    if not real_block_name then
+        minetest.chat_send_player(name, S('block not allowed'))
+        return
+    end
+
+    local angle = 2 / pi * (drone.dir % (2 * pi))
+
+    local hollow = hollow and true or false
+    local radius = radius or 10
+    local x
+    local y
+    local z
+
+    if angle == 0 then
+        x = drone.x + radius
+        y = drone.y + radius + 1
+        z = drone.z + radius
+    elseif angle == 1 then
+        x = drone.x - radius
+        y = drone.y + radius + 1
+        z = drone.z + radius
+    elseif angle == 2 then
+        x = drone.x - radius
+        y = drone.y + radius + 1
+        z = drone.z - radius
+    elseif angle == 3 then
+        x = drone.x + radius
+        y = drone.y + radius + 1
+        z = drone.z - radius
+    end
+
+    count = worldedit.sphere({x = x, y = y, z = z}, radius, real_block_name,
+                             hollow)
+
+end
 -------------------------------------------------------------------------------
 -- checkpoints
 -------------------------------------------------------------------------------

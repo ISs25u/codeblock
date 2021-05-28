@@ -54,6 +54,10 @@ function codeblock.sandbox.run_safe(name, file)
             codeblock.commands.drone_turn_right(name)
             return
         end,
+        turn = function(quarters)
+            codeblock.commands.drone_turn(name, quarters)
+            return
+        end,
         place = function(block)
             codeblock.commands.drone_place_block(name, block)
             return
@@ -69,6 +73,9 @@ function codeblock.sandbox.run_safe(name, file)
         end,
         cube = function(w, h, l, block, hollow)
             codeblock.commands.drone_place_cube(name, w, h, l, block, hollow)
+        end,
+        sphere = function(r, block, hollow)
+            codeblock.commands.drone_place_sphere(name, r, block, hollow)
         end,
         blocks = codeblock.sandbox.cubes_names,
         plants = codeblock.sandbox.plants_names,

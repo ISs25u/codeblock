@@ -34,6 +34,7 @@ right(n)
 move(right,forward,up)
 turn_right()
 turn_left()
+turn(n_quarters)
 ```
 
 Example: `forward(5)`
@@ -43,6 +44,8 @@ Example: `forward(5)`
 ```lua
 place(block)
 place_relative(x, y, z, block, checkpoint_name)
+cube(w, h, l, block, hollow)
+sphere(radius, block, hollow)
 ```
 
 ```lua

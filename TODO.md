@@ -10,8 +10,8 @@
 
 - [ ] safe formspecs
 - [ ] check compatible versions of minetest
-- [ ] add orient(N,E,S,W) ?
-- [ ] add sphere()
+- [x] add turn(n) ?
+- [x] add sphere()
 - [x] add cube()
 - [x] add move(r,f,u)
 - [x] relative positioning
