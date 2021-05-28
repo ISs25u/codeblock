@@ -6,10 +6,16 @@
 - [ ] Control drone operating speed (medium priority)
 - [ ] In-game lua code editor (low priority)
 
+### v0.3
+
+- [ ] make worldedit optional
+- [ ] add cylinder() and dome()
+- [ ] try to control drone speed?
+
 ### v0.2
 
-- [ ] safe formspecs
-- [ ] check compatible versions of minetest
+- [x] safe formspecs
+- [x] check compatible versions of minetest
 - [x] add turn(n) ?
 - [x] add sphere()
 - [x] add cube()

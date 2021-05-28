@@ -49,7 +49,7 @@ local DroneEntity = {
     on_rightclick = function(self, clicker) end,
     on_punch = function(self, puncher, time_from_last_punch, tool_capabilities,
                         dir) return {} end,
-    on_blast = function(self, damage) return false, false, {} end,
+    on_blast = function(self, damage) return end,
     drone_owner = nil,
     nametag = '?'
 }
