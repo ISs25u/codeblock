@@ -231,7 +231,7 @@ codeblock.examples.forest = [[
                 if sqrt(i * i + j * j) < radius then
                     go('o')
                     move(i + random(-5, 5), 0, j + random(-5, 5))
-                    orient(random(0, 3))
+                    turn(random(0, 3))
                     tree(HMIN, HMAX)
                 end
     
