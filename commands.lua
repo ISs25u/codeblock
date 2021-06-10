@@ -416,6 +416,78 @@ function codeblock.commands.drone_place_sphere(name, radius, block_identifier,
                              hollow)
 
 end
+
+function codeblock.commands.drone_place_cylinder(name, A, L, R,
+                                                 block_identifier, hollow)
+
+    local drone = codeblock.drones[name]
+    if not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+        return
+    end
+
+    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
+    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+
+    if not real_block_name then
+        minetest.chat_send_player(name, S('block not allowed'))
+        return
+    end
+
+    local angle = 2 / pi * (drone.dir % (2 * pi))
+
+    local hollow = hollow and true or false
+    local A = A or 'V'
+    if (A == 'V') then
+        A = 'y'
+    elseif (A == 'H') then
+        if angle == 0 then
+            A = 'z'
+        elseif angle == 1 then
+            A = 'x'
+        elseif angle == 2 then
+            A = 'z'
+        elseif angle == 3 then
+            A = 'x'
+        end
+    else
+        A = 'y'
+    end
+
+    local iX = (A == 'x' and 1 or 0)
+    local iY = (A == 'y' and 1 or 0)
+    local iZ = (A == 'z' and 1 or 0)
+
+    local L = L or 10
+    local R = R or 5
+
+    local x
+    local y
+    local z
+
+    if angle == 0 then
+        x = drone.x + R
+        y = drone.y + R * (1 - iY)
+        z = drone.z + R * iY
+    elseif angle == 1 then
+        x = drone.x - R * iY - (L - 1) * iX
+        y = drone.y + R * (1 - iY)
+        z = drone.z + R
+    elseif angle == 2 then
+        x = drone.x - R
+        y = drone.y + R * (1 - iY)
+        z = drone.z - R * iY - (L - 1) * iZ
+    elseif angle == 3 then
+        x = drone.x + R * iY
+        y = drone.y + R * (1 - iY)
+        z = drone.z - R
+    end
+
+    count = worldedit.cylinder({x = x, y = y, z = z}, A, L, R, R,
+                               real_block_name, hollow)
+
+end
+
 -------------------------------------------------------------------------------
 -- checkpoints
 -------------------------------------------------------------------------------

@@ -77,6 +77,10 @@ function codeblock.sandbox.run_safe(name, file)
         sphere = function(r, block, hollow)
             codeblock.commands.drone_place_sphere(name, r, block, hollow)
         end,
+        cylinder = function(a, l, r, block, hollow)
+            codeblock.commands
+                .drone_place_cylinder(name, a, l, r, block, hollow)
+        end,
         blocks = codeblock.sandbox.cubes_names,
         plants = codeblock.sandbox.plants_names,
         wools = codeblock.sandbox.wools_names,
