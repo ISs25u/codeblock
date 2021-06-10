@@ -243,6 +243,57 @@ codeblock.examples.forest = [[
     forest(100)
 ]]
 
+codeblock.examples.death_star = [[
+    local R1 = 30
+    local R2 = R1
+    
+    local V1 = vector.new(-1, -1, -1)
+    local v = vector.floor(vector.multiply(vector.normalize(V1), 0.95 * (R1 + R2)))
+    
+    up(2 * R1 + R2)
+    save('c1')
+    csphere(R1, wools.grey)
+    csphere(R1 - 1, wools.cyan)
+    move(v.x, v.y, v.z)
+    csphere(R2, blocks.air)
+    
+    go('c1')
+    for i = 1, 200, 1 do
+        csphere(2, blocks.meselamp)
+        move(V1.x, V1.y, V1.z)
+    end    
+]]
+
+codeblock.examples.planet = [[
+    local R1 = 100
+
+    up(2 * R1)
+    
+    csphere(R1, blocks.desert_sandstone)
+    csphere(R1 - 2, blocks.silver_sandstone)
+    local vcenter = vector.new(0, 0, 0)
+    
+    save('c')
+    local theta
+    local phi
+    local vrandom, vdep
+    for i = 1, 200 do
+    
+        theta = random() * pi
+        phi = random() * 2 * pi
+        r = random(5, 20)
+    
+        vrandom = vector.new(r * cos(phi) * sin(theta), r * sin(phi) * sin(theta),
+                             r * cos(theta))
+        vdep = vector.multiply(vector.direction(vcenter, vrandom), (R1 + r) * 0.95)
+    
+        go('c')
+        move(vdep.x, vdep.y, vdep.z)
+        csphere(r, blocks.air)
+    
+    end
+]]
+
 -- codeblock.examples.exampleN = [[
 
 -- ]]

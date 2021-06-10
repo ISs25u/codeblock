@@ -339,37 +339,74 @@ function codeblock.commands.drone_place_cube(name, w, h, l, block_identifier,
 
     local angle = 2 / pi * (drone.dir % (2 * pi))
 
-    local hollow = hollow and true or false
+    local hollow = (hollow == nil) and false or (hollow and true or false)
     local w = w or 10
     local h = h or 10
     local l = l or 10
     local x
-    local y
+    local y = drone.y
     local z
 
     if angle == 0 then
         w, l = w, l
         x = drone.x + floor(w * 0.5)
-        y = drone.y
         z = drone.z + floor(l * 0.5)
     elseif angle == 1 then
         w, l = l, w
         x = drone.x - floor((w - 1) * 0.5)
-        y = drone.y
         z = drone.z - floor((l - 1) * 0.5) + l - 1
     elseif angle == 2 then
         w, l = w, l
         x = drone.x - floor((w - 1) * 0.5)
-        y = drone.y
         z = drone.z - floor((l - 1) * 0.5)
     elseif angle == 3 then
         w, l = l, w
         x = drone.x + floor(w * 0.5)
-        y = drone.y
         z = drone.z + floor(l * 0.5) - l + 1
     end
 
-    count = worldedit.cube({x = x, y = y, z = z}, w, h, l, real_block_name, hollow)
+    count = worldedit.cube({x = x, y = y, z = z}, w, h, l, real_block_name,
+                           hollow)
+
+end
+
+function codeblock.commands.drone_place_ccube(name, w, h, l, block_identifier,
+                                              hollow)
+
+    local drone = codeblock.drones[name]
+    if not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+        return
+    end
+
+    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
+    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+
+    if not real_block_name then
+        minetest.chat_send_player(name, S('block not allowed'))
+        return
+    end
+
+    local angle = 2 / pi * (drone.dir % (2 * pi))
+
+    local hollow = (hollow == nil) and false or (hollow and true or false)
+    local w = w or 10
+    local h = h or 10
+    local l = l or 10
+
+    if angle == 0 then
+        w, l = w, l
+    elseif angle == 1 then
+        w, l = l, w
+    elseif angle == 2 then
+        w, l = w, l
+    elseif angle == 3 then
+        w, l = l, w
+    end
+
+    local pos = {x = drone.x, y = drone.y, z = drone.z}
+
+    count = worldedit.cube(pos, w, h, l, real_block_name, hollow)
 
 end
 
@@ -392,32 +429,122 @@ function codeblock.commands.drone_place_sphere(name, radius, block_identifier,
 
     local angle = 2 / pi * (drone.dir % (2 * pi))
 
-    local hollow = hollow and true or false
+    local hollow = (hollow == nil) and false or (hollow and true or false)
     local radius = radius or 10
     local x
-    local y
+    local y = drone.y + radius
     local z
 
     if angle == 0 then
         x = drone.x + radius
-        y = drone.y + radius + 1
         z = drone.z + radius
     elseif angle == 1 then
         x = drone.x - radius
-        y = drone.y + radius + 1
         z = drone.z + radius
     elseif angle == 2 then
         x = drone.x - radius
-        y = drone.y + radius + 1
         z = drone.z - radius
     elseif angle == 3 then
         x = drone.x + radius
-        y = drone.y + radius + 1
         z = drone.z - radius
     end
 
     count = worldedit.sphere({x = x, y = y, z = z}, radius, real_block_name,
                              hollow)
+
+end
+
+function codeblock.commands.drone_place_csphere(name, radius, block_identifier,
+                                                hollow)
+
+    local drone = codeblock.drones[name]
+    if not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+        return
+    end
+
+    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
+    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+
+    if not real_block_name then
+        minetest.chat_send_player(name, S('block not allowed'))
+        return
+    end
+
+    local hollow = (hollow == nil) and false or (hollow and true or false)
+    local radius = radius or 10
+    local pos = {x = floor(drone.x), y = floor(drone.y), z = floor(drone.z)}
+
+    count = worldedit.sphere(pos, radius, real_block_name, hollow)
+
+end
+
+function codeblock.commands.drone_place_dome(name, radius, block_identifier,
+                                             hollow)
+
+    local drone = codeblock.drones[name]
+    if not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+        return
+    end
+
+    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
+    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+
+    if not real_block_name then
+        minetest.chat_send_player(name, S('block not allowed'))
+        return
+    end
+
+    local angle = 2 / pi * (drone.dir % (2 * pi))
+
+    local hollow = (hollow == nil) and false or (hollow and true or false)
+    local radius = radius or 10
+    local x
+    local y = drone.y
+    local z
+
+    if angle == 0 then
+        x = drone.x + radius
+        z = drone.z + radius
+    elseif angle == 1 then
+        x = drone.x - radius
+        z = drone.z + radius
+    elseif angle == 2 then
+        x = drone.x - radius
+        z = drone.z - radius
+    elseif angle == 3 then
+        x = drone.x + radius
+        z = drone.z - radius
+    end
+
+    count = worldedit.dome({x = x, y = y, z = z}, radius, real_block_name,
+                           hollow)
+
+end
+
+function codeblock.commands.drone_place_cdome(name, radius, block_identifier,
+                                              hollow)
+
+    local drone = codeblock.drones[name]
+    if not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+        return
+    end
+
+    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
+    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+
+    if not real_block_name then
+        minetest.chat_send_player(name, S('block not allowed'))
+        return
+    end
+
+    local hollow = (hollow == nil) and false or (hollow and true or false)
+    local radius = radius or 10
+    local pos = {x = drone.x, y = drone.y, z = drone.z}
+
+    count = worldedit.dome(pos, radius, real_block_name, hollow)
 
 end
 
@@ -440,7 +567,7 @@ function codeblock.commands.drone_place_cylinder(name, A, L, R,
 
     local angle = 2 / pi * (drone.dir % (2 * pi))
 
-    local hollow = hollow and true or false
+    local hollow = (hollow == nil) and false or (hollow and true or false)
     local A = A or 'V'
     if (A == 'V') then
         A = 'y'
@@ -489,6 +616,51 @@ function codeblock.commands.drone_place_cylinder(name, A, L, R,
 
     count = worldedit.cylinder({x = x, y = y, z = z}, A, L, R, R,
                                real_block_name, hollow)
+
+end
+
+function codeblock.commands.drone_place_ccylinder(name, A, L, R,
+                                                  block_identifier, hollow)
+
+    local drone = codeblock.drones[name]
+    if not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+        return
+    end
+
+    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
+    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+
+    if not real_block_name then
+        minetest.chat_send_player(name, S('block not allowed'))
+        return
+    end
+
+    local angle = 2 / pi * (drone.dir % (2 * pi))
+
+    local hollow = (hollow == nil) and false or (hollow and true or false)
+    local A = A or 'V'
+    if (A == 'V') then
+        A = 'y'
+    elseif (A == 'H') then
+        if angle == 0 then
+            A = 'z'
+        elseif angle == 1 then
+            A = 'x'
+        elseif angle == 2 then
+            A = 'z'
+        elseif angle == 3 then
+            A = 'x'
+        end
+    else
+        A = 'y'
+    end
+
+    local L = L or 10
+    local R = R or 5
+    local pos = {x = drone.x, y = drone.y, z = drone.z}
+
+    count = worldedit.cylinder(pos, A, L, R, R, real_block_name, hollow)
 
 end
 

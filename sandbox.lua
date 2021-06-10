@@ -74,12 +74,28 @@ function codeblock.sandbox.run_safe(name, file)
         cube = function(w, h, l, block, hollow)
             codeblock.commands.drone_place_cube(name, w, h, l, block, hollow)
         end,
+        ccube = function(w, h, l, block, hollow)
+            codeblock.commands.drone_place_ccube(name, w, h, l, block, hollow)
+        end,
         sphere = function(r, block, hollow)
             codeblock.commands.drone_place_sphere(name, r, block, hollow)
+        end,
+        csphere = function(r, block, hollow)
+            codeblock.commands.drone_place_csphere(name, r, block, hollow)
+        end,
+        dome = function(r, block, hollow)
+            codeblock.commands.drone_place_dome(name, r, block, hollow)
+        end,
+        cdome = function(r, block, hollow)
+            codeblock.commands.drone_place_cdome(name, r, block, hollow)
         end,
         cylinder = function(a, l, r, block, hollow)
             codeblock.commands
                 .drone_place_cylinder(name, a, l, r, block, hollow)
+        end,
+        ccylinder = function(a, l, r, block, hollow)
+            codeblock.commands.drone_place_ccylinder(name, a, l, r, block,
+                                                     hollow)
         end,
         blocks = codeblock.sandbox.cubes_names,
         plants = codeblock.sandbox.plants_names,
@@ -108,9 +124,13 @@ function codeblock.sandbox.run_safe(name, file)
         sqrt = function(x) return math.sqrt(x) end,
         abs = function(x) return math.abs(x) end,
         sin = function(x) return math.sin(x) end,
+        asin = function(x) return math.asin(x) end,
         cos = function(x) return math.cos(x) end,
+        acos = function(x) return math.acos(x) end,
         tan = function(x) return math.tan(x) end,
+        atan = function(x) return math.atan(x) end,
         pi = math.pi,
+        vector = vector,
         print = function(msg)
             minetest.chat_send_player(name, '> ' .. tostring(msg))
             return
