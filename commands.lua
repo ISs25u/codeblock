@@ -316,6 +316,10 @@ function codeblock.commands.drone_place_relative(name, x, y, z,
 
 end
 
+-------------------------------------------------------------------------------
+-- WorldEdit
+-------------------------------------------------------------------------------
+
 function codeblock.commands.drone_place_cube(name, w, h, l, block_identifier,
                                              hollow)
 
@@ -365,7 +369,7 @@ function codeblock.commands.drone_place_cube(name, w, h, l, block_identifier,
         z = drone.z + floor(l * 0.5) - l + 1
     end
 
-    worldedit.cube({x = x, y = y, z = z}, w, h, l, real_block_name, hollow)
+    count = worldedit.cube({x = x, y = y, z = z}, w, h, l, real_block_name, hollow)
 
 end
 
