@@ -151,12 +151,11 @@ codeblock.examples.plot3D = [[
 
 codeblock.examples.menger = [[
     function menger(size, block)
-
         local function recursion(size, x, y, z)
     
             local inc = floor(size / 3)
     
-            save(size)
+            save('chpt_' .. size)
     
             if size == 1 then return end
     
@@ -166,11 +165,11 @@ codeblock.examples.menger = [[
     
                         if (nx == ny and nx == inc) or (ny == nz and nz == inc) or
                             (nz == nx and nx == inc) then
-                            go(size)
+                            go('chpt_' .. size)
                             move(x + nx, y + ny, z + nz)
                             cube(inc, inc, inc, blocks.air)
                         else
-                            go(size)
+                            go('chpt_' .. size)
                             recursion(inc, x + nx, y + ny, z + nz)
                         end
     
@@ -198,7 +197,6 @@ codeblock.examples.menger = [[
 
 codeblock.examples.forest = [[
     function forest(radius)
-
         local function tree(HMIN, HMAX)
     
             local H = random(HMIN, HMAX)
@@ -247,20 +245,21 @@ codeblock.examples.death_star = [[
     local R1 = 30
     local R2 = R1
     
-    local V1 = vector.new(-1, -1, -1)
-    local v = vector.floor(vector.multiply(vector.normalize(V1), 0.95 * (R1 + R2)))
+    local mvt = vector.new(-1, -1, -1)
+    local pos = vector.floor(vector.multiply(vector.normalize(mvt), 0.95 * (R1 + R2)))
     
     up(2 * R1 + R2)
-    save('c1')
+    save('center')
     csphere(R1, wools.grey)
     csphere(R1 - 1, wools.cyan)
-    move(v.x, v.y, v.z)
+    
+    move(pos.x, pos.y, pos.z)
     csphere(R2, blocks.air)
     
-    go('c1')
+    go('center')
     for i = 1, 200, 1 do
         csphere(2, blocks.meselamp)
-        move(V1.x, V1.y, V1.z)
+        move(mvt.x, mvt.y, mvt.z)
     end    
 ]]
 
@@ -268,27 +267,23 @@ codeblock.examples.planet = [[
     local R1 = 100
 
     up(2 * R1)
-    
+    save('center')
     csphere(R1, blocks.desert_sandstone)
     csphere(R1 - 2, blocks.silver_sandstone)
     local vcenter = vector.new(0, 0, 0)
     
-    save('c')
-    local theta
-    local phi
-    local vrandom, vdep
     for i = 1, 200 do
     
-        theta = random() * pi
-        phi = random() * 2 * pi
-        r = random(5, 20)
+        local theta = random() * pi
+        local phi = random() * 2 * pi
+        local r = random(5, 20)
     
-        vrandom = vector.new(r * cos(phi) * sin(theta), r * sin(phi) * sin(theta),
+        local vrandom = vector.new(r * cos(phi) * sin(theta), r * sin(phi) * sin(theta),
                              r * cos(theta))
-        vdep = vector.multiply(vector.direction(vcenter, vrandom), (R1 + r) * 0.95)
+        local pos = vector.multiply(vector.direction(vcenter, vrandom), (R1 + r) * 0.95)
     
-        go('c')
-        move(vdep.x, vdep.y, vdep.z)
+        go('center')
+        move(pos.x, pos.y, pos.z)
         csphere(r, blocks.air)
     
     end
