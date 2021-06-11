@@ -10,9 +10,8 @@
 
 - [x] add cylinder() and dome()
 - [x] WE center placing functions
-- [ ] floor x,y,z in (WE) functions + type() == 'number'
-- [ ] allow to use vectors
-- [ ] try to control drone speed?
+- [x] sanity checks of input types
+- [ ] allow to use vectors easily
 - [ ] update list of commands in README and contentDB
 
 ### v0.2
