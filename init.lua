@@ -9,8 +9,11 @@ end
 
 codeblock.drones = {}
 codeblock.drone_entities = {}
+codeblock.call_limit = 1e6
+codeblock.max_operations = 10e6
 codeblock.S = minetest.get_translator("codeblock")
 
+dofile(codeblock.modpath .. "/utils.lua")
 dofile(codeblock.modpath .. "/register.lua")
 dofile(codeblock.modpath .. "/drone.lua")
 dofile(codeblock.modpath .. "/events.lua")

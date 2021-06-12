@@ -2,6 +2,307 @@ codeblock.sandbox = {}
 
 local S = codeblock.S
 
+local function getScriptEnv(name)
+
+    local cmd = codeblock.commands
+    local utils = codeblock.utils
+
+    local env = {
+        move = function(x, y, z)
+            cmd.drone_move(name, x, y, z)
+            return
+        end,
+        forward = function(n)
+            cmd.drone_forward(name, n)
+            return
+        end,
+        back = function(n)
+            cmd.drone_back(name, n)
+            return
+        end,
+        left = function(n)
+            cmd.drone_left(name, n)
+            return
+        end,
+        right = function(n)
+            cmd.drone_right(name, n)
+            return
+        end,
+        up = function(n)
+            cmd.drone_up(name, n)
+            return
+        end,
+        down = function(n)
+            cmd.drone_down(name, n)
+            return
+        end,
+        turn_left = function()
+            cmd.drone_turn_left(name)
+            return
+        end,
+        turn_right = function()
+            cmd.drone_turn_right(name)
+            return
+        end,
+        turn = function(quarters)
+            cmd.drone_turn(name, quarters)
+            return
+        end,
+        place = function(block)
+            cmd.drone_place_block(name, block)
+            return
+        end,
+        place_relative = function(x, y, z, block, label)
+            cmd.drone_place_relative(name, x, y, z, block, label)
+        end,
+        save = function(label) cmd.drone_save_checkpoint(name, label) end,
+        go = function(label) cmd.drone_goto_checkpoint(name, label) end,
+        cube = function(w, h, l, block, hollow)
+            cmd.drone_place_cube(name, w, h, l, block, hollow)
+        end,
+        ccube = function(w, h, l, block, hollow)
+            cmd.drone_place_ccube(name, w, h, l, block, hollow)
+        end,
+        sphere = function(r, block, hollow)
+            cmd.drone_place_sphere(name, r, block, hollow)
+        end,
+        csphere = function(r, block, hollow)
+            cmd.drone_place_csphere(name, r, block, hollow)
+        end,
+        dome = function(r, block, hollow)
+            cmd.drone_place_dome(name, r, block, hollow)
+        end,
+        cdome = function(r, block, hollow)
+            cmd.drone_place_cdome(name, r, block, hollow)
+        end,
+        cylinder = function(a, l, r, block, hollow)
+            cmd.drone_place_cylinder(name, a, l, r, block, hollow)
+        end,
+        ccylinder = function(a, l, r, block, hollow)
+            cmd.drone_place_ccylinder(name, a, l, r, block, hollow)
+        end,
+        blocks = codeblock.utils.cubes_names,
+        plants = codeblock.utils.plants_names,
+        wools = codeblock.utils.wools_names,
+        iwools = codeblock.utils.iwools_names,
+        ipairs = ipairs,
+        pairs = pairs,
+        random = math.random,
+        floor = math.floor,
+        ceil = math.ceil,
+        deg = math.deg,
+        rad = math.rad,
+        exp = math.exp,
+        log = math.log,
+        max = math.max,
+        min = math.min,
+        pow = math.pow,
+        sqrt = math.sqrt,
+        abs = math.abs,
+        sin = math.sin,
+        sinh = math.sinh,
+        asin = math.asin,
+        cos = math.cos,
+        cosh = math.cosh,
+        acos = math.acos,
+        tan = math.tan,
+        tanh = math.tanh,
+        atan = math.atan,
+        atan2 = math.atan2,
+        pi = math.pi,
+        vector = vector,
+        error = error,
+        print = function(msg)
+            minetest.chat_send_player(name, '> ' .. tostring(msg))
+            return
+        end
+    }
+
+    env._G = env
+    return env
+
+end
+
+--------------------------------------------------------------------------------
+-- adapted from https://github.com/ac-minetest/basic_robot/blob/master/init.lua
+--------------------------------------------------------------------------------
+
+local function check_code(code)
+    -- "while ", "for ", "do ","goto ",  
+    local bad_code = {
+        "repeat", "until", "_c_", "_G", "while%(", "while{"
+    } -- ,"\\\"", "%[=*%[","--[["}, "%.%.[^%.]"
+    for _, v in pairs(bad_code) do
+        if string.find(code, v) then return v .. " is not allowed!"; end
+    end
+end
+
+local function identify_strings(code) -- returns list of positions {start,end} of literal strings in lua code
+
+    local i = 0;
+    local j;
+    local _;
+    local length = string.len(code);
+    local mode = 0; -- 0: not in string, 1: in '...' string, 2: in "..." string, 3. in [==[ ... ]==] string
+    local modes = {
+        {"'", "'"}, -- inside ' '
+        {"\"", "\""}, -- inside " "
+        {"%[=*%[", "%]=*%]"} -- inside [=[ ]=]
+    }
+    local ret = {}
+    while i < length do
+        i = i + 1
+
+        local jmin = length + 1;
+        if mode == 0 then -- not yet inside string
+            for k = 1, #modes do
+                j = string.find(code, modes[k][1], i);
+                if j and j < jmin then -- pick closest one
+                    jmin = j
+                    mode = k
+                end
+            end
+            if mode ~= 0 then -- found something
+                j = jmin
+                ret[#ret + 1] = {jmin}
+            end
+            if not j then break end -- found nothing
+        else
+            _, j = string.find(code, modes[mode][2], i); -- search for closing pair
+            if not j then break end
+            if (mode ~= 2 or (string.sub(code, j - 1, j - 1) ~= "\\") or
+                string.sub(code, j - 2, j - 1) == "\\\\") then -- not (" and not \" - but "\\" is allowed)
+                ret[#ret][2] = j
+                mode = 0
+            end
+        end
+        i = j -- move to next position
+    end
+    if mode ~= 0 then ret[#ret][2] = length end
+    return ret
+end
+
+local function is_inside_string(strings, pos) -- is position inside one of the strings?
+    local low = 1;
+    local high = #strings;
+    if high == 0 then return false end
+    local mid = high;
+    while high > low + 1 do
+        mid = math.floor((low + high) / 2)
+        if pos < strings[mid][1] then
+            high = mid
+        else
+            low = mid
+        end
+    end
+    if pos > strings[low][2] then
+        mid = high
+    else
+        mid = low
+    end
+    return strings[mid][1] <= pos and pos <= strings[mid][2]
+end
+
+local function find_outside_string(script, pattern, pos, strings)
+    local length = string.len(script)
+    local found = true;
+    local i1 = pos;
+    while found do
+        found = false
+        local i2 = string.find(script, pattern, i1);
+        if i2 then
+            if not is_inside_string(strings, i2) then return i2 end
+            found = true;
+            i1 = i2 + 1;
+        end
+    end
+    return nil
+end
+
+local function preprocess_code(script, call_limit) -- version 07/24/2018
+
+    --[[ idea: in each local a = function (args) ... end insert counter like:
+	local a = function (args) counter_check_code ... end 
+	when counter exceeds limit exit with error
+	--]]
+
+    local call_limit = codeblock.call_limit
+
+    script = script:gsub("%-%-%[%[.*%-%-%]%]", ""):gsub("%-%-[^\n]*\n", "\n") -- strip comments
+
+    -- process script to insert call counter in every function
+    local _increase_ccounter = " _c_ = _c_ + 1; if _c_ > " .. call_limit ..
+                                   " then _G.error(\"Execution count \".. _c_ .. \" exceeded " ..
+                                   call_limit .. "\") end; "
+
+    local i1 = 0;
+    local i2 = 0;
+    local found = true;
+
+    local strings = identify_strings(script);
+
+    local inserts = {};
+
+    local constructs = {
+        {"while%s", "%sdo%s", 2, 6}, -- numbers: insertion pos = i2+2,  after skip to i1 = i12+6
+        {"function", ")", 0, 8}, {"for%s", "%sdo%s", 2, 4},
+        {"goto%s", nil, -1, 5}
+    }
+
+    for i = 1, #constructs do
+        i1 = 0;
+        found = true
+        while (found) do -- PROCESS SCRIPT AND INSERT COUNTER AT PROBLEMATIC SPOTS
+
+            found = false;
+
+            i2 = find_outside_string(script, constructs[i][1], i1, strings) -- first part of construct
+            if i2 then
+                local i21 = i2;
+                if constructs[i][2] then
+                    i2 = find_outside_string(script, constructs[i][2], i2,
+                                             strings); -- second part of construct ( if any )
+                    if i2 then
+                        inserts[#inserts + 1] = i2 + constructs[i][3]; -- move to last position of construct[i][2]
+                        found = true;
+                    end
+                else
+                    inserts[#inserts + 1] = i2 + constructs[i][3]
+                    found = true -- 1 part construct
+                end
+
+                if found then
+                    i1 = i21 + constructs[i][4]; -- skip to after constructs[i][1]
+                end
+            end
+
+        end
+    end
+
+    table.sort(inserts)
+
+    -- add inserts
+    local ret = {};
+    i1 = 1;
+    for i = 1, #inserts do
+        i2 = inserts[i];
+        ret[#ret + 1] = string.sub(script, i1, i2);
+        i1 = i2 + 1;
+    end
+    ret[#ret + 1] = string.sub(script, i1);
+    script = table.concat(ret, _increase_ccounter)
+
+    -- must reset ccounter when paused, but user should not be able to force reset by modifying pause!
+    -- (suggestion about 'pause' by Kimapr, 09/26/2019)
+
+    -- TODO adapt this
+    return
+        "_c_ = 0 local _pause_ = pause pause = function() _c_ = 0; _pause_() end " ..
+            script;
+
+    -- return script:gsub("pause%(%)", "_c_ = 0; pause()") -- reset ccounter at pause
+end
+
 function codeblock.sandbox.run_safe(name, file)
 
     if not file then
@@ -17,142 +318,31 @@ function codeblock.sandbox.run_safe(name, file)
         return
     end
 
-    local command_env = {
-        move = function(x, y, z)
-            codeblock.commands.drone_move(name, x, y, z)
-            return
-        end,
-        forward = function(n)
-            codeblock.commands.drone_forward(name, n)
-            return
-        end,
-        back = function(n)
-            codeblock.commands.drone_back(name, n)
-            return
-        end,
-        left = function(n)
-            codeblock.commands.drone_left(name, n)
-            return
-        end,
-        right = function(n)
-            codeblock.commands.drone_right(name, n)
-            return
-        end,
-        up = function(n)
-            codeblock.commands.drone_up(name, n)
-            return
-        end,
-        down = function(n)
-            codeblock.commands.drone_down(name, n)
-            return
-        end,
-        turn_left = function()
-            codeblock.commands.drone_turn_left(name)
-            return
-        end,
-        turn_right = function()
-            codeblock.commands.drone_turn_right(name)
-            return
-        end,
-        turn = function(quarters)
-            codeblock.commands.drone_turn(name, quarters)
-            return
-        end,
-        place = function(block)
-            codeblock.commands.drone_place_block(name, block)
-            return
-        end,
-        place_relative = function(x, y, z, block, label)
-            codeblock.commands.drone_place_relative(name, x, y, z, block, label)
-        end,
-        save = function(label)
-            codeblock.commands.drone_save_checkpoint(name, label)
-        end,
-        go = function(label)
-            codeblock.commands.drone_goto_checkpoint(name, label)
-        end,
-        cube = function(w, h, l, block, hollow)
-            codeblock.commands.drone_place_cube(name, w, h, l, block, hollow)
-        end,
-        ccube = function(w, h, l, block, hollow)
-            codeblock.commands.drone_place_ccube(name, w, h, l, block, hollow)
-        end,
-        sphere = function(r, block, hollow)
-            codeblock.commands.drone_place_sphere(name, r, block, hollow)
-        end,
-        csphere = function(r, block, hollow)
-            codeblock.commands.drone_place_csphere(name, r, block, hollow)
-        end,
-        dome = function(r, block, hollow)
-            codeblock.commands.drone_place_dome(name, r, block, hollow)
-        end,
-        cdome = function(r, block, hollow)
-            codeblock.commands.drone_place_cdome(name, r, block, hollow)
-        end,
-        cylinder = function(a, l, r, block, hollow)
-            codeblock.commands
-                .drone_place_cylinder(name, a, l, r, block, hollow)
-        end,
-        ccylinder = function(a, l, r, block, hollow)
-            codeblock.commands.drone_place_ccylinder(name, a, l, r, block,
-                                                     hollow)
-        end,
-        blocks = codeblock.sandbox.cubes_names,
-        plants = codeblock.sandbox.plants_names,
-        wools = codeblock.sandbox.wools_names,
-        iwools = codeblock.sandbox.iwools_names,
-        ipairs = ipairs,
-        pairs = pairs,
-        random = function(a, b)
-            if not a and not b then
-                return math.random()
-            elseif not a or not b then
-                return math.random(a or b)
-            else
-                return math.random(a, b)
-            end
-        end,
-        floor = function(x) return math.floor(x) end,
-        ceil = function(x) return math.ceil(x) end,
-        deg = function(x) return math.deg(x) end,
-        rad = function(x) return math.rad(x) end,
-        exp = function(x) return math.exp(x) end,
-        log = function(x) return math.log(x) end,
-        max = function(x, ...) return math.max(x, ...) end,
-        min = function(x, ...) return math.min(x, ...) end,
-        pow = function(x, y) return math.pow(x, y) end,
-        sqrt = function(x) return math.sqrt(x) end,
-        abs = function(x) return math.abs(x) end,
-        sin = function(x) return math.sin(x) end,
-        asin = function(x) return math.asin(x) end,
-        cos = function(x) return math.cos(x) end,
-        acos = function(x) return math.acos(x) end,
-        tan = function(x) return math.tan(x) end,
-        atan = function(x) return math.atan(x) end,
-        pi = math.pi,
-        vector = vector,
-        print = function(msg)
-            minetest.chat_send_player(name, '> ' .. tostring(msg))
-            return
-        end
-    }
-
     if untrusted_code:byte(1) == 27 then
         minetest.chat_send_player(name, S("Error in @1", file) ..
                                       S("binary bytecode prohibited"))
     end
 
-    local untrusted_function, message = loadstring(untrusted_code)
-    if not untrusted_function then
+    err = check_code(untrusted_code);
+
+    if err then
+        minetest.chat_send_player(name, S("Error in @1", file))
+        minetest.chat_send_player(name, err)
+        return
+    end
+
+    safe_code = preprocess_code(untrusted_code, 10); -- TODO change limit
+
+    local bytecode, message = loadstring(safe_code)
+    if not bytecode then
         minetest.chat_send_player(name, S("Error in @1", file))
         minetest.chat_send_player(name, message)
         return
     end
 
-    setfenv(untrusted_function, command_env)
-
+    setfenv(bytecode, getScriptEnv(name))
     math.randomseed(minetest.get_us_time())
-    local status, err = pcall(untrusted_function)
+    local status, err = pcall(bytecode)
 
     if not status then
         minetest.chat_send_player(name, S("Error in @1", file))
@@ -161,273 +351,3 @@ function codeblock.sandbox.run_safe(name, file)
     end
 
 end
-
---
--- Allowed blocks
---
-
-codeblock.sandbox.blocks = {
-    air = 'air',
-    stone = 'default:stone',
-    cobble = 'default:cobble',
-    stonebrick = 'default:stonebrick',
-    stone_block = 'default:stone_block',
-    mossycobble = 'default:mossycobble',
-    desert_stone = 'default:desert_stone',
-    desert_cobble = 'default:desert_cobble',
-    desert_stonebrick = 'default:desert_stonebrick',
-    desert_stone_block = 'default:desert_stone_block',
-    sandstone = 'default:sandstone',
-    sandstonebrick = 'default:sandstonebrick',
-    sandstone_block = 'default:sandstone_block',
-    desert_sandstone = 'default:desert_sandstone',
-    desert_sandstone_brick = 'default:desert_sandstone_brick',
-    desert_sandstone_block = 'default:desert_sandstone_block',
-    silver_sandstone = 'default:silver_sandstone',
-    silver_sandstone_brick = 'default:silver_sandstone_brick',
-    silver_sandstone_block = 'default:silver_sandstone_block',
-    obsidian = 'default:obsidian',
-    obsidianbrick = 'default:obsidianbrick',
-    obsidian_block = 'default:obsidian_block',
-    dirt = 'default:dirt',
-    dirt_with_grass = 'default:dirt_with_grass',
-    dirt_with_grass_footsteps = 'default:dirt_with_grass_footsteps',
-    dirt_with_dry_grass = 'default:dirt_with_dry_grass',
-    dirt_with_snow = 'default:dirt_with_snow',
-    dirt_with_rainforest_litter = 'default:dirt_with_rainforest_litter',
-    dirt_with_coniferous_litter = 'default:dirt_with_coniferous_litter',
-    dry_dirt = 'default:dry_dirt',
-    dry_dirt_with_dry_grass = 'default:dry_dirt_with_dry_grass',
-    permafrost = 'default:permafrost',
-    permafrost_with_stones = 'default:permafrost_with_stones',
-    permafrost_with_moss = 'default:permafrost_with_moss',
-    clay = 'default:clay',
-    snowblock = 'default:snowblock',
-    ice = 'default:ice',
-    cave_ice = 'default:cave_ice',
-    tree = 'default:tree',
-    wood = 'default:wood',
-    leaves = 'default:leaves',
-    jungletree = 'default:jungletree',
-    junglewood = 'default:junglewood',
-    jungleleaves = 'default:jungleleaves',
-    pine_tree = 'default:pine_tree',
-    pine_wood = 'default:pine_wood',
-    pine_needles = 'default:pine_needles',
-    acacia_tree = 'default:acacia_tree',
-    acacia_wood = 'default:acacia_wood',
-    acacia_leaves = 'default:acacia_leaves',
-    aspen_tree = 'default:aspen_tree',
-    aspen_wood = 'default:aspen_wood',
-    aspen_leaves = 'default:aspen_leaves',
-    stone_with_coal = 'default:stone_with_coal',
-    coalblock = 'default:coalblock',
-    stone_with_iron = 'default:stone_with_iron',
-    steelblock = 'default:steelblock',
-    stone_with_copper = 'default:stone_with_copper',
-    copperblock = 'default:copperblock',
-    stone_with_tin = 'default:stone_with_tin',
-    tinblock = 'default:tinblock',
-    bronzeblock = 'default:bronzeblock',
-    stone_with_gold = 'default:stone_with_gold',
-    goldblock = 'default:goldblock',
-    stone_with_mese = 'default:stone_with_mese',
-    mese = 'default:mese',
-    stone_with_diamond = 'default:stone_with_diamond',
-    diamondblock = 'default:diamondblock',
-    cactus = 'default:cactus',
-    bush_leaves = 'default:bush_leaves',
-    acacia_bush_leaves = 'default:acacia_bush_leaves',
-    pine_bush_needles = 'default:pine_bush_needles',
-    bookshelf = 'default:bookshelf',
-    glass = 'default:glass',
-    obsidian_glass = 'default:obsidian_glass',
-    brick = 'default:brick',
-    meselamp = 'default:meselamp',
-    sapling = 'default:sapling',
-    apple = 'default:apple',
-    junglesapling = 'default:junglesapling',
-    emergent_jungle_sapling = 'default:emergent_jungle_sapling',
-    pine_sapling = 'default:pine_sapling',
-    acacia_sapling = 'default:acacia_sapling',
-    aspen_sapling = 'default:aspen_sapling',
-    large_cactus_seedling = 'default:large_cactus_seedling',
-    dry_shrub = 'default:dry_shrub',
-    junglegrass = 'default:junglegrass',
-    grass_1 = 'default:grass_1',
-    grass_2 = 'default:grass_2',
-    grass_3 = 'default:grass_3',
-    grass_4 = 'default:grass_4',
-    grass_5 = 'default:grass_5',
-    dry_grass_1 = 'default:dry_grass_1',
-    dry_grass_2 = 'default:dry_grass_2',
-    dry_grass_3 = 'default:dry_grass_3',
-    dry_grass_4 = 'default:dry_grass_4',
-    dry_grass_5 = 'default:dry_grass_5',
-    fern_1 = 'default:fern_1',
-    fern_2 = 'default:fern_2',
-    fern_3 = 'default:fern_3',
-    marram_grass_1 = 'default:marram_grass_1',
-    marram_grass_2 = 'default:marram_grass_2',
-    marram_grass_3 = 'default:marram_grass_3',
-    bush_stem = 'default:bush_stem',
-    bush_sapling = 'default:bush_sapling',
-    acacia_bush_stem = 'default:acacia_bush_stem',
-    acacia_bush_sapling = 'default:acacia_bush_sapling',
-    pine_bush_stem = 'default:pine_bush_stem',
-    pine_bush_sapling = 'default:pine_bush_sapling',
-    wool_white = 'wool:white',
-    wool_grey = 'wool:grey',
-    wool_dark_grey = 'wool:dark_grey',
-    wool_black = 'wool:black',
-    wool_violet = 'wool:violet',
-    wool_blue = 'wool:blue',
-    wool_cyan = 'wool:cyan',
-    wool_dark_green = 'wool:dark_green',
-    wool_green = 'wool:green',
-    wool_yellow = 'wool:yellow',
-    wool_brown = 'wool:brown',
-    wool_orange = 'wool:orange',
-    wool_red = 'wool:red',
-    wool_magenta = 'wool:magenta',
-    wool_pink = 'wool:pink'
-}
-
-codeblock.sandbox.cubes_names = {
-    air = 'air',
-    stone = 'stone',
-    cobble = 'cobble',
-    stonebrick = 'stonebrick',
-    stone_block = 'stone_block',
-    mossycobble = 'mossycobble',
-    desert_stone = 'desert_stone',
-    desert_cobble = 'desert_cobble',
-    desert_stonebrick = 'desert_stonebrick',
-    desert_stone_block = 'desert_stone_block',
-    sandstone = 'sandstone',
-    sandstonebrick = 'sandstonebrick',
-    sandstone_block = 'sandstone_block',
-    desert_sandstone = 'desert_sandstone',
-    desert_sandstone_brick = 'desert_sandstone_brick',
-    desert_sandstone_block = 'desert_sandstone_block',
-    silver_sandstone = 'silver_sandstone',
-    silver_sandstone_brick = 'silver_sandstone_brick',
-    silver_sandstone_block = 'silver_sandstone_block',
-    obsidian = 'obsidian',
-    obsidianbrick = 'obsidianbrick',
-    obsidian_block = 'obsidian_block',
-    dirt = 'dirt',
-    dirt_with_grass = 'dirt_with_grass',
-    dirt_with_grass_footsteps = 'dirt_with_grass_footsteps',
-    dirt_with_dry_grass = 'dirt_with_dry_grass',
-    dirt_with_snow = 'dirt_with_snow',
-    dirt_with_rainforest_litter = 'dirt_with_rainforest_litter',
-    dirt_with_coniferous_litter = 'dirt_with_coniferous_litter',
-    dry_dirt = 'dry_dirt',
-    dry_dirt_with_dry_grass = 'dry_dirt_with_dry_grass',
-    permafrost = 'permafrost',
-    permafrost_with_stones = 'permafrost_with_stones',
-    permafrost_with_moss = 'permafrost_with_moss',
-    clay = 'clay',
-    snowblock = 'snowblock',
-    ice = 'ice',
-    cave_ice = 'cave_ice',
-    tree = 'tree',
-    wood = 'wood',
-    leaves = 'leaves',
-    jungletree = 'jungletree',
-    junglewood = 'junglewood',
-    jungleleaves = 'jungleleaves',
-    pine_tree = 'pine_tree',
-    pine_wood = 'pine_wood',
-    pine_needles = 'pine_needles',
-    acacia_tree = 'acacia_tree',
-    acacia_wood = 'acacia_wood',
-    acacia_leaves = 'acacia_leaves',
-    aspen_tree = 'aspen_tree',
-    aspen_wood = 'aspen_wood',
-    aspen_leaves = 'aspen_leaves',
-    stone_with_coal = 'stone_with_coal',
-    coalblock = 'coalblock',
-    stone_with_iron = 'stone_with_iron',
-    steelblock = 'steelblock',
-    stone_with_copper = 'stone_with_copper',
-    copperblock = 'copperblock',
-    stone_with_tin = 'stone_with_tin',
-    tinblock = 'tinblock',
-    bronzeblock = 'bronzeblock',
-    stone_with_gold = 'stone_with_gold',
-    goldblock = 'goldblock',
-    stone_with_mese = 'stone_with_mese',
-    mese = 'mese',
-    stone_with_diamond = 'stone_with_diamond',
-    diamondblock = 'diamondblock',
-    cactus = 'cactus',
-    bush_leaves = 'bush_leaves',
-    acacia_bush_leaves = 'acacia_bush_leaves',
-    pine_bush_needles = 'pine_bush_needles',
-    bookshelf = 'bookshelf',
-    glass = 'glass',
-    obsidian_glass = 'obsidian_glass',
-    brick = 'brick',
-    meselamp = 'meselamp'
-}
-
-codeblock.sandbox.plants_names = {
-    sapling = 'sapling',
-    apple = 'apple',
-    junglesapling = 'junglesapling',
-    emergent_jungle_sapling = 'emergent_jungle_sapling',
-    pine_sapling = 'pine_sapling',
-    acacia_sapling = 'acacia_sapling',
-    aspen_sapling = 'aspen_sapling',
-    large_cactus_seedling = 'large_cactus_seedling',
-    dry_shrub = 'dry_shrub',
-    grass_1 = 'grass_1',
-    grass_2 = 'grass_2',
-    grass_3 = 'grass_3',
-    grass_4 = 'grass_4',
-    grass_5 = 'grass_5',
-    dry_grass_1 = 'dry_grass_1',
-    dry_grass_2 = 'dry_grass_2',
-    dry_grass_3 = 'dry_grass_3',
-    dry_grass_4 = 'dry_grass_4',
-    dry_grass_5 = 'dry_grass_5',
-    fern_1 = 'fern_1',
-    fern_2 = 'fern_2',
-    fern_3 = 'fern_3',
-    marram_grass_1 = 'marram_grass_1',
-    marram_grass_2 = 'marram_grass_2',
-    marram_grass_3 = 'marram_grass_3',
-    bush_stem = 'bush_stem',
-    bush_sapling = 'bush_sapling',
-    acacia_bush_stem = 'acacia_bush_stem',
-    acacia_bush_sapling = 'acacia_bush_sapling',
-    pine_bush_stem = 'pine_bush_stem',
-    pine_bush_needles = 'pine_bush_needles',
-    pine_bush_sapling = 'pine_bush_sapling'
-}
-
-codeblock.sandbox.wools_names = {
-    white = 'wool_white',
-    grey = 'wool_grey',
-    dark_grey = 'wool_dark_grey',
-    black = 'wool_black',
-    violet = 'wool_violet',
-    blue = 'wool_blue',
-    cyan = 'wool_cyan',
-    dark_green = 'wool_dark_green',
-    green = 'wool_green',
-    yellow = 'wool_yellow',
-    brown = 'wool_brown',
-    orange = 'wool_orange',
-    red = 'wool_red',
-    magenta = 'wool_magenta',
-    pink = 'wool_pink'
-}
-
-codeblock.sandbox.iwools_names = {
-    'wool_magenta', 'wool_red', 'wool_pink', 'wool_brown', 'wool_orange',
-    'wool_yellow', 'wool_green', 'wool_dark_green', 'wool_cyan', 'wool_blue',
-    'wool_violet'
-}

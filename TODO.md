@@ -10,9 +10,14 @@
 
 - [x] add cylinder() and dome()
 - [x] WE center placing functions
-- [x] sanity checks of input types
+- [ ] sanity checks of input types -> abs values !
+- [ ] separate H and V cylinder
+- [ ] review numbers of operations allowed
+- [ ] use coroutine?
 - [ ] allow to use vectors easily
 - [ ] update list of commands in README and contentDB
+- [ ] allow to get drone pos and dir in scripts
+- [ ] save drone obj in drone
 
 ### v0.2
 

@@ -9,6 +9,27 @@ local S = codeblock.S
 local floor = math.floor
 local pi = math.pi
 local upper = string.upper
+local utils = codeblock.utils
+
+function codeblock.commands.check_operations(name, amount)
+
+    local drone = codeblock.drones[name]
+
+    if not drone then
+        minetest.chat_send_player(name, S("drone does not exist"))
+        return
+    end
+
+    if codeblock.max_operations ~= 0 then
+        local operations = drone.operations + amount;
+        if operations <= codeblock.max_operations then
+            drone.operations = operations
+        else
+            error("Robot out of available operations");
+            return false
+        end
+    end
+end
 
 -------------------------------------------------------------------------------
 -- utilities
@@ -92,6 +113,8 @@ function codeblock.commands.drone_move(name, nx, ny, nz)
         return
     end
 
+    codeblock.commands.check_operations(name, 1)
+
     local angle = 2 / pi * (drone.dir % (2 * pi))
 
     if angle == 0 then
@@ -127,6 +150,8 @@ function codeblock.commands.drone_forward(name, n)
         return
     end
 
+    codeblock.commands.check_operations(name, 1)
+
     local angle = 2 / pi * (drone.dir % (2 * pi))
 
     if angle == 0 then
@@ -160,6 +185,8 @@ function codeblock.commands.drone_right(name, n)
         minetest.chat_send_player(name, S("drone does not exist"))
         return
     end
+
+    codeblock.commands.check_operations(name, 1)
 
     local angle = 2 / pi * (drone.dir % (2 * pi))
 
@@ -195,6 +222,8 @@ function codeblock.commands.drone_up(name, n)
         return
     end
 
+    codeblock.commands.check_operations(name, 1)
+
     drone.y = drone.y + n
 
     codeblock.events.handle_update_drone_entity(drone)
@@ -229,6 +258,8 @@ function codeblock.commands.drone_turn(name, quarters)
         return
     end
 
+    codeblock.commands.check_operations(name, 1)
+
     local quarters = (type(quarters) == 'number') and floor(quarters) or 0
 
     drone.dir = (drone.dir + quarters * pi * 0.5) % (2 * pi)
@@ -249,13 +280,15 @@ function codeblock.commands.drone_place_block(name, block_identifier)
         return
     end
 
-    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
-    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+    block_identifier = block_identifier or codeblock.utils.cubes_names.stone
+    local real_block_name = utils.blocks[block_identifier]
 
     if not real_block_name then
         minetest.chat_send_player(name, S('block not allowed'))
         return
     end
+
+    codeblock.commands.check_operations(name, 1)
 
     codeblock.events.handle_place_block({x = drone.x, y = drone.y, z = drone.z},
                                         real_block_name)
@@ -276,13 +309,15 @@ function codeblock.commands.drone_place_relative(name, x, y, z,
         return
     end
 
-    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
-    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+    block_identifier = block_identifier or utils.cubes_names.stone
+    local real_block_name = utils.blocks[block_identifier]
 
     if not real_block_name then
         minetest.chat_send_player(name, S('block not allowed'))
         return
     end
+
+    codeblock.commands.check_operations(name, 1)
 
     local cp_name = checkpoint_name or 'start'
     if not drone.checkpoints[cp_name] then
@@ -334,8 +369,8 @@ function codeblock.commands.drone_place_cube(name, w, h, l, block_identifier,
         return
     end
 
-    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
-    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+    block_identifier = block_identifier or utils.cubes_names.stone
+    local real_block_name = utils.blocks[block_identifier]
 
     if not real_block_name then
         minetest.chat_send_player(name, S('block not allowed'))
@@ -351,6 +386,8 @@ function codeblock.commands.drone_place_cube(name, w, h, l, block_identifier,
     local x
     local y = drone.y
     local z
+
+    codeblock.commands.check_operations(name, w * h * l)
 
     if angle == 0 then
         w, l = w, l
@@ -384,8 +421,8 @@ function codeblock.commands.drone_place_ccube(name, w, h, l, block_identifier,
         return
     end
 
-    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
-    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+    block_identifier = block_identifier or utils.cubes_names.stone
+    local real_block_name = utils.blocks[block_identifier]
 
     if not real_block_name then
         minetest.chat_send_player(name, S('block not allowed'))
@@ -398,6 +435,8 @@ function codeblock.commands.drone_place_ccube(name, w, h, l, block_identifier,
     local w = (type(w) == 'number') and w or 10
     local h = (type(h) == 'number') and h or 10
     local l = (type(l) == 'number') and l or 10
+
+    codeblock.commands.check_operations(name, w * h * l)
 
     if angle == 0 then
         w, l = w, l
@@ -424,8 +463,8 @@ function codeblock.commands.drone_place_sphere(name, radius, block_identifier,
         return
     end
 
-    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
-    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+    block_identifier = block_identifier or utils.cubes_names.stone
+    local real_block_name = utils.blocks[block_identifier]
 
     if not real_block_name then
         minetest.chat_send_player(name, S('block not allowed'))
@@ -439,6 +478,14 @@ function codeblock.commands.drone_place_sphere(name, radius, block_identifier,
     local x
     local y = drone.y + radius
     local z
+
+    codeblock.commands.check_operations(name, floor(4 / 3 * pi *
+                                                        ((radius) * (radius) *
+                                                            (radius) +
+                                                            (radius + 1.0241) *
+                                                            (radius + 1.0241) *
+                                                            (radius + 1.0241)) /
+                                                        2))
 
     if angle == 0 then
         x = drone.x + radius
@@ -468,8 +515,8 @@ function codeblock.commands.drone_place_csphere(name, radius, block_identifier,
         return
     end
 
-    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
-    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+    block_identifier = block_identifier or utils.cubes_names.stone
+    local real_block_name = utils.blocks[block_identifier]
 
     if not real_block_name then
         minetest.chat_send_player(name, S('block not allowed'))
@@ -479,6 +526,14 @@ function codeblock.commands.drone_place_csphere(name, radius, block_identifier,
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local radius = (type(radius) == 'number') and floor(radius) or 10
     local pos = {x = floor(drone.x), y = floor(drone.y), z = floor(drone.z)}
+
+    codeblock.commands.check_operations(name, floor(4 / 3 * pi *
+                                                        ((radius) * (radius) *
+                                                            (radius) +
+                                                            (radius + 1.0241) *
+                                                            (radius + 1.0241) *
+                                                            (radius + 1.0241)) /
+                                                        2))
 
     count = worldedit.sphere(pos, radius, real_block_name, hollow)
 
@@ -493,8 +548,8 @@ function codeblock.commands.drone_place_dome(name, radius, block_identifier,
         return
     end
 
-    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
-    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+    block_identifier = block_identifier or utils.cubes_names.stone
+    local real_block_name = utils.blocks[block_identifier]
 
     if not real_block_name then
         minetest.chat_send_player(name, S('block not allowed'))
@@ -508,6 +563,14 @@ function codeblock.commands.drone_place_dome(name, radius, block_identifier,
     local x
     local y = drone.y
     local z
+
+    codeblock.commands.check_operations(name, floor(4 / 3 * pi *
+                                                        ((radius) * (radius) *
+                                                            (radius) +
+                                                            (radius + 1.0241) *
+                                                            (radius + 1.0241) *
+                                                            (radius + 1.0241)) /
+                                                        4))
 
     if angle == 0 then
         x = drone.x + radius
@@ -537,8 +600,8 @@ function codeblock.commands.drone_place_cdome(name, radius, block_identifier,
         return
     end
 
-    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
-    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+    block_identifier = block_identifier or utils.cubes_names.stone
+    local real_block_name = utils.blocks[block_identifier]
 
     if not real_block_name then
         minetest.chat_send_player(name, S('block not allowed'))
@@ -548,6 +611,14 @@ function codeblock.commands.drone_place_cdome(name, radius, block_identifier,
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local radius = (type(radius) == 'number') and floor(radius) or 10
     local pos = {x = drone.x, y = drone.y, z = drone.z}
+
+    codeblock.commands.check_operations(name, floor(4 / 3 * pi *
+                                                        ((radius) * (radius) *
+                                                            (radius) +
+                                                            (radius + 1.0241) *
+                                                            (radius + 1.0241) *
+                                                            (radius + 1.0241)) /
+                                                        4))
 
     count = worldedit.dome(pos, radius, real_block_name, hollow)
 
@@ -562,8 +633,8 @@ function codeblock.commands.drone_place_cylinder(name, A, L, R,
         return
     end
 
-    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
-    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+    block_identifier = block_identifier or utils.cubes_names.stone
+    local real_block_name = utils.blocks[block_identifier]
 
     if not real_block_name then
         minetest.chat_send_player(name, S('block not allowed'))
@@ -596,6 +667,10 @@ function codeblock.commands.drone_place_cylinder(name, A, L, R,
 
     local L = (type(L) == 'number') and floor(L) or 10
     local R = (type(R) == 'number') and floor(R) or 5
+
+    codeblock.commands.check_operations(name, floor(
+                                            (pi * L * (R ^ 2 + (R + 1.0241) ^ 2) /
+                                                2)))
 
     local x
     local y
@@ -633,8 +708,8 @@ function codeblock.commands.drone_place_ccylinder(name, A, L, R,
         return
     end
 
-    block_identifier = block_identifier or codeblock.sandbox.cubes_names.stone
-    local real_block_name = codeblock.sandbox.blocks[block_identifier]
+    block_identifier = block_identifier or utils.cubes_names.stone
+    local real_block_name = utils.blocks[block_identifier]
 
     if not real_block_name then
         minetest.chat_send_player(name, S('block not allowed'))
@@ -663,6 +738,11 @@ function codeblock.commands.drone_place_ccylinder(name, A, L, R,
 
     local L = (type(L) == 'number') and floor(L) or 10
     local R = (type(R) == 'number') and floor(R) or 5
+
+    codeblock.commands.check_operations(name, floor(
+                                            (pi * L * (R ^ 2 + (R + 1.0241) ^ 2) /
+                                                2)))
+
     local pos = {x = drone.x, y = drone.y, z = drone.z}
 
     count = worldedit.cylinder(pos, A, L, R, R, real_block_name, hollow)
@@ -686,6 +766,8 @@ function codeblock.commands.drone_save_checkpoint(name, label)
         return
     end
 
+    codeblock.commands.check_operations(name, 1)
+
     drone.checkpoints[label] = {
         x = drone.x,
         y = drone.y,
@@ -707,6 +789,8 @@ function codeblock.commands.drone_goto_checkpoint(name, label)
         minetest.chat_send_player(name, S("no checkpoint @1", label or ""))
         return
     end
+
+    codeblock.commands.check_operations(name, 1)
 
     local cp = drone.checkpoints[label]
     drone.x = cp.x
