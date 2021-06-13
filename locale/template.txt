@@ -19,3 +19,7 @@ no file selected=
 no files=
 cannot read file=
 Cannot create @1=
+too far away=
+out of available operations=
+@1 is not allowed=
+call limit (@1) exeeded=

@@ -11,6 +11,7 @@ codeblock.drones = {}
 codeblock.drone_entities = {}
 codeblock.call_limit = 1e6
 codeblock.max_operations = 10e6
+codeblock.max_place_value = 300 * 300
 codeblock.S = minetest.get_translator("codeblock")
 
 dofile(codeblock.modpath .. "/utils.lua")

@@ -5,7 +5,7 @@ local S = codeblock.S
 -- local
 -------------------------------------------------------------------------------
 
-local ceil = math.ceil
+local floor = math.floor
 
 -------------------------------------------------------------------------------
 -- handles
@@ -102,9 +102,9 @@ function codeblock.events.handle_place_block(pos, block)
     local block = block or "default:dirt"
 
     minetest.set_node({
-        x = ceil(pos.x),
-        y = ceil(pos.y),
-        z = ceil(pos.z)
+        x = floor(pos.x),
+        y = floor(pos.y),
+        z = floor(pos.z)
     }, {name = block})
 
 end

@@ -1,5 +1,7 @@
 ## TODO
 
+### v1.0
+
 - [x] User associated filesystem to store programs (high priority)
 - [x] Allow to set drone's file with in-game interface + remember last program started (high priority)
 - [ ] Blockly web-based editor (high priority)
@@ -10,14 +12,15 @@
 
 - [x] add cylinder() and dome()
 - [x] WE center placing functions
-- [ ] sanity checks of input types -> abs values !
-- [ ] separate H and V cylinder
-- [ ] review numbers of operations allowed
+- [x] separate H and V cylinder and centered funcitons
+- [x] sanity checks of input types -> abs values !
+- [x] fix trad
+- [ ] fix centered cylinders placement
+- [ ] review numbers of operations allowed (cube and cylinder may be large)
 - [ ] use coroutine?
 - [ ] allow to use vectors easily
 - [ ] update list of commands in README and contentDB
-- [ ] allow to get drone pos and dir in scripts
-- [ ] save drone obj in drone
+- [ ] save drone obj in drone?
 
 ### v0.2
 

@@ -60,27 +60,43 @@ local function getScriptEnv(name)
         cube = function(w, h, l, block, hollow)
             cmd.drone_place_cube(name, w, h, l, block, hollow)
         end,
-        ccube = function(w, h, l, block, hollow)
-            cmd.drone_place_ccube(name, w, h, l, block, hollow)
-        end,
         sphere = function(r, block, hollow)
             cmd.drone_place_sphere(name, r, block, hollow)
-        end,
-        csphere = function(r, block, hollow)
-            cmd.drone_place_csphere(name, r, block, hollow)
         end,
         dome = function(r, block, hollow)
             cmd.drone_place_dome(name, r, block, hollow)
         end,
-        cdome = function(r, block, hollow)
-            cmd.drone_place_cdome(name, r, block, hollow)
-        end,
-        cylinder = function(a, l, r, block, hollow)
-            cmd.drone_place_cylinder(name, a, l, r, block, hollow)
-        end,
-        ccylinder = function(a, l, r, block, hollow)
-            cmd.drone_place_ccylinder(name, a, l, r, block, hollow)
-        end,
+        vertical = {
+            cylinder = function(l, r, block, hollow)
+                cmd.drone_place_cylinder(name, 'V', l, r, block, hollow)
+            end
+        },
+        horizontal = {
+            cylinder = function(l, r, block, hollow)
+                cmd.drone_place_cylinder(name, 'H', l, r, block, hollow)
+            end
+        },
+        centered = {
+            cube = function(w, h, l, block, hollow)
+                cmd.drone_place_ccube(name, w, h, l, block, hollow)
+            end,
+            sphere = function(r, block, hollow)
+                cmd.drone_place_csphere(name, r, block, hollow)
+            end,
+            dome = function(r, block, hollow)
+                cmd.drone_place_cdome(name, r, block, hollow)
+            end,
+            vertical = {
+                cylinder = function(l, r, block, hollow)
+                    cmd.drone_place_ccylinder(name, 'V', l, r, block, hollow)
+                end
+            },
+            horizontal = {
+                cylinder = function(l, r, block, hollow)
+                    cmd.drone_place_ccylinder(name, 'H', l, r, block, hollow)
+                end
+            }
+        },
         blocks = codeblock.utils.cubes_names,
         plants = codeblock.utils.plants_names,
         wools = codeblock.utils.wools_names,
@@ -129,11 +145,9 @@ end
 
 local function check_code(code)
     -- "while ", "for ", "do ","goto ",  
-    local bad_code = {
-        "repeat", "until", "_c_", "_G", "while%(", "while{"
-    } -- ,"\\\"", "%[=*%[","--[["}, "%.%.[^%.]"
+    local bad_code = {"repeat", "until", "_c_", "_G", "while%(", "while{"} -- ,"\\\"", "%[=*%[","--[["}, "%.%.[^%.]"
     for _, v in pairs(bad_code) do
-        if string.find(code, v) then return v .. " is not allowed!"; end
+        if string.find(code, v) then return S('@1 is not allowed', v) end
     end
 end
 
@@ -232,8 +246,9 @@ local function preprocess_code(script, call_limit) -- version 07/24/2018
 
     -- process script to insert call counter in every function
     local _increase_ccounter = " _c_ = _c_ + 1; if _c_ > " .. call_limit ..
-                                   " then _G.error(\"Execution count \".. _c_ .. \" exceeded " ..
-                                   call_limit .. "\") end; "
+                                   " then _G.error(\"" ..
+                                   S('call limit (@1) exeeded', call_limit) ..
+                                   "\") end; "
 
     local i1 = 0;
     local i2 = 0;
@@ -295,12 +310,8 @@ local function preprocess_code(script, call_limit) -- version 07/24/2018
     -- must reset ccounter when paused, but user should not be able to force reset by modifying pause!
     -- (suggestion about 'pause' by Kimapr, 09/26/2019)
 
-    -- TODO adapt this
-    return
-        "_c_ = 0 local _pause_ = pause pause = function() _c_ = 0; _pause_() end " ..
-            script;
+    return '_c_ = 0\n' .. script;
 
-    -- return script:gsub("pause%(%)", "_c_ = 0; pause()") -- reset ccounter at pause
 end
 
 function codeblock.sandbox.run_safe(name, file)
