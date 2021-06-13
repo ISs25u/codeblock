@@ -233,7 +233,7 @@ local function find_outside_string(script, pattern, pos, strings)
     return nil
 end
 
-local function preprocess_code(script, call_limit) -- version 07/24/2018
+local function preprocess_code(script) -- version 07/24/2018
 
     --[[ idea: in each local a = function (args) ... end insert counter like:
 	local a = function (args) counter_check_code ... end 
@@ -342,7 +342,7 @@ function codeblock.sandbox.run_safe(name, file)
         return
     end
 
-    safe_code = preprocess_code(untrusted_code, 10); -- TODO change limit
+    safe_code = preprocess_code(untrusted_code);
 
     local bytecode, message = loadstring(safe_code)
     if not bytecode then
@@ -351,7 +351,10 @@ function codeblock.sandbox.run_safe(name, file)
         return
     end
 
+    -- local co = coroutine.create(bytecode)
     setfenv(bytecode, getScriptEnv(name))
+    -- ret, err = coroutine.resume(co)
+
     math.randomseed(minetest.get_us_time())
     local status, err = pcall(bytecode)
 
@@ -362,3 +365,4 @@ function codeblock.sandbox.run_safe(name, file)
     end
 
 end
+

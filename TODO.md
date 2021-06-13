@@ -16,6 +16,7 @@
 - [x] sanity checks of input types -> abs values !
 - [x] fix trad
 - [ ] fix centered cylinders placement
+- [ ] rewrite programs with appropriate functions
 - [ ] review numbers of operations allowed (cube and cylinder may be large)
 - [ ] use coroutine?
 - [ ] allow to use vectors easily
