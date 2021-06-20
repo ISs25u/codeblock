@@ -20,6 +20,6 @@ no files=Vous n'avez aucun fichier
 cannot read file=Impossible de lire le fichier
 Cannot create @1=Impossible de créer le répertoire @1
 too far away=Le bloc est placé trop loin du checkpoint
-out of available operations=Nombre maximal d'opérations dépassé
+out of available volume=Volume maximal de blocs dépassé
 @1 is not allowed=L'usage de @1 est interdit !
 call limit (@1) exeeded=Dépassement du nombre d'appels maximal (@1)

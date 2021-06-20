@@ -10,7 +10,7 @@ function codeblock.Drone:new(pos, dir, name, file)
         checkpoints = {},
         name = name,
         file = file,
-        operations = 0
+        volume = 0
     }
 
     drone.checkpoints['start'] = {

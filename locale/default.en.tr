@@ -20,6 +20,6 @@ no files=You don't have any files
 cannot read file=Cannot read file
 Cannot create @1=Cannot create directory @1
 too far away=Placing block too far away from checkpoint
-out of available operations=Out of available operations
+out of available volume=Out of available volume of blocks
 @1 is not allowed=@1 is not allowed!
 call limit (@1) exeeded=Call limit exeeded (@1)

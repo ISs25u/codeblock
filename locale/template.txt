@@ -20,6 +20,6 @@ no files=
 cannot read file=
 Cannot create @1=
 too far away=
-out of available operations=
+out of available volume=
 @1 is not allowed=
 call limit (@1) exeeded=

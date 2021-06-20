@@ -10,6 +10,8 @@
 
 ### v0.4
 
+- [ ] use volume, surface, operations and calls to limit drone usage
+- [ ] limite movements
 - [ ] use coroutine?
 - [ ] use custom vector library?
 - [ ] save drone obj and cor in drone?
