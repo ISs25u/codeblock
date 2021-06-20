@@ -39,32 +39,70 @@ turn(n_quarters)
 
 Example: `forward(5)`
 
-### Blocks
+### Construction
+
+__Individual blocks__
 
 ```lua
 place(block)
 place_relative(x, y, z, block, checkpoint_name)
-cube(w, h, l, block, hollow)
+```
+
+__Primitives ("back-bottom-left" placed)__
+
+```lua
+cube(width, height, length, block, hollow)
 sphere(radius, block, hollow)
+dome(radius, block, hollow)
+vertical.cylinder(height, radius, block, hollow)
+horizontal.cylinder(length, radius, block, hollow)
 ```
 
-```lua
-blocks = {air, stone, cobble, stonebrick, stone_block, mossycobble, desert_stone, desert_cobble, desert_stonebrick, desert_stone_block, sandstone, sandstonebrick, sandstone_block, desert_sandstone, desert_sandstone_brick, desert_sandstone_block, silver_sandstone, silver_sandstone_brick, silver_sandstone_block, obsidian, obsidianbrick, obsidian_block, dirt, dirt_with_grass, dirt_with_grass_footsteps, dirt_with_dry_grass, dirt_with_snow, dirt_with_rainforest_litter, dirt_with_coniferous_litter, dry_dirt, dry_dirt_with_dry_grass, permafrost, permafrost_with_stones, permafrost_with_moss, clay, snowblock, ice, cave_ice, tree, wood, leaves, jungletree, junglewood, jungleleaves, pine_tree, pine_wood, pine_needles, acacia_tree, acacia_wood, acacia_leaves, aspen_tree, aspen_wood, aspen_leaves, stone_with_coal, coalblock, stone_with_iron, steelblock, stone_with_copper, copperblock, stone_with_tin, tinblock, bronzeblock, stone_with_gold, goldblock, stone_with_mese, mese, stone_with_diamond, diamondblock, cactus, bush_leaves, acacia_bush_leaves, pine_bush_needles, bookshelf, glass, obsidian_glass, brick, meselamp}
-```
+__Centered primitives__
 
 ```lua
-plants = {sapling, apple, junglesapling, emergent_jungle_sapling, pine_sapling, acacia_sapling, aspen_sapling, large_cactus_seedling, dry_shrub, grass_1, grass_2, grass_3, grass_4, grass_5, dry_grass_1, dry_grass_2, dry_grass_3, dry_grass_4, dry_grass_5, fern_1, fern_2, fern_3, marram_grass_1, marram_grass_2, marram_grass_3, bush_stem, bush_sapling, acacia_bush_stem, acacia_bush_sapling, pine_bush_stem, pine_bush_needles, pine_bush_sapling}
+centered.cube(width, height, length, block, hollow)
+centered.sphere(radius, block, hollow)
+centered.dome(radius, block, hollow)
+centered.vertical.cylinder(height, radius, block, hollow)
+centered.horizontal.cylinder(length, radius, block, hollow)
 ```
 
+### Types of blocks
+
+`blocks`
+
 ```lua
-wools = {white, grey, dark_grey, black, violet, blue, cyan, dark_green, green, yellow, brown, orange, red, magenta, pink}
+air, stone, cobble, stonebrick, stone_block, mossycobble, desert_stone, desert_cobble, desert_stonebrick, desert_stone_block, sandstone, sandstonebrick, sandstone_block, desert_sandstone, desert_sandstone_brick, desert_sandstone_block, silver_sandstone, silver_sandstone_brick, silver_sandstone_block, obsidian, obsidianbrick, obsidian_block, dirt, dirt_with_grass, dirt_with_grass_footsteps, dirt_with_dry_grass, dirt_with_snow, dirt_with_rainforest_litter, dirt_with_coniferous_litter, dry_dirt, dry_dirt_with_dry_grass, permafrost, permafrost_with_stones, permafrost_with_moss, clay, snowblock, ice, cave_ice, tree, wood, leaves, jungletree, junglewood, jungleleaves, pine_tree, pine_wood, pine_needles, acacia_tree, acacia_wood, acacia_leaves, aspen_tree, aspen_wood, aspen_leaves, stone_with_coal, coalblock, stone_with_iron, steelblock, stone_with_copper, copperblock, stone_with_tin, tinblock, bronzeblock, stone_with_gold, goldblock, stone_with_mese, mese, stone_with_diamond, diamondblock, cactus, bush_leaves, acacia_bush_leaves, pine_bush_needles, bookshelf, glass, obsidian_glass, brick, meselamp
+```
+
+`plants`
+
+```lua
+sapling, apple, junglesapling, emergent_jungle_sapling, pine_sapling, acacia_sapling, aspen_sapling, large_cactus_seedling, dry_shrub, grass_1, grass_2, grass_3, grass_4, grass_5, dry_grass_1, dry_grass_2, dry_grass_3, dry_grass_4, dry_grass_5, fern_1, fern_2, fern_3, marram_grass_1, marram_grass_2, marram_grass_3, bush_stem, bush_sapling, acacia_bush_stem, acacia_bush_sapling, pine_bush_stem, pine_bush_needles, pine_bush_sapling
+```
+
+`wools`
+
+```lua
+white, grey, dark_grey, black, violet, blue, cyan, dark_green, green, yellow, brown, orange, red, magenta, pink
+```
+
+`iwools`
+
+```lua
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ```
 
 Example: 
 ```lua
 place(blocks.stone)
 up(1)
+place(plants.acacia_bush_stem)
+up(1)
 place(wools.blue)
+up(1)
+place(iwools[3])
 ```
 
 ### Checkpoints
@@ -77,10 +115,10 @@ go(name)
 Example:
 ```lua
 save('place1')
-move(0,1,1)
+move(0, 1, 1)
 place(wools.obsidian)
 go('place1')
-move(0,-1,-1)
+move(0, -1, -1)
 place(wools.glass)
 ```
 
@@ -100,8 +138,15 @@ pow(a,b)
 sqrt(x)
 abs(x)
 sin(x)
+sinh(x)
+asin(x)
 cos(x)
+cosh(x)
+acos(x)
 tan(x)
+tanh(x)
+atan(x)
+atan2(x)
 pi
 ```
 

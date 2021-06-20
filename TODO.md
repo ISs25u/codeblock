@@ -12,6 +12,7 @@
 
 - [ ] use volume, surface, operations and calls to limit drone usage
 - [ ] limite movements
+- [ ] centered cube/dome placement
 - [ ] use coroutine?
 - [ ] use custom vector library?
 - [ ] save drone obj and cor in drone?
@@ -25,8 +26,8 @@
 - [x] fix trad
 - [x] fix centered cylinders placement
 - [x] rewrite programs with appropriate functions
-- [ ] review numbers of operations allowed (cube and cylinder may be large)
-- [ ] update list of commands in README and contentDB
+- [x] review max volume allowed
+- [x] update list of commands in README and contentDB
 
 ### v0.2
 
