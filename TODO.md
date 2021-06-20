@@ -8,6 +8,12 @@
 - [ ] Control drone operating speed (medium priority)
 - [ ] In-game lua code editor (low priority)
 
+### v0.4
+
+- [ ] use coroutine?
+- [ ] use custom vector library?
+- [ ] save drone obj and cor in drone?
+
 ### v0.3
 
 - [x] add cylinder() and dome()
@@ -15,13 +21,10 @@
 - [x] separate H and V cylinder and centered funcitons
 - [x] sanity checks of input types -> abs values !
 - [x] fix trad
-- [ ] fix centered cylinders placement
-- [ ] rewrite programs with appropriate functions
+- [x] fix centered cylinders placement
+- [x] rewrite programs with appropriate functions
 - [ ] review numbers of operations allowed (cube and cylinder may be large)
-- [ ] use coroutine?
-- [ ] allow to use vectors easily
 - [ ] update list of commands in README and contentDB
-- [ ] save drone obj in drone?
 
 ### v0.2
 

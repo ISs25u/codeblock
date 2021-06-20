@@ -606,24 +606,40 @@ function codeblock.commands.drone_place_ccylinder(name, o, l, r, block, hollow)
     codeblock.commands.check_operations(name, floor((pi * l * (r + 0.514) ^ 2)))
 
     local axis
+    local x, y, z
     local angle = 2 / pi * (drone.dir % (2 * pi))
     if (o == 'V') then
         axis = 'y'
+        x = drone.x
+        y = drone.y
+        z = drone.z
     elseif (o == 'H') then
         if angle == 0 then
             axis = 'z'
+            x = drone.x
+            y = drone.y
+            z = drone.z - floor(l / 2)
         elseif angle == 1 then
             axis = 'x'
+            x = drone.x - floor(l / 2)
+            y = drone.y
+            z = drone.z
         elseif angle == 2 then
             axis = 'z'
+            x = drone.x
+            y = drone.y
+            z = drone.z - floor(l / 2)
         elseif angle == 3 then
             axis = 'x'
+            x = drone.x - floor(l / 2)
+            y = drone.y
+            z = drone.z
         end
     else
         axis = 'y'
     end
 
-    local pos = {x = drone.x, y = drone.y, z = drone.z}
+    local pos = {x = x, y = y, z = z}
 
     count = worldedit.cylinder(pos, axis, l, r, r, real_block, hollow)
 
