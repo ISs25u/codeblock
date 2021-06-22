@@ -12,6 +12,8 @@ local pi = math.pi
 local upper = string.upper
 local utils = codeblock.utils
 
+local function round(x) return floor(x + 0.5) end
+
 function codeblock.commands.check_volume(name, volume)
 
     assert(name)
@@ -106,9 +108,9 @@ end
 
 function codeblock.commands.drone_move(name, nx, ny, nz)
 
-    local nx = (type(nx) == 'number') and floor(nx) or 0
-    local ny = (type(ny) == 'number') and floor(ny) or 0
-    local nz = (type(nz) == 'number') and floor(nz) or 0
+    local nx = (type(nx) == 'number') and round(nx) or 0
+    local ny = (type(ny) == 'number') and round(ny) or 0
+    local nz = (type(nz) == 'number') and round(nz) or 0
 
     local drone = codeblock.drones[name]
     if not drone then error(S("drone does not exist")) end
@@ -140,7 +142,7 @@ end
 
 function codeblock.commands.drone_forward(name, n)
 
-    local n = (type(n) == 'number') and floor(n) or 1
+    local n = (type(n) == 'number') and round(n) or 1
 
     local drone = codeblock.drones[name]
     if not drone then error(S("drone does not exist")) end
@@ -164,7 +166,7 @@ end
 
 function codeblock.commands.drone_back(name, n)
 
-    local n = (type(n) == 'number') and floor(n) or 1
+    local n = (type(n) == 'number') and round(n) or 1
 
     codeblock.commands.drone_forward(name, -n)
 
@@ -172,7 +174,7 @@ end
 
 function codeblock.commands.drone_right(name, n)
 
-    local n = (type(n) == 'number') and floor(n) or 1
+    local n = (type(n) == 'number') and round(n) or 1
 
     local drone = codeblock.drones[name]
     if not drone then error(S("drone does not exist")) end
@@ -196,7 +198,7 @@ end
 
 function codeblock.commands.drone_left(name, n)
 
-    local n = (type(n) == 'number') and floor(n) or 1
+    local n = (type(n) == 'number') and round(n) or 1
 
     codeblock.commands.drone_right(name, -n)
 
@@ -204,7 +206,7 @@ end
 
 function codeblock.commands.drone_up(name, n)
 
-    local n = (type(n) == 'number') and floor(n) or 1
+    local n = (type(n) == 'number') and round(n) or 1
 
     local drone = codeblock.drones[name]
     if not drone then error(S("drone does not exist")) end
@@ -218,7 +220,7 @@ end
 
 function codeblock.commands.drone_down(name, n)
 
-    local n = (type(n) == 'number') and floor(n) or 1
+    local n = (type(n) == 'number') and round(n) or 1
 
     codeblock.commands.drone_up(name, -n)
 
@@ -242,7 +244,7 @@ function codeblock.commands.drone_turn(name, quarters)
     if not drone then error(S("drone does not exist")) end
     -- codeblock.commands.check_volume(name, 1)
 
-    local quarters = (type(quarters) == 'number') and floor(quarters) or 0
+    local quarters = (type(quarters) == 'number') and round(quarters) or 0
 
     drone.dir = (drone.dir + quarters * pi * 0.5) % (2 * pi)
 
@@ -273,9 +275,9 @@ end
 function codeblock.commands.drone_place_relative(name, x, y, z, block,
                                                  checkpoint_name)
 
-    local x = (type(x) == 'number') and floor(x) or 0
-    local y = (type(y) == 'number') and floor(y) or 0
-    local z = (type(z) == 'number') and floor(z) or 0
+    local x = (type(x) == 'number') and round(x) or 0
+    local y = (type(y) == 'number') and round(y) or 0
+    local z = (type(z) == 'number') and round(z) or 0
 
     local drone = codeblock.drones[name]
     if not drone then error(S("drone does not exist")) end
@@ -339,9 +341,9 @@ function codeblock.commands.drone_place_cube(name, w, h, l, block, hollow)
     if not real_block then error(S('block not allowed')) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
-    local w = (type(w) == 'number') and floor(abs(w)) or 10
-    local h = (type(h) == 'number') and floor(abs(h)) or 10
-    local l = (type(l) == 'number') and floor(abs(l)) or 10
+    local w = (type(w) == 'number') and round(abs(w)) or 10
+    local h = (type(h) == 'number') and round(abs(h)) or 10
+    local l = (type(l) == 'number') and round(abs(l)) or 10
     local x
     local y = drone.y
     local z
@@ -383,9 +385,9 @@ function codeblock.commands.drone_place_ccube(name, w, h, l, block, hollow)
     if not real_block then error(S('block not allowed')) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
-    local w = (type(w) == 'number') and floor(abs(w)) or 10
-    local h = (type(h) == 'number') and floor(abs(h)) or 10
-    local l = (type(l) == 'number') and floor(abs(l)) or 10
+    local w = (type(w) == 'number') and round(abs(w)) or 10
+    local h = (type(h) == 'number') and round(abs(h)) or 10
+    local l = (type(l) == 'number') and round(abs(l)) or 10
 
     codeblock.commands.check_volume(name, w * h * l)
 
@@ -416,13 +418,12 @@ function codeblock.commands.drone_place_sphere(name, r, block, hollow)
     if not real_block then error(S('block not allowed')) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
-    local r = (type(r) == 'number') and floor(abs(r)) or 5
+    local r = (type(r) == 'number') and round(abs(r)) or 5
     local x
     local y = drone.y + r
     local z
 
-    codeblock.commands.check_volume(name,
-                                        floor(4 / 3 * pi * (r + 0.514) ^ 3))
+    codeblock.commands.check_volume(name, round(4 / 3 * pi * (r + 0.514) ^ 3))
 
     local angle = 2 / pi * (drone.dir % (2 * pi))
     if angle == 0 then
@@ -455,11 +456,10 @@ function codeblock.commands.drone_place_csphere(name, r, block, hollow)
     if not real_block then error(S('block not allowed')) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
-    local r = (type(r) == 'number') and floor(abs(r)) or 5
-    local pos = {x = floor(drone.x), y = floor(drone.y), z = floor(drone.z)}
+    local r = (type(r) == 'number') and round(abs(r)) or 5
+    local pos = {x = round(drone.x), y = round(drone.y), z = round(drone.z)}
 
-    codeblock.commands.check_volume(name,
-                                        floor(4 / 3 * pi * (r + 0.514) ^ 3))
+    codeblock.commands.check_volume(name, round(4 / 3 * pi * (r + 0.514) ^ 3))
 
     count = worldedit.sphere(pos, r, real_block, hollow)
 
@@ -475,13 +475,12 @@ function codeblock.commands.drone_place_dome(name, r, block, hollow)
     if not real_block then error(S('block not allowed')) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
-    local r = (type(r) == 'number') and floor(abs(r)) or 5
+    local r = (type(r) == 'number') and round(abs(r)) or 5
     local x
     local y = drone.y
     local z
 
-    codeblock.commands.check_volume(name,
-                                        floor(2 / 3 * pi * (r + 0.514) ^ 3))
+    codeblock.commands.check_volume(name, round(2 / 3 * pi * (r + 0.514) ^ 3))
 
     local angle = 2 / pi * (drone.dir % (2 * pi))
     if angle == 0 then
@@ -514,11 +513,10 @@ function codeblock.commands.drone_place_cdome(name, r, block, hollow)
     if not real_block then error(S('block not allowed')) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
-    local r = (type(r) == 'number') and floor(abs(r)) or 5
+    local r = (type(r) == 'number') and round(abs(r)) or 5
     local pos = {x = drone.x, y = drone.y, z = drone.z}
 
-    codeblock.commands.check_volume(name,
-                                        floor(2 / 3 * pi * (r + 0.514) ^ 3))
+    codeblock.commands.check_volume(name, round(2 / 3 * pi * (r + 0.514) ^ 3))
 
     count = worldedit.dome(pos, r, real_block, hollow)
 
@@ -535,10 +533,10 @@ function codeblock.commands.drone_place_cylinder(name, o, l, r, block, hollow)
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local o = (type(o) == 'string') and upper(o) or 'V'
-    local l = (type(l) == 'number') and floor(abs(l)) or 10
-    local r = (type(r) == 'number') and floor(abs(r)) or 5
+    local l = (type(l) == 'number') and round(abs(l)) or 10
+    local r = (type(r) == 'number') and round(abs(r)) or 5
 
-    codeblock.commands.check_volume(name, floor((pi * l * (r + 0.514) ^ 2)))
+    codeblock.commands.check_volume(name, round((pi * l * (r + 0.514) ^ 2)))
 
     local axis
     local angle = 2 / pi * (drone.dir % (2 * pi))
@@ -600,10 +598,10 @@ function codeblock.commands.drone_place_ccylinder(name, o, l, r, block, hollow)
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local o = (type(o) == 'string') and upper(o) or 'V'
-    local l = (type(l) == 'number') and floor(abs(l)) or 10
-    local r = (type(r) == 'number') and floor(abs(r)) or 5
+    local l = (type(l) == 'number') and round(abs(l)) or 10
+    local r = (type(r) == 'number') and round(abs(r)) or 5
 
-    codeblock.commands.check_volume(name, floor((pi * l * (r + 0.514) ^ 2)))
+    codeblock.commands.check_volume(name, round((pi * l * (r + 0.514) ^ 2)))
 
     local axis
     local x, y, z

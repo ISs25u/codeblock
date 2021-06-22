@@ -1,6 +1,6 @@
 ## TODO
 
-### v1.0
+### v1.0.0
 
 - [x] User associated filesystem to store programs (high priority)
 - [x] Allow to set drone's file with in-game interface + remember last program started (high priority)
@@ -8,16 +8,16 @@
 - [ ] Control drone operating speed (medium priority)
 - [ ] In-game lua code editor (low priority)
 
-### v0.4
+### v0.4.0
 
 - [ ] use volume, surface, operations and calls to limit drone usage
 - [ ] limite movements
 - [ ] centered cube/dome placement
 - [ ] use coroutine?
-- [ ] use custom vector library?
+- [x] use custom vector library
 - [ ] save drone obj and cor in drone?
 
-### v0.3
+### v0.3.0
 
 - [x] add cylinder() and dome()
 - [x] WE center placing functions
@@ -29,7 +29,7 @@
 - [x] review max volume allowed
 - [x] update list of commands in README and contentDB
 
-### v0.2
+### v0.2.0
 
 - [x] safe formspecs
 - [x] check compatible versions of minetest

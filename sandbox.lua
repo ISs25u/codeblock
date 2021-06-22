@@ -106,6 +106,10 @@ local function getScriptEnv(name)
         random = math.random,
         floor = math.floor,
         ceil = math.ceil,
+        round = function(num, dec)
+            local mult = 10 ^ (dec or 0)
+            return math.floor(num * mult + 0.5) / mult
+        end,
         deg = math.deg,
         rad = math.rad,
         exp = math.exp,
@@ -126,7 +130,7 @@ local function getScriptEnv(name)
         atan = math.atan,
         atan2 = math.atan2,
         pi = math.pi,
-        vector = vector,
+        vector = vector3,
         error = error,
         print = function(msg)
             minetest.chat_send_player(name, '> ' .. tostring(msg))

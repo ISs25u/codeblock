@@ -103,9 +103,9 @@ function codeblock.events.handle_place_block(pos, block)
     local block = block or "default:dirt"
 
     minetest.set_node({
-        x = floor(pos.x),
-        y = floor(pos.y),
-        z = floor(pos.z)
+        x = floor(pos.x + 0.5),
+        y = floor(pos.y + 0.5),
+        z = floor(pos.z + 0.5)
     }, {name = block})
 
 end
