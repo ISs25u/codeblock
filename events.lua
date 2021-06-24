@@ -20,13 +20,9 @@ function codeblock.events.handle_update_drone_entity(drone)
         return
     end
 
-    drone_entity:move_to({x = drone.x, y = drone.y, z = drone.z})
+    drone_entity:set_pos({x = drone.x, y = drone.y, z = drone.z})
     drone_entity:set_rotation({x = 0, y = drone.dir, z = 0})
-
-    -- TODO sometimes attr is nil here
-    local attr = drone_entity:get_nametag_attributes()
-    attr.text = drone.file
-    drone_entity:set_nametag_attributes(attr)
+    drone_entity:set_properties({nametag = drone.file});
 
 end
 

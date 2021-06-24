@@ -87,7 +87,7 @@ function codeblock.commands.set_drone_file_from_index(name, index)
         return
     end
 
-    codeblock.drones[name]:set_file(file)
+    codeblock.drones[name].file = file
 
     codeblock.events.handle_update_drone_entity(drone)
 

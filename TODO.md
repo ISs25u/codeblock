@@ -10,11 +10,12 @@
 
 ### v0.4.0
 
+- [x] use custom vector library
+- [ ] readme for vectors
 - [ ] use volume, surface, operations and calls to limit drone usage
-- [ ] limite movements
+- [ ] limit movements
 - [ ] centered cube/dome placement
 - [ ] use coroutine?
-- [x] use custom vector library
 - [ ] save drone obj and cor in drone?
 
 ### v0.3.0

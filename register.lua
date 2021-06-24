@@ -56,7 +56,20 @@ local DroneEntity = {
 
 function DroneEntity:set_drone_owner(name) self.drone_owner = name end
 
+function DroneEntity:get_staticdata()
+    return minetest.write_json({drone_owner = self.drone_owner})
+end
+
+function DroneEntity:on_activate(staticdata)
+    if staticdata ~= "" and staticdata ~= nil then
+        local data = minetest.parse_json(staticdata) or {}
+        self:set_drone_owner(data.drone_owner)
+    end
+end
+
 minetest.register_entity("codeblock:drone", DroneEntity)
+
+-- End Entities
 
 minetest.register_on_joinplayer(function(player)
 
