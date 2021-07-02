@@ -7,14 +7,13 @@ function codeblock.filesystem.get_files(directory_path)
 end
 
 function codeblock.filesystem.read(file)
-    local file = io.open(file, "rb")
-    if not file then return nil end
+    local file, err = io.open(file, "rb")
+    if not file then return false, err end
     local content = file:read("*a")
     file:close()
     return content
 end
 
 function codeblock.filesystem.write(filepath, content)
-    minetest.safe_file_write(filepath, content)
-    return content
+    return minetest.safe_file_write(filepath, content)
 end

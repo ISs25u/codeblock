@@ -10,11 +10,15 @@ local floor = math.floor
 local abs = math.abs
 local pi = math.pi
 local upper = string.upper
+
 local utils = codeblock.utils
+local Drone = codeblock.Drone
+local csp = minetest.chat_send_player
+local update_drone_entity = codeblock.events.handle_update_drone_entity
 
-local function round(x) return floor(x + 0.5) end
+local function round(x) return floor(x + .5) end
 
-function codeblock.commands.check_volume(name, volume)
+local function check_volume(name, volume)
 
     assert(name)
 
@@ -42,7 +46,7 @@ end
 
 function codeblock.commands.add_drone(pos, dir, name, file)
 
-    local drone = codeblock.Drone:new(pos, dir, name, file)
+    local drone = Drone(pos, dir, name, file)
     codeblock.drones[name] = drone
 
     local drone_entity = minetest.add_entity(pos, "codeblock:drone", nil)
@@ -59,21 +63,21 @@ function codeblock.commands.set_drone_file_from_index(name, index)
     local path = codeblock.datapath .. name
 
     if not path then
-        minetest.chat_send_player(name, S("no file selected"))
+        csp(name, S("no file selected"))
         return
     end
 
     local files = codeblock.filesystem.get_files(path)
 
     if not files or #files == 0 then
-        minetest.chat_send_player(name, S('no files'))
+        csp(name, S('no files'))
         return
     end
 
     local file = files[index]
 
     if not file then
-        minetest.chat_send_player(name, S('no file selected')) -- annoying
+        csp(name, S('no file selected')) -- annoying
         return
     end
 
@@ -83,13 +87,13 @@ function codeblock.commands.set_drone_file_from_index(name, index)
     local drone = codeblock.drones[name]
 
     if not drone then
-        minetest.chat_send_player(name, S("drone does not exist"))
+        csp(name, S("drone does not exist"))
         return
     end
 
     codeblock.drones[name].file = file
 
-    codeblock.events.handle_update_drone_entity(drone)
+    update_drone_entity(drone)
 
 end
 
@@ -114,9 +118,9 @@ function codeblock.commands.drone_move(name, nx, ny, nz)
 
     local drone = codeblock.drones[name]
     if not drone then error(S("drone does not exist")) end
-    -- codeblock.commands.check_volume(name, 1)
+    -- check_volume(name, 1)
 
-    local angle = 2 / pi * (drone.dir % (2 * pi))
+    local angle = drone:angle()
 
     if angle == 0 then
         drone.x = drone.x + nx
@@ -136,7 +140,7 @@ function codeblock.commands.drone_move(name, nx, ny, nz)
         drone.z = drone.z - nx
     end
 
-    codeblock.events.handle_update_drone_entity(drone)
+    update_drone_entity(drone)
 
 end
 
@@ -146,9 +150,9 @@ function codeblock.commands.drone_forward(name, n)
 
     local drone = codeblock.drones[name]
     if not drone then error(S("drone does not exist")) end
-    -- codeblock.commands.check_volume(name, 1)
+    -- check_volume(name, 1)
 
-    local angle = 2 / pi * (drone.dir % (2 * pi))
+    local angle = drone:angle()
 
     if angle == 0 then
         drone.z = drone.z + n
@@ -160,7 +164,7 @@ function codeblock.commands.drone_forward(name, n)
         drone.x = drone.x + n
     end
 
-    codeblock.events.handle_update_drone_entity(drone)
+    update_drone_entity(drone)
 
 end
 
@@ -178,9 +182,9 @@ function codeblock.commands.drone_right(name, n)
 
     local drone = codeblock.drones[name]
     if not drone then error(S("drone does not exist")) end
-    -- codeblock.commands.check_volume(name, 1)
+    -- check_volume(name, 1)
 
-    local angle = 2 / pi * (drone.dir % (2 * pi))
+    local angle = drone:angle()
 
     if angle == 0 then
         drone.x = drone.x + n
@@ -192,7 +196,7 @@ function codeblock.commands.drone_right(name, n)
         drone.z = drone.z - n
     end
 
-    codeblock.events.handle_update_drone_entity(drone)
+    update_drone_entity(drone)
 
 end
 
@@ -210,11 +214,11 @@ function codeblock.commands.drone_up(name, n)
 
     local drone = codeblock.drones[name]
     if not drone then error(S("drone does not exist")) end
-    -- codeblock.commands.check_volume(name, 1)
+    -- check_volume(name, 1)
 
     drone.y = drone.y + n
 
-    codeblock.events.handle_update_drone_entity(drone)
+    update_drone_entity(drone)
 
 end
 
@@ -242,13 +246,13 @@ function codeblock.commands.drone_turn(name, quarters)
 
     local drone = codeblock.drones[name]
     if not drone then error(S("drone does not exist")) end
-    -- codeblock.commands.check_volume(name, 1)
+    -- check_volume(name, 1)
 
     local quarters = (type(quarters) == 'number') and round(quarters) or 0
 
     drone.dir = (drone.dir + quarters * pi * 0.5) % (2 * pi)
 
-    codeblock.events.handle_update_drone_entity(drone)
+    update_drone_entity(drone)
 
 end
 
@@ -265,7 +269,7 @@ function codeblock.commands.drone_place_block(name, block)
     local real_block = utils.blocks[block]
     if not real_block then error(S('block not allowed')) end
 
-    codeblock.commands.check_volume(name, 1)
+    check_volume(name, 1)
 
     codeblock.events.handle_place_block({x = drone.x, y = drone.y, z = drone.z},
                                         real_block)
@@ -296,9 +300,9 @@ function codeblock.commands.drone_place_relative(name, x, y, z, block,
     end
     local cp = drone.checkpoints[cp_name]
 
-    codeblock.commands.check_volume(name, 1)
+    check_volume(name, 1)
 
-    local angle = 2 / pi * (drone.dir % (2 * pi))
+    local angle = drone:angle()
     if angle == 0 then
         drone.x = cp.x + x
         drone.y = cp.y + y
@@ -321,7 +325,7 @@ function codeblock.commands.drone_place_relative(name, x, y, z, block,
         drone.dir = cp.dir
     end
 
-    codeblock.events.handle_update_drone_entity(drone)
+    update_drone_entity(drone)
     codeblock.events.handle_place_block({x = drone.x, y = drone.y, z = drone.z},
                                         real_block)
 
@@ -348,9 +352,9 @@ function codeblock.commands.drone_place_cube(name, w, h, l, block, hollow)
     local y = drone.y
     local z
 
-    codeblock.commands.check_volume(name, w * h * l)
+    check_volume(name, w * h * l)
 
-    local angle = 2 / pi * (drone.dir % (2 * pi))
+    local angle = drone:angle()
     if angle == 0 then
         w, l = w, l
         x = drone.x + floor(w * 0.5)
@@ -389,9 +393,9 @@ function codeblock.commands.drone_place_ccube(name, w, h, l, block, hollow)
     local h = (type(h) == 'number') and round(abs(h)) or 10
     local l = (type(l) == 'number') and round(abs(l)) or 10
 
-    codeblock.commands.check_volume(name, w * h * l)
+    check_volume(name, w * h * l)
 
-    local angle = 2 / pi * (drone.dir % (2 * pi))
+    local angle = drone:angle()
     if angle == 0 then
         w, l = w, l
     elseif angle == 1 then
@@ -423,9 +427,9 @@ function codeblock.commands.drone_place_sphere(name, r, block, hollow)
     local y = drone.y + r
     local z
 
-    codeblock.commands.check_volume(name, round(4 / 3 * pi * (r + 0.514) ^ 3))
+    check_volume(name, round(4 / 3 * pi * (r + 0.514) ^ 3))
 
-    local angle = 2 / pi * (drone.dir % (2 * pi))
+    local angle = drone:angle()
     if angle == 0 then
         x = drone.x + r
         z = drone.z + r
@@ -459,7 +463,7 @@ function codeblock.commands.drone_place_csphere(name, r, block, hollow)
     local r = (type(r) == 'number') and round(abs(r)) or 5
     local pos = {x = round(drone.x), y = round(drone.y), z = round(drone.z)}
 
-    codeblock.commands.check_volume(name, round(4 / 3 * pi * (r + 0.514) ^ 3))
+    check_volume(name, round(4 / 3 * pi * (r + 0.514) ^ 3))
 
     count = worldedit.sphere(pos, r, real_block, hollow)
 
@@ -480,9 +484,9 @@ function codeblock.commands.drone_place_dome(name, r, block, hollow)
     local y = drone.y
     local z
 
-    codeblock.commands.check_volume(name, round(2 / 3 * pi * (r + 0.514) ^ 3))
+    check_volume(name, round(2 / 3 * pi * (r + 0.514) ^ 3))
 
-    local angle = 2 / pi * (drone.dir % (2 * pi))
+    local angle = drone:angle()
     if angle == 0 then
         x = drone.x + r
         z = drone.z + r
@@ -516,7 +520,7 @@ function codeblock.commands.drone_place_cdome(name, r, block, hollow)
     local r = (type(r) == 'number') and round(abs(r)) or 5
     local pos = {x = drone.x, y = drone.y, z = drone.z}
 
-    codeblock.commands.check_volume(name, round(2 / 3 * pi * (r + 0.514) ^ 3))
+    check_volume(name, round(2 / 3 * pi * (r + 0.514) ^ 3))
 
     count = worldedit.dome(pos, r, real_block, hollow)
 
@@ -536,10 +540,10 @@ function codeblock.commands.drone_place_cylinder(name, o, l, r, block, hollow)
     local l = (type(l) == 'number') and round(abs(l)) or 10
     local r = (type(r) == 'number') and round(abs(r)) or 5
 
-    codeblock.commands.check_volume(name, round((pi * l * (r + 0.514) ^ 2)))
+    check_volume(name, round((pi * l * (r + 0.514) ^ 2)))
 
     local axis
-    local angle = 2 / pi * (drone.dir % (2 * pi))
+    local angle = drone:angle()
     if (o == 'V') then
         axis = 'y'
     elseif (o == 'H') then
@@ -601,11 +605,11 @@ function codeblock.commands.drone_place_ccylinder(name, o, l, r, block, hollow)
     local l = (type(l) == 'number') and round(abs(l)) or 10
     local r = (type(r) == 'number') and round(abs(r)) or 5
 
-    codeblock.commands.check_volume(name, round((pi * l * (r + 0.514) ^ 2)))
+    check_volume(name, round((pi * l * (r + 0.514) ^ 2)))
 
     local axis
     local x, y, z
-    local angle = 2 / pi * (drone.dir % (2 * pi))
+    local angle = drone:angle()
     if (o == 'V') then
         axis = 'y'
         x = drone.x
@@ -654,7 +658,7 @@ function codeblock.commands.drone_save_checkpoint(name, label)
 
     if type(label) ~= 'string' then error(S("no checkpoint name")) end
 
-    -- codeblock.commands.check_volume(name, 1)
+    -- check_volume(name, 1)
 
     drone.checkpoints[label] = {
         x = drone.x,
@@ -674,7 +678,7 @@ function codeblock.commands.drone_goto_checkpoint(name, label)
         error(S("no checkpoint @1", label or ""))
     end
 
-    -- codeblock.commands.check_volume(name, 1)
+    -- check_volume(name, 1)
 
     local cp = drone.checkpoints[label]
     drone.x = cp.x
@@ -682,6 +686,6 @@ function codeblock.commands.drone_goto_checkpoint(name, label)
     drone.z = cp.z
     drone.dir = cp.dir
 
-    codeblock.events.handle_update_drone_entity(drone)
+    update_drone_entity(drone)
 
 end
