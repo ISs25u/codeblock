@@ -1,6 +1,16 @@
+--------------------------------------------------------------------------------
+-- local
+--------------------------------------------------------------------------------
 local S = codeblock.S
+local drone_run = codeblock.DroneEntity.run
+local drone_place = codeblock.DroneEntity.place
+local drone_remove = codeblock.DroneEntity.remove_drone
+local drone_form = codeblock.DroneEntity.showfileformspec
+local drone_setfile = codeblock.DroneEntity.setfilefromindex
 
--- Tools
+--------------------------------------------------------------------------------
+-- tools
+--------------------------------------------------------------------------------
 
 minetest.register_tool("codeblock:drone_placer", {
     description = S("Drone Placer"),
@@ -8,11 +18,11 @@ minetest.register_tool("codeblock:drone_placer", {
     range = 128,
     stack_max = 1,
     on_use = function(itemstack, user, pointed_thing)
-        codeblock.events.handle_start_drone(user)
+        drone_run(user)
         return itemstack
     end,
     on_place = function(itemstack, placer, pointed_thing)
-        codeblock.events.handle_place_drone(placer, pointed_thing)
+        drone_place(placer, pointed_thing)
         return itemstack
     end
 })
@@ -23,53 +33,24 @@ minetest.register_tool("codeblock:drone_starter", {
     range = 128,
     stack_max = 1,
     on_use = function(itemstack, user, pointed_thing)
-        codeblock.events.handle_show_set_drone(user)
+        drone_form(user)
         return itemstack
     end,
     on_place = function(itemstack, placer, pointed_thing)
-        -- codeblock.commands.remove_drone(user:get_player_name())
+        drone_remove(placer)
         return itemstack
     end
 })
 
--- Entities
+--------------------------------------------------------------------------------
+-- entities
+--------------------------------------------------------------------------------
 
-local DroneEntity = {
-    initial_properties = {
-        visual = "cube",
-        visual_size = {x = 1.1, y = 1.1},
-        textures = {
-            "drone_top.png", "drone_side.png", "drone_side.png",
-            "drone_side.png", "drone_side.png", "drone_side.png"
-        },
-        collisionbox = {-0.55, -0.55, -0.55, 0.55, 0.55, 0.55},
-        physical = false,
-        static_save = false
-    },
-    on_rightclick = function(self, clicker) end,
-    on_punch = function(self, puncher, time_from_last_punch, tool_capabilities,
-                        dir) return {} end,
-    on_blast = function(self, damage) return end,
-    drone_owner = nil,
-    nametag = '?'
-}
+minetest.register_entity("codeblock:drone", codeblock.DroneEntity)
 
-function DroneEntity:set_drone_owner(name) self.drone_owner = name end
-
-function DroneEntity:get_staticdata()
-    return minetest.write_json({drone_owner = self.drone_owner})
-end
-
-function DroneEntity:on_activate(staticdata)
-    if staticdata ~= "" and staticdata ~= nil then
-        local data = minetest.parse_json(staticdata) or {}
-        self:set_drone_owner(data.drone_owner)
-    end
-end
-
-minetest.register_entity("codeblock:drone", DroneEntity)
-
--- End Entities
+--------------------------------------------------------------------------------
+-- players
+--------------------------------------------------------------------------------
 
 minetest.register_on_joinplayer(function(player)
 
@@ -80,7 +61,7 @@ minetest.register_on_joinplayer(function(player)
         minetest.chat_send_player(name, S('Cannot create @1', path))
     end
 
-    player:get_meta():set_int('codeblock:last_index', 0)
+    -- player:get_meta():set_int('codeblock:last_index', 0)
 
 end)
 
@@ -102,14 +83,12 @@ minetest.register_on_newplayer(function(player)
 
 end)
 
-minetest.register_on_leaveplayer(function(player, timed_out)
+minetest.register_on_leaveplayer(
+    function(player, timed_out) drone_remove(player) end)
 
-    local name = player:get_player_name()
-    codeblock.commands.remove_drone(name)
-
-end)
-
--- Events
+--------------------------------------------------------------------------------
+-- formspecs
+--------------------------------------------------------------------------------
 
 minetest.register_on_player_receive_fields(
     function(player, formname, fields)
@@ -122,7 +101,7 @@ minetest.register_on_player_receive_fields(
             if res.type == "DCL" then
 
                 minetest.close_formspec(name, 'codeblock:choose_file')
-                codeblock.commands.set_drone_file_from_index(name, res.index)
+                drone_setfile(player, res.index)
 
             end
 

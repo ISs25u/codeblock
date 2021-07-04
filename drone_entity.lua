@@ -1,0 +1,207 @@
+codeblock.DroneEntity = {}
+
+--------------------------------------------------------------------------------
+-- local
+--------------------------------------------------------------------------------
+
+local S = codeblock.S
+local floor = math.floor
+local pi = math.pi
+local minetest_send_player = minetest.chat_send_player
+local Drone = codeblock.Drone
+
+local tmp1 = 2 / pi
+local tmp3 = pi / 2
+local tmp4 = pi / 4
+
+local function dirtocardinal(dir) return floor((dir + tmp4) * tmp1) * tmp3 end
+
+--------------------------------------------------------------------------------
+-- private
+--------------------------------------------------------------------------------
+
+local DroneEntity = {
+    initial_properties = {
+        visual = "cube",
+        visual_size = {x = 1.1, y = 1.1},
+        textures = {
+            "drone_top.png", "drone_side.png", "drone_side.png",
+            "drone_side.png", "drone_side.png", "drone_side.png"
+        },
+        collisionbox = {-0.55, -0.55, -0.55, 0.55, 0.55, 0.55},
+        physical = false,
+        static_save = false
+    },
+    nametag = '?.lua',
+    _data = nil,
+    owner = nil
+}
+
+local success, err, drone, status
+local entity_mt = {
+
+    __index = {
+
+        on_step = function(self, dtime, moveresult)
+
+            drone = self._data
+
+            if drone ~= nil and drone.cor ~= nil then
+
+                status = coroutine.status(drone.cor)
+
+                if status == 'dead' then
+                    Drone[drone.name] = nil
+                elseif status == 'suspended' then
+                    success, err = coroutine.resume(drone.cor)
+
+                    if not success then
+                        minetest.chat_send_all(err)
+                    end
+                end
+
+            end
+
+            return
+        end,
+
+        on_rightclick = function(self, clicker) return end,
+
+        on_punch = function(self, puncher, time_from_last_punch,
+                            tool_capabilities, dir, damage) return {} end,
+
+        on_blast = function(self, damage) return end,
+
+        on_deactivate = function(self, ...)
+            -- Drone[self.owner] = nil
+            return
+        end
+
+    }
+
+}
+
+--------------------------------------------------------------------------------
+-- static
+--------------------------------------------------------------------------------
+
+function DroneEntity.place(placer, pointed_thing)
+
+    local name = placer:get_player_name()
+
+    local pos = minetest.get_pointed_thing_position(pointed_thing)
+
+    if not pos then
+        minetest_send_player(name, S("Please target node"))
+        return {}
+    end
+
+    local dir = dirtocardinal(placer:get_look_horizontal())
+
+    local drone = Drone(name, pos, dir, nil)
+
+    local meta = placer:get_meta()
+    local last_index = meta:get_int('codeblock:last_index')
+    if not last_index or last_index == 0 then
+        DroneEntity.showfileformspec(placer)
+    else
+        DroneEntity.setfilefromindex(placer, last_index)
+    end
+
+end
+
+function DroneEntity.run(user)
+
+    local name = user:get_player_name()
+
+    local drone = Drone[name]
+
+    if not drone then
+        minetest_send_player(name, S("drone does not exist"))
+        return
+    end
+
+    local file = drone.file
+
+    if not file then
+        minetest_send_player(name, S("no file selected"))
+        return
+    end
+
+    drone.cor = codeblock.sandbox.run_safe_coroutine(name, file)
+
+end
+
+function DroneEntity.remove_drone(player)
+
+    local name = player:get_player_name()
+    Drone[name] = nil
+
+end
+
+function DroneEntity.setfilefromindex(player, index)
+
+    local name = player:get_player_name()
+
+    local drone = Drone[name]
+
+    if not drone then
+        minetest_send_player(name, S("drone does not exist"))
+        return
+    end
+
+    local path = codeblock.datapath .. name
+
+    if not path then
+        minetest_send_player(name, S("no file selected"))
+        return
+    end
+
+    local files = codeblock.filesystem.get_files(path)
+
+    if not files or #files == 0 then
+        minetest_send_player(name, S('no files'))
+        return
+    end
+
+    local file = files[index]
+
+    if not file then
+        minetest_send_player(name, S('no file selected')) -- annoying
+        return
+    end
+
+    minetest.get_player_by_name(name):get_meta():set_int('codeblock:last_index',
+                                                         index)
+
+    drone.file = file
+    drone:update_entity()
+
+end
+
+function DroneEntity.showfileformspec(player)
+
+    local name = player:get_player_name()
+    local path = codeblock.datapath .. name
+
+    if not path then
+        minetest_send_player(name, S("no file selected"))
+        return
+    end
+
+    local files = codeblock.filesystem.get_files(path)
+
+    if not files or #files == 0 then
+        minetest_send_player(name, S('no files'))
+        return
+    end
+
+    minetest.show_formspec(name, 'codeblock:choose_file',
+                           codeblock.formspecs.choose_file(files))
+
+end
+
+--- export
+
+codeblock.DroneEntity = setmetatable(DroneEntity, entity_mt)
+

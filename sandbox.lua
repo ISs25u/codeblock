@@ -1,8 +1,21 @@
 codeblock.sandbox = {}
 
+--------------------------------------------------------------------------------
+-- local
+--------------------------------------------------------------------------------
+
 local S = codeblock.S
+local minetest_send_player = minetest.chat_send_player
+
+local env_cache = {}
+
+--------------------------------------------------------------------------------
+-- private
+--------------------------------------------------------------------------------
 
 local function getScriptEnv(name)
+
+    if env_cache[name] ~= nil then return env_cache[name] end
 
     local cmd = codeblock.commands
     local utils = codeblock.utils
@@ -10,90 +23,118 @@ local function getScriptEnv(name)
     local env = {
         move = function(x, y, z)
             cmd.drone_move(name, x, y, z)
+            coroutine.yield()
             return
         end,
         forward = function(n)
             cmd.drone_forward(name, n)
+            coroutine.yield()
             return
         end,
         back = function(n)
             cmd.drone_back(name, n)
+            coroutine.yield()
             return
         end,
         left = function(n)
             cmd.drone_left(name, n)
+            coroutine.yield()
             return
         end,
         right = function(n)
             cmd.drone_right(name, n)
+            coroutine.yield()
             return
         end,
         up = function(n)
             cmd.drone_up(name, n)
+            coroutine.yield()
             return
         end,
         down = function(n)
             cmd.drone_down(name, n)
+            coroutine.yield()
             return
         end,
         turn_left = function()
             cmd.drone_turn_left(name)
+            coroutine.yield()
             return
         end,
         turn_right = function()
             cmd.drone_turn_right(name)
+            coroutine.yield()
             return
         end,
         turn = function(quarters)
             cmd.drone_turn(name, quarters)
+            coroutine.yield()
             return
         end,
         place = function(block)
             cmd.drone_place_block(name, block)
+            coroutine.yield()
             return
         end,
-        place_relative = function(x, y, z, block, label)
-            cmd.drone_place_relative(name, x, y, z, block, label)
+        place_relative = function(x, y, z, block, chkpt)
+            cmd.drone_place_relative(name, x, y, z, block, chkpt)
+            coroutine.yield()
         end,
-        save = function(label) cmd.drone_save_checkpoint(name, label) end,
-        go = function(label) cmd.drone_goto_checkpoint(name, label) end,
+        save = function(chkpt)
+            cmd.drone_save_checkpoint(name, chkpt)
+            coroutine.yield()
+        end,
+        go = function(chkpt, x, y, z)
+            cmd.drone_goto_checkpoint(name, chkpt, x, y, z)
+            coroutine.yield()
+        end,
         cube = function(w, h, l, block, hollow)
             cmd.drone_place_cube(name, w, h, l, block, hollow)
+            coroutine.yield()
         end,
         sphere = function(r, block, hollow)
             cmd.drone_place_sphere(name, r, block, hollow)
+            coroutine.yield()
         end,
         dome = function(r, block, hollow)
             cmd.drone_place_dome(name, r, block, hollow)
+            coroutine.yield()
         end,
         vertical = {
             cylinder = function(l, r, block, hollow)
                 cmd.drone_place_cylinder(name, 'V', l, r, block, hollow)
+                coroutine.yield()
             end
         },
         horizontal = {
             cylinder = function(l, r, block, hollow)
                 cmd.drone_place_cylinder(name, 'H', l, r, block, hollow)
+                coroutine.yield()
             end
         },
         centered = {
             cube = function(w, h, l, block, hollow)
                 cmd.drone_place_ccube(name, w, h, l, block, hollow)
+                coroutine.yield()
             end,
             sphere = function(r, block, hollow)
                 cmd.drone_place_csphere(name, r, block, hollow)
+                coroutine.yield()
             end,
             dome = function(r, block, hollow)
                 cmd.drone_place_cdome(name, r, block, hollow)
+                coroutine.yield()
             end,
             vertical = {
                 cylinder = function(l, r, block, hollow)
                     cmd.drone_place_ccylinder(name, 'V', l, r, block, hollow)
+                    coroutine.yield()
                 end
             },
             horizontal = {
                 cylinder = function(l, r, block, hollow)
                     cmd.drone_place_ccylinder(name, 'H', l, r, block, hollow)
+                    coroutine.yield()
                 end
             }
         },
@@ -133,12 +174,14 @@ local function getScriptEnv(name)
         vector = vector3,
         error = error,
         print = function(msg)
-            minetest.chat_send_player(name, '> ' .. tostring(msg))
+            minetest_send_player(name, '> ' .. tostring(msg))
+            coroutine.yield()
             return
         end
     }
 
     env._G = env
+    env_cache[name] = env
     return env
 
 end
@@ -249,10 +292,10 @@ local function preprocess_code(script) -- version 07/24/2018
     script = script:gsub("%-%-%[%[.*%-%-%]%]", ""):gsub("%-%-[^\n]*\n", "\n") -- strip comments
 
     -- process script to insert call counter in every function
-    local _increase_ccounter = " _c_ = _c_ + 1; if _c_ > " .. call_limit ..
-                                   " then _G.error(\"" ..
-                                   S('call limit (@1) exeeded', call_limit) ..
-                                   "\") end; "
+    local _check_and_pause_code = " _c_ = _c_ + 1; if _c_ > " .. call_limit ..
+                                      " then _G.error(\"" ..
+                                      S('call limit (@1) exeeded', call_limit) ..
+                                      "\") end; "
 
     local i1 = 0;
     local i2 = 0;
@@ -309,7 +352,7 @@ local function preprocess_code(script) -- version 07/24/2018
         i1 = i2 + 1;
     end
     ret[#ret + 1] = string.sub(script, i1);
-    script = table.concat(ret, _increase_ccounter)
+    script = table.concat(ret, _check_and_pause_code)
 
     -- must reset ccounter when paused, but user should not be able to force reset by modifying pause!
     -- (suggestion about 'pause' by Kimapr, 09/26/2019)
@@ -318,10 +361,76 @@ local function preprocess_code(script) -- version 07/24/2018
 
 end
 
-function codeblock.sandbox.run_safe(name, file)
+--------------------------------------------------------------------------------
+-- public
+--------------------------------------------------------------------------------
+
+-- function codeblock.sandbox.run_safe(name, file)
+
+--     -- loading file
+
+--     if not file then
+--         minetest_send_player(name, S("Empty drone file"))
+--         return
+--     end
+
+--     local path = codeblock.datapath .. name .. '/' .. file
+--     local untrusted_code = codeblock.filesystem.read(path)
+
+--     if not untrusted_code then
+--         minetest_send_player(name, S('@1 not found', file))
+--         return
+--     end
+
+--     if untrusted_code:byte(1) == 27 then
+--         minetest_send_player(name, S("Error in @1", file) ..
+--                                  S("binary bytecode prohibited"))
+--     end
+
+--     -- checking forbiden things
+
+--     err = check_code(untrusted_code);
+
+--     if err then
+--         minetest_send_player(name, S("Error in @1", file))
+--         minetest_send_player(name, err)
+--         return
+--     end
+
+--     -- preprocessing code
+
+--     safe_code = preprocess_code(untrusted_code);
+
+--     -- compiling into bytecode
+
+--     local bytecode, message = loadstring(safe_code)
+--     if not bytecode then
+--         minetest_send_player(name, S("Error in @1", file))
+--         minetest_send_player(name, message)
+--         return
+--     end
+
+--     -- running it
+
+--     setfenv(bytecode, getScriptEnv(name))
+
+--     math.randomseed(minetest.get_us_time())
+--     local status, err = pcall(bytecode)
+
+--     if not status then
+--         minetest_send_player(name, S("Error in @1", file))
+--         minetest_send_player(name, err)
+--         return
+--     end
+
+-- end
+
+function codeblock.sandbox.run_safe_coroutine(name, file)
+
+    -- loading file
 
     if not file then
-        minetest.chat_send_player(name, S("Empty drone file"))
+        minetest_send_player(name, S("Empty drone file"))
         return
     end
 
@@ -329,44 +438,46 @@ function codeblock.sandbox.run_safe(name, file)
     local untrusted_code = codeblock.filesystem.read(path)
 
     if not untrusted_code then
-        minetest.chat_send_player(name, S('@1 not found', file))
+        minetest_send_player(name, S('@1 not found', file))
         return
     end
 
     if untrusted_code:byte(1) == 27 then
-        minetest.chat_send_player(name, S("Error in @1", file) ..
-                                      S("binary bytecode prohibited"))
+        minetest_send_player(name, S("Error in @1", file) ..
+                                 S("binary bytecode prohibited"))
     end
+
+    -- checking forbiden things
 
     err = check_code(untrusted_code);
 
     if err then
-        minetest.chat_send_player(name, S("Error in @1", file))
-        minetest.chat_send_player(name, err)
+        minetest_send_player(name, S("Error in @1", file))
+        minetest_send_player(name, err)
         return
     end
+
+    -- preprocessing code
 
     safe_code = preprocess_code(untrusted_code);
 
+    -- compiling into bytecode
+
     local bytecode, message = loadstring(safe_code)
     if not bytecode then
-        minetest.chat_send_player(name, S("Error in @1", file))
-        minetest.chat_send_player(name, message)
+        minetest_send_player(name, S("Error in @1", file))
+        minetest_send_player(name, message)
         return
     end
 
-    -- local co = coroutine.create(bytecode)
+    -- running it
+
     setfenv(bytecode, getScriptEnv(name))
-    -- ret, err = coroutine.resume(co)
+    local cor = coroutine.create(bytecode)
 
     math.randomseed(minetest.get_us_time())
-    local status, err = pcall(bytecode)
+    coroutine.resume(cor)
 
-    if not status then
-        minetest.chat_send_player(name, S("Error in @1", file))
-        minetest.chat_send_player(name, err)
-        return
-    end
+    return cor
 
 end
-
