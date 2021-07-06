@@ -26,50 +26,43 @@ local tmp4 = 2 / 3 * pi
 -- private
 -------------------------------------------------------------------------------
 
-local function round(x) return floor(x + .5) end
+local function round0(x) return floor(x + .5) end
 
---[[ 
-    rounding and checking x,y,z are numbers should always be
-    done before calling this method
- ]]
 local function place_block(x, y, z, block)
     minetest_set_node({x = x, y = y, z = z}, {name = block})
 end
 
 local function use_volume(drone, v_used)
 
-    if codeblock.max_volume ~= 0 then
-        local volume = drone.volume + v_used;
-        if volume <= codeblock.max_volume then
-            drone.volume = volume
-            return true
-        else
-            error(S('out of available volume'), 4);
-            return false
-        end
+    local volume = drone.volume + v_used;
+    if volume <= codeblock.max_volume then
+        drone.volume = volume
+    else
+        error(S('out of available volume'), 4);
     end
 
 end
 
 local function use_call(drone)
 
-    -- TODO
-
-end
-
-local function use_movement(drone)
-
-    -- TODO
+    local calls = drone.calls + 1;
+    if calls <= codeblock.max_calls then
+        drone.calls = calls
+    else
+        error(S('call limit (@1) exeeded', codeblock.max_calls), 4);
+    end
 
 end
 
 local function check_drone_yield(drone, op_level)
 
-    -- TODO: temporary setting
-    if op_level > 0 then
-        return coroutine.yield()
+    local operations = drone.operations + 1;
+    if operations <= codeblock.max_ops then
+        drone.operations = operations
+        minetest.chat_send_all(drone.operations)
+        if op_level > 4 then coroutine.yield() end
     else
-        return false
+        error(S('ops limit (@1) exeeded', codeblock.max_ops), 4);
     end
 
 end
@@ -82,9 +75,9 @@ local function drone_move(drone, x, y, z)
 
     assert(drone, S("drone does not exist"))
 
-    local x = (type(x) == 'number') and round(x) or 0
-    local y = (type(y) == 'number') and round(y) or 0
-    local z = (type(z) == 'number') and round(z) or 0
+    local x = (type(x) == 'number') and round0(x) or 0
+    local y = (type(y) == 'number') and round0(y) or 0
+    local z = (type(z) == 'number') and round0(z) or 0
 
     local angle = drone:angle()
 
@@ -115,7 +108,7 @@ local function drone_forward(drone, n)
 
     assert(drone, S("drone does not exist"))
 
-    local n = (type(n) == 'number') and round(n) or 1
+    local n = (type(n) == 'number') and round0(n) or 1
 
     local angle = drone:angle()
 
@@ -138,7 +131,7 @@ local function drone_back(drone, n)
 
     assert(drone, S("drone does not exist"))
 
-    local n = (type(n) == 'number') and round(n) or 1
+    local n = (type(n) == 'number') and round0(n) or 1
 
     local angle = drone:angle()
 
@@ -161,7 +154,7 @@ local function drone_right(drone, n)
 
     assert(drone, S("drone does not exist"))
 
-    local n = (type(n) == 'number') and round(n) or 1
+    local n = (type(n) == 'number') and round0(n) or 1
 
     local angle = drone:angle()
 
@@ -184,7 +177,7 @@ local function drone_left(drone, n)
 
     assert(drone, S("drone does not exist"))
 
-    local n = (type(n) == 'number') and round(n) or 1
+    local n = (type(n) == 'number') and round0(n) or 1
 
     local angle = drone:angle()
 
@@ -207,7 +200,7 @@ local function drone_up(drone, n)
 
     assert(drone, S("drone does not exist"))
 
-    local n = (type(n) == 'number') and round(n) or 1
+    local n = (type(n) == 'number') and round0(n) or 1
 
     drone.y = drone.y + n
 
@@ -220,7 +213,7 @@ local function drone_down(drone, n)
 
     assert(drone, S("drone does not exist"))
 
-    local n = (type(n) == 'number') and round(n) or 1
+    local n = (type(n) == 'number') and round0(n) or 1
 
     drone.y = drone.y - n
 
@@ -255,7 +248,7 @@ local function drone_turn(drone, quarters)
 
     assert(drone, S("drone does not exist"))
 
-    local quarters = (type(quarters) == 'number') and round(quarters) or 0
+    local quarters = (type(quarters) == 'number') and round0(quarters) or 0
 
     drone.dir = (drone.dir + quarters * tmp2) % tmp1
 
@@ -287,9 +280,9 @@ local function drone_place_relative(drone, x, y, z, block, chkpt)
 
     assert(drone, S("drone does not exist"))
 
-    local x = (type(x) == 'number') and round(x) or 0
-    local y = (type(y) == 'number') and round(y) or 0
-    local z = (type(z) == 'number') and round(z) or 0
+    local x = (type(x) == 'number') and round0(x) or 0
+    local y = (type(y) == 'number') and round0(y) or 0
+    local z = (type(z) == 'number') and round0(z) or 0
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
@@ -347,9 +340,9 @@ local function drone_place_cube(drone, w, h, l, block, hollow)
     if not real_block then error(S('block not allowed')) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
-    local w = (type(w) == 'number') and round(abs(w)) or 10
-    local h = (type(h) == 'number') and round(abs(h)) or 10
-    local l = (type(l) == 'number') and round(abs(l)) or 10
+    local w = (type(w) == 'number') and round0(abs(w)) or 10
+    local h = (type(h) == 'number') and round0(abs(h)) or 10
+    local l = (type(l) == 'number') and round0(abs(l)) or 10
     local x
     local y = drone.y
     local z
@@ -391,9 +384,9 @@ local function drone_place_ccube(drone, w, h, l, block, hollow)
     if not real_block then error(S('block not allowed')) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
-    local w = (type(w) == 'number') and round(abs(w)) or 10
-    local h = (type(h) == 'number') and round(abs(h)) or 10
-    local l = (type(l) == 'number') and round(abs(l)) or 10
+    local w = (type(w) == 'number') and round0(abs(w)) or 10
+    local h = (type(h) == 'number') and round0(abs(h)) or 10
+    local l = (type(l) == 'number') and round0(abs(l)) or 10
 
     use_volume(drone, w * h * l)
 
@@ -424,12 +417,12 @@ local function drone_place_sphere(drone, r, block, hollow)
     if not real_block then error(S('block not allowed')) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
-    local r = (type(r) == 'number') and round(abs(r)) or 5
+    local r = (type(r) == 'number') and round0(abs(r)) or 5
     local x
     local y = drone.y + r
     local z
 
-    use_volume(drone, round(tmp3 * (r + 0.514) ^ 3))
+    use_volume(drone, round0(tmp3 * (r + 0.514) ^ 3))
 
     local angle = drone:angle()
     if angle == 0 then
@@ -462,10 +455,10 @@ local function drone_place_csphere(drone, r, block, hollow)
     if not real_block then error(S('block not allowed')) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
-    local r = (type(r) == 'number') and round(abs(r)) or 5
-    local pos = {x = round(drone.x), y = round(drone.y), z = round(drone.z)}
+    local r = (type(r) == 'number') and round0(abs(r)) or 5
+    local pos = {x = round0(drone.x), y = round0(drone.y), z = round0(drone.z)}
 
-    use_volume(drone, round(tmp3 * (r + 0.514) ^ 3))
+    use_volume(drone, round0(tmp3 * (r + 0.514) ^ 3))
 
     count = worldedit.sphere(pos, r, real_block, hollow)
     check_drone_yield(drone, 2)
@@ -481,12 +474,12 @@ local function drone_place_dome(drone, r, block, hollow)
     if not real_block then error(S('block not allowed')) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
-    local r = (type(r) == 'number') and round(abs(r)) or 5
+    local r = (type(r) == 'number') and round0(abs(r)) or 5
     local x
     local y = drone.y
     local z
 
-    use_volume(drone, round(tmp4 * (r + 0.514) ^ 3))
+    use_volume(drone, round0(tmp4 * (r + 0.514) ^ 3))
 
     local angle = drone:angle()
     if angle == 0 then
@@ -519,10 +512,10 @@ local function drone_place_cdome(drone, r, block, hollow)
     if not real_block then error(S('block not allowed')) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
-    local r = (type(r) == 'number') and round(abs(r)) or 5
+    local r = (type(r) == 'number') and round0(abs(r)) or 5
     local pos = {x = drone.x, y = drone.y, z = drone.z}
 
-    use_volume(drone, round(tmp4 * (r + 0.514) ^ 3))
+    use_volume(drone, round0(tmp4 * (r + 0.514) ^ 3))
 
     count = worldedit.dome(pos, r, real_block, hollow)
     check_drone_yield(drone, 2)
@@ -539,10 +532,10 @@ local function drone_place_cylinder(drone, o, l, r, block, hollow)
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local o = (type(o) == 'string') and upper(o) or 'V'
-    local l = (type(l) == 'number') and round(abs(l)) or 10
-    local r = (type(r) == 'number') and round(abs(r)) or 5
+    local l = (type(l) == 'number') and round0(abs(l)) or 10
+    local r = (type(r) == 'number') and round0(abs(r)) or 5
 
-    use_volume(drone, round((pi * l * (r + 0.514) ^ 2)))
+    use_volume(drone, round0((pi * l * (r + 0.514) ^ 2)))
 
     local axis
     local angle = drone:angle()
@@ -604,10 +597,10 @@ local function drone_place_ccylinder(drone, o, l, r, block, hollow)
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local o = (type(o) == 'string') and upper(o) or 'V'
-    local l = (type(l) == 'number') and round(abs(l)) or 10
-    local r = (type(r) == 'number') and round(abs(r)) or 5
+    local l = (type(l) == 'number') and round0(abs(l)) or 10
+    local r = (type(r) == 'number') and round0(abs(r)) or 5
 
-    use_volume(drone, round((pi * l * (r + 0.514) ^ 2)))
+    use_volume(drone, round0((pi * l * (r + 0.514) ^ 2)))
 
     local axis
     local x, y, z
@@ -675,9 +668,9 @@ local function drone_goto_checkpoint(drone, chkpt, x, y, z)
 
     assert(drone, S("drone does not exist"))
 
-    local x = (type(x) == 'number') and round(x) or 0
-    local y = (type(y) == 'number') and round(y) or 0
-    local z = (type(z) == 'number') and round(z) or 0
+    local x = (type(x) == 'number') and round0(x) or 0
+    local y = (type(y) == 'number') and round0(y) or 0
+    local z = (type(z) == 'number') and round0(z) or 0
 
     if (x * x + y * y + z * z > codeblock.max_place_value) then
         error(S('too far away'))

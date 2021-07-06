@@ -52,6 +52,8 @@ local drone_mt = {
             file = file,
             checkpoints = {},
             volume = 0,
+            calls = 0,
+            operations = 0,
             cor = nil,
             obj = nil
         }

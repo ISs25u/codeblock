@@ -336,7 +336,7 @@ centered.sphere(R1 - 1, wools.black)
 for i = 1, 100 do
 
     local r = random(10, 25)
-    local pos = vector.random():scale(R1 + 0.90 * r)
+    local pos = vector.srandom(1, 1):scale(R1 + 0.90 * r)
 
     go('center', pos.x, pos.y, pos.z)
     centered.sphere(r, blocks.air)

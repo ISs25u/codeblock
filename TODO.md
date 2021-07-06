@@ -2,24 +2,21 @@
 
 ### v1.0.0
 
-- [x] User associated filesystem to store programs (high priority)
-- [x] Allow to set drone's file with in-game interface + remember last program started (high priority)
-- [ ] Blockly web-based editor (high priority)
-- [ ] Control drone operating speed (medium priority)
-- [ ] In-game lua code editor (low priority)
+- [x] User associated filesystem to store programs
+- [x] Allow to set drone's file with in-game interface + remember last program started
+- [ ] Control drone operating speed
+- [ ] In-game lua code editor
+- [ ] Blockly web-based editor
 
 ### v0.4.0
 
 - [x] use custom vector library
-- [x] save drone obj and cor in drone?
+- [x] save drone obj and cor in drone
 - [x] use coroutine
-- [ ] repair examples
-- [ ] handle drone speed
-- [ ] limit movements
-- [ ] readme for vectors -> ref to library
-- [ ] use volume, surface, operations and calls to limit drone usage
+- [ ] add surface and/or distance to limit drone usage
+- [ ] limit drone usage and speed with an auth_level
 - [ ] centered cube/dome placement
-
+- [ ] update readme (and ref to vector3)
 
 ### v0.3.0
 

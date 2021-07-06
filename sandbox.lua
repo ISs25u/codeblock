@@ -46,17 +46,23 @@ local niwools = #iwools
 -- private
 --------------------------------------------------------------------------------
 
-local function round(num, dec)
+local function gen_round(dec)
     local mult = 10 ^ (dec or 0)
-    return math.floor(num * mult + 0.5) / mult
+    return function(num) return math.floor(num * mult + 0.5) / mult end
+end
+
+local function round(dec, num)
+    local mult = 10 ^ (dec or 0)
+    return function(num) return math.floor(num * mult + 0.5) / mult end
 end
 
 local tmp1 = niwools - 1
+local round0 = gen_round(0)
 local function color(v, m, M)
     local m = (type(m) == 'number') and m or 1
     local M = (type(M) == 'number') and M or 11
     m, M = min(m, M), max(m, M)
-    local i = round(((v - m) / (M - m) * tmp1) % niwools) + 1
+    local i = round0(((v - m) / (M - m) * tmp1) % niwools) + 1
     return iwools[i]
 end
 
@@ -171,6 +177,7 @@ local function getScriptEnv(drone)
         floor = math.floor,
         ceil = math.ceil,
         round = round,
+        round0 = round0,
         deg = math.deg,
         rad = math.rad,
         exp = math.exp,
@@ -198,9 +205,7 @@ local function getScriptEnv(drone)
     env._G = {
         print = env.print,
         error = env.error,
-        use_one_call = function()
-            --
-        end
+        use_call = function() use_call(drone) end
     }
     return env
 
@@ -302,20 +307,13 @@ end
 
 local function preprocess_code(script) -- version 07/24/2018
 
-    --[[ idea: in each local a = function (args) ... end insert counter like:
-	local a = function (args) counter_check_code ... end 
-	when counter exceeds limit exit with error
-	--]]
-
     local call_limit = codeblock.call_limit
 
     script = script:gsub("%-%-%[%[.*%-%-%]%]", ""):gsub("%-%-[^\n]*\n", "\n") -- strip comments
 
     -- process script to insert call counter in every function
-    local _check_and_pause_code = " _c_ = _c_ + 1; if _c_ > " .. call_limit ..
-                                      " then _G.error(\"" ..
-                                      S('call limit (@1) exeeded', call_limit) ..
-                                      "\") end; "
+
+    local _use_call_code = " _G.use_call(); "
 
     local i1 = 0;
     local i2 = 0;
@@ -372,12 +370,9 @@ local function preprocess_code(script) -- version 07/24/2018
         i1 = i2 + 1;
     end
     ret[#ret + 1] = string.sub(script, i1);
-    script = table.concat(ret, _check_and_pause_code)
+    script = table.concat(ret, _use_call_code)
 
-    -- must reset ccounter when paused, but user should not be able to force reset by modifying pause!
-    -- (suggestion about 'pause' by Kimapr, 09/26/2019)
-
-    return '_c_ = 0;' .. script;
+    return script;
 
 end
 

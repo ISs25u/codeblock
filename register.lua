@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 -- local
 --------------------------------------------------------------------------------
+
 local S = codeblock.S
 local drone_run = codeblock.DroneEntity.run
 local drone_place = codeblock.DroneEntity.place
