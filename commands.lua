@@ -36,12 +36,13 @@ local function place_block(x, y, z, block)
     minetest_set_node({x = x, y = y, z = z}, {name = block})
 end
 
-local function check_volume(drone, volume)
+local function use_volume(drone, v_used)
 
     if codeblock.max_volume ~= 0 then
-        local volume = drone.volume + volume;
+        local volume = drone.volume + v_used;
         if volume <= codeblock.max_volume then
             drone.volume = volume
+            return true
         else
             error(S('out of available volume'), 4);
             return false
@@ -50,10 +51,22 @@ local function check_volume(drone, volume)
 
 end
 
-local function check_and_yield(drone, type)
+local function use_call(drone)
 
-    -- TODO: temporary
-    if type > 0 then
+    -- TODO
+
+end
+
+local function use_movement(drone)
+
+    -- TODO
+
+end
+
+local function check_drone_yield(drone, op_level)
+
+    -- TODO: temporary setting
+    if op_level > 0 then
         return coroutine.yield()
     else
         return false
@@ -65,7 +78,7 @@ end
 -- movements
 -------------------------------------------------------------------------------
 
-function codeblock.commands.drone_move(drone, x, y, z)
+local function drone_move(drone, x, y, z)
 
     assert(drone, S("drone does not exist"))
 
@@ -94,11 +107,11 @@ function codeblock.commands.drone_move(drone, x, y, z)
     end
 
     drone:update_entity()
-    check_and_yield(drone, 0)
+    check_drone_yield(drone, 0)
 
 end
 
-function codeblock.commands.drone_forward(drone, n)
+local function drone_forward(drone, n)
 
     assert(drone, S("drone does not exist"))
 
@@ -117,11 +130,11 @@ function codeblock.commands.drone_forward(drone, n)
     end
 
     drone:update_entity()
-    check_and_yield(drone, 0)
+    check_drone_yield(drone, 0)
 
 end
 
-function codeblock.commands.drone_back(drone, n)
+local function drone_back(drone, n)
 
     assert(drone, S("drone does not exist"))
 
@@ -140,11 +153,11 @@ function codeblock.commands.drone_back(drone, n)
     end
 
     drone:update_entity()
-    check_and_yield(drone, 0)
+    check_drone_yield(drone, 0)
 
 end
 
-function codeblock.commands.drone_right(drone, n)
+local function drone_right(drone, n)
 
     assert(drone, S("drone does not exist"))
 
@@ -163,11 +176,11 @@ function codeblock.commands.drone_right(drone, n)
     end
 
     drone:update_entity()
-    check_and_yield(drone, 0)
+    check_drone_yield(drone, 0)
 
 end
 
-function codeblock.commands.drone_left(drone, n)
+local function drone_left(drone, n)
 
     assert(drone, S("drone does not exist"))
 
@@ -186,11 +199,11 @@ function codeblock.commands.drone_left(drone, n)
     end
 
     drone:update_entity()
-    check_and_yield(drone, 0)
+    check_drone_yield(drone, 0)
 
 end
 
-function codeblock.commands.drone_up(drone, n)
+local function drone_up(drone, n)
 
     assert(drone, S("drone does not exist"))
 
@@ -199,11 +212,11 @@ function codeblock.commands.drone_up(drone, n)
     drone.y = drone.y + n
 
     drone:update_entity()
-    check_and_yield(drone, 0)
+    check_drone_yield(drone, 0)
 
 end
 
-function codeblock.commands.drone_down(drone, n)
+local function drone_down(drone, n)
 
     assert(drone, S("drone does not exist"))
 
@@ -212,33 +225,33 @@ function codeblock.commands.drone_down(drone, n)
     drone.y = drone.y - n
 
     drone:update_entity()
-    check_and_yield(drone, 0)
+    check_drone_yield(drone, 0)
 
 end
 
-function codeblock.commands.drone_turn_left(drone)
+local function drone_turn_left(drone)
 
     assert(drone, S("drone does not exist"))
 
     drone.dir = (drone.dir + tmp2) % tmp1
 
     drone:update_entity()
-    check_and_yield(drone, 0)
+    check_drone_yield(drone, 0)
 
 end
 
-function codeblock.commands.drone_turn_right(drone)
+local function drone_turn_right(drone)
 
     assert(drone, S("drone does not exist"))
 
     drone.dir = (drone.dir - tmp2) % tmp1
 
     drone:update_entity()
-    check_and_yield(drone, 0)
+    check_drone_yield(drone, 0)
 
 end
 
-function codeblock.commands.drone_turn(drone, quarters)
+local function drone_turn(drone, quarters)
 
     assert(drone, S("drone does not exist"))
 
@@ -247,7 +260,7 @@ function codeblock.commands.drone_turn(drone, quarters)
     drone.dir = (drone.dir + quarters * tmp2) % tmp1
 
     drone:update_entity()
-    check_and_yield(drone, 0)
+    check_drone_yield(drone, 0)
 
 end
 
@@ -255,7 +268,7 @@ end
 -- blocks
 -------------------------------------------------------------------------------
 
-function codeblock.commands.drone_place_block(drone, block)
+local function drone_place_block(drone, block)
 
     assert(drone, S("drone does not exist"))
 
@@ -263,14 +276,14 @@ function codeblock.commands.drone_place_block(drone, block)
     local real_block = blocks[block]
     if not real_block then error(S('block not allowed')) end
 
-    check_volume(drone, 1)
+    use_volume(drone, 1)
 
     place_block(drone.x, drone.y, drone.z, real_block)
-    check_and_yield(drone, 1)
+    check_drone_yield(drone, 1)
 
 end
 
-function codeblock.commands.drone_place_relative(drone, x, y, z, block, chkpt)
+local function drone_place_relative(drone, x, y, z, block, chkpt)
 
     assert(drone, S("drone does not exist"))
 
@@ -290,7 +303,7 @@ function codeblock.commands.drone_place_relative(drone, x, y, z, block, chkpt)
     if not drone.checkpoints[chkpt] then error(S("no chkpt @1", chkpt)) end
     local cp = drone.checkpoints[chkpt]
 
-    check_volume(drone, 1)
+    use_volume(drone, 1)
 
     local angle = drone:angle()
     if angle == 0 then
@@ -317,7 +330,7 @@ function codeblock.commands.drone_place_relative(drone, x, y, z, block, chkpt)
 
     drone:update_entity()
     place_block(drone.x, drone.y, drone.z, real_block)
-    check_and_yield(drone, 1)
+    check_drone_yield(drone, 1)
 
 end
 
@@ -325,7 +338,7 @@ end
 -- WorldEdit
 -------------------------------------------------------------------------------
 
-function codeblock.commands.drone_place_cube(drone, w, h, l, block, hollow)
+local function drone_place_cube(drone, w, h, l, block, hollow)
 
     assert(drone, S("drone does not exist"))
 
@@ -341,7 +354,7 @@ function codeblock.commands.drone_place_cube(drone, w, h, l, block, hollow)
     local y = drone.y
     local z
 
-    check_volume(drone, w * h * l)
+    use_volume(drone, w * h * l)
 
     local angle = drone:angle()
     if angle == 0 then
@@ -365,11 +378,11 @@ function codeblock.commands.drone_place_cube(drone, w, h, l, block, hollow)
     local pos = {x = x, y = y, z = z}
 
     count = worldedit.cube(pos, w, h, l, real_block, hollow)
-    check_and_yield(drone, 2)
+    check_drone_yield(drone, 2)
 
 end
 
-function codeblock.commands.drone_place_ccube(drone, w, h, l, block, hollow)
+local function drone_place_ccube(drone, w, h, l, block, hollow)
 
     assert(drone, S("drone does not exist"))
 
@@ -382,7 +395,7 @@ function codeblock.commands.drone_place_ccube(drone, w, h, l, block, hollow)
     local h = (type(h) == 'number') and round(abs(h)) or 10
     local l = (type(l) == 'number') and round(abs(l)) or 10
 
-    check_volume(drone, w * h * l)
+    use_volume(drone, w * h * l)
 
     local angle = drone:angle()
     if angle == 0 then
@@ -398,11 +411,11 @@ function codeblock.commands.drone_place_ccube(drone, w, h, l, block, hollow)
     local pos = {x = drone.x, y = drone.y, z = drone.z}
 
     count = worldedit.cube(pos, w, h, l, real_block, hollow)
-    check_and_yield(drone, 2)
+    check_drone_yield(drone, 2)
 
 end
 
-function codeblock.commands.drone_place_sphere(drone, r, block, hollow)
+local function drone_place_sphere(drone, r, block, hollow)
 
     assert(drone, S("drone does not exist"))
 
@@ -416,7 +429,7 @@ function codeblock.commands.drone_place_sphere(drone, r, block, hollow)
     local y = drone.y + r
     local z
 
-    check_volume(drone, round(tmp3 * (r + 0.514) ^ 3))
+    use_volume(drone, round(tmp3 * (r + 0.514) ^ 3))
 
     local angle = drone:angle()
     if angle == 0 then
@@ -436,11 +449,11 @@ function codeblock.commands.drone_place_sphere(drone, r, block, hollow)
     local pos = {x = x, y = y, z = z}
 
     count = worldedit.sphere(pos, r, real_block, hollow)
-    check_and_yield(drone, 2)
+    check_drone_yield(drone, 2)
 
 end
 
-function codeblock.commands.drone_place_csphere(drone, r, block, hollow)
+local function drone_place_csphere(drone, r, block, hollow)
 
     assert(drone, S("drone does not exist"))
 
@@ -452,14 +465,14 @@ function codeblock.commands.drone_place_csphere(drone, r, block, hollow)
     local r = (type(r) == 'number') and round(abs(r)) or 5
     local pos = {x = round(drone.x), y = round(drone.y), z = round(drone.z)}
 
-    check_volume(drone, round(tmp3 * (r + 0.514) ^ 3))
+    use_volume(drone, round(tmp3 * (r + 0.514) ^ 3))
 
     count = worldedit.sphere(pos, r, real_block, hollow)
-    check_and_yield(drone, 2)
+    check_drone_yield(drone, 2)
 
 end
 
-function codeblock.commands.drone_place_dome(drone, r, block, hollow)
+local function drone_place_dome(drone, r, block, hollow)
 
     assert(drone, S("drone does not exist"))
 
@@ -473,7 +486,7 @@ function codeblock.commands.drone_place_dome(drone, r, block, hollow)
     local y = drone.y
     local z
 
-    check_volume(drone, round(tmp4 * (r + 0.514) ^ 3))
+    use_volume(drone, round(tmp4 * (r + 0.514) ^ 3))
 
     local angle = drone:angle()
     if angle == 0 then
@@ -493,11 +506,11 @@ function codeblock.commands.drone_place_dome(drone, r, block, hollow)
     local pos = {x = x, y = y, z = z}
 
     count = worldedit.dome(pos, r, real_block, hollow)
-    check_and_yield(drone, 2)
+    check_drone_yield(drone, 2)
 
 end
 
-function codeblock.commands.drone_place_cdome(drone, r, block, hollow)
+local function drone_place_cdome(drone, r, block, hollow)
 
     assert(drone, S("drone does not exist"))
 
@@ -509,14 +522,14 @@ function codeblock.commands.drone_place_cdome(drone, r, block, hollow)
     local r = (type(r) == 'number') and round(abs(r)) or 5
     local pos = {x = drone.x, y = drone.y, z = drone.z}
 
-    check_volume(drone, round(tmp4 * (r + 0.514) ^ 3))
+    use_volume(drone, round(tmp4 * (r + 0.514) ^ 3))
 
     count = worldedit.dome(pos, r, real_block, hollow)
-    check_and_yield(drone, 2)
+    check_drone_yield(drone, 2)
 
 end
 
-function codeblock.commands.drone_place_cylinder(drone, o, l, r, block, hollow)
+local function drone_place_cylinder(drone, o, l, r, block, hollow)
 
     assert(drone, S("drone does not exist"))
 
@@ -529,7 +542,7 @@ function codeblock.commands.drone_place_cylinder(drone, o, l, r, block, hollow)
     local l = (type(l) == 'number') and round(abs(l)) or 10
     local r = (type(r) == 'number') and round(abs(r)) or 5
 
-    check_volume(drone, round((pi * l * (r + 0.514) ^ 2)))
+    use_volume(drone, round((pi * l * (r + 0.514) ^ 2)))
 
     local axis
     local angle = drone:angle()
@@ -577,11 +590,11 @@ function codeblock.commands.drone_place_cylinder(drone, o, l, r, block, hollow)
     local pos = {x = x, y = y, z = z}
 
     count = worldedit.cylinder(pos, axis, l, r, r, real_block, hollow)
-    check_and_yield(drone, 2)
+    check_drone_yield(drone, 2)
 
 end
 
-function codeblock.commands.drone_place_ccylinder(drone, o, l, r, block, hollow)
+local function drone_place_ccylinder(drone, o, l, r, block, hollow)
 
     assert(drone, S("drone does not exist"))
 
@@ -594,7 +607,7 @@ function codeblock.commands.drone_place_ccylinder(drone, o, l, r, block, hollow)
     local l = (type(l) == 'number') and round(abs(l)) or 10
     local r = (type(r) == 'number') and round(abs(r)) or 5
 
-    check_volume(drone, round((pi * l * (r + 0.514) ^ 2)))
+    use_volume(drone, round((pi * l * (r + 0.514) ^ 2)))
 
     local axis
     local x, y, z
@@ -633,7 +646,7 @@ function codeblock.commands.drone_place_ccylinder(drone, o, l, r, block, hollow)
     local pos = {x = x, y = y, z = z}
 
     count = worldedit.cylinder(pos, axis, l, r, r, real_block, hollow)
-    check_and_yield(drone, 2)
+    check_drone_yield(drone, 2)
 
 end
 
@@ -641,7 +654,7 @@ end
 -- checkpoints
 -------------------------------------------------------------------------------
 
-function codeblock.commands.drone_save_checkpoint(drone, chkpt)
+local function drone_save_checkpoint(drone, chkpt)
 
     assert(drone, S("drone does not exist"))
 
@@ -654,11 +667,11 @@ function codeblock.commands.drone_save_checkpoint(drone, chkpt)
         dir = drone.dir
     }
 
-    check_and_yield(drone, 0)
+    check_drone_yield(drone, 0)
 
 end
 
-function codeblock.commands.drone_goto_checkpoint(drone, chkpt, x, y, z)
+local function drone_goto_checkpoint(drone, chkpt, x, y, z)
 
     assert(drone, S("drone does not exist"))
 
@@ -695,7 +708,7 @@ function codeblock.commands.drone_goto_checkpoint(drone, chkpt, x, y, z)
     end
 
     drone:update_entity()
-    check_and_yield(drone, 0)
+    check_drone_yield(drone, 0)
 
 end
 
@@ -703,11 +716,39 @@ end
 -- message
 -------------------------------------------------------------------------------
 
-function codeblock.commands.drone_send_message(drone, string)
+local function drone_send_message(drone, string)
 
     assert(drone, S("drone does not exist"))
 
     minetest_send_player(drone.name, '> ' .. tostring(msg))
-    check_and_yield(drone, 1)
+    check_drone_yield(drone, 1)
 end
 
+-------------------------------------------------------------------------------
+-- export
+-------------------------------------------------------------------------------
+
+codeblock.commands.drone_move = drone_move
+codeblock.commands.drone_forward = drone_forward
+codeblock.commands.drone_back = drone_back
+codeblock.commands.drone_right = drone_right
+codeblock.commands.drone_left = drone_left
+codeblock.commands.drone_up = drone_up
+codeblock.commands.drone_down = drone_down
+codeblock.commands.drone_turn_left = drone_turn_left
+codeblock.commands.drone_turn_right = drone_turn_right
+codeblock.commands.drone_turn = drone_turn
+codeblock.commands.drone_place_block = drone_place_block
+codeblock.commands.drone_place_relative = drone_place_relative
+codeblock.commands.drone_place_cube = drone_place_cube
+codeblock.commands.drone_place_ccube = drone_place_ccube
+codeblock.commands.drone_place_sphere = drone_place_sphere
+codeblock.commands.drone_place_csphere = drone_place_csphere
+codeblock.commands.drone_place_dome = drone_place_dome
+codeblock.commands.drone_place_cdome = drone_place_cdome
+codeblock.commands.drone_place_cylinder = drone_place_cylinder
+codeblock.commands.drone_place_ccylinder = drone_place_ccylinder
+codeblock.commands.drone_save_checkpoint = drone_save_checkpoint
+codeblock.commands.drone_goto_checkpoint = drone_goto_checkpoint
+codeblock.commands.drone_send_message = drone_send_message
+codeblock.commands.drone_use_call = use_call

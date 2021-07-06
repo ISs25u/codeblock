@@ -62,26 +62,31 @@ end
 ]]
 
 codeblock.examples.spirals = [[
-function spiral(TURNS, MAX_RADIUS, MAX_Y, BLOCK, ORIGIN)
+function spiral(TURNS, MAX_RADIUS, MAX_Y, BLOCK)
 
-    local A = 2 * pi * TURNS
+    save('origin')
 
-    local a = 0
-    local R, pos, lpos, p
-    while a < A do
+    local MAX_PHI = 2 * pi * TURNS
 
-        p = a / A
+    local phi = 0
+    local R, y, pos, lpos, p
+    while phi < MAX_PHI do
+
+        p = phi / MAX_PHI
         R = (p * (MAX_RADIUS - 0.5)) + 0.5
-        pos = vector(R * cos(a), p * MAX_Y, R * sin(a)):round()
+        y = p * MAX_Y
+        pos = vector.fromCylindrical(R, phi, y):round()
 
         if pos ~= lpos then
-            place_relative(pos.x, pos.y, pos.z, BLOCK, ORIGIN)
+            place_relative(pos.x, pos.y, pos.z, BLOCK, 'origin')
             lpos = pos
         end
 
-        a = a + 1 / (2 * pi * R)
+        phi = phi + 1 / (2 * pi * R)
 
     end
+
+    go('origin')
 
 end
 
@@ -92,59 +97,61 @@ local mblocks = {
 }
 
 for i = 1, #mblocks do
-    spiral(5, 25, 100, mblocks[i % (#mblocks + 1)], 'spiral' .. i)
-    go('spiral' .. i)
+    spiral(5, 25, 100, mblocks[i])
     right(50)
-end    
+end
 ]]
 
 codeblock.examples.plot2D = [[
-function plot2D(XMIN, XMAX, ZMIN, ZMAX, FMIN, FMAX, NPOINTS, f)
+function plot2D(XMIN, XMAX, ZMIN, ZMAX, FMIN, FMAX, NPOINTS, SIZE, fun)
 
     local increment = (XMAX - XMIN) / (NPOINTS - 1)
 
-    for nx = 1, NPOINTS do
-        for nz = 1, NPOINTS do
-            local x = XMIN + ((nx - 1) * increment)
-            local z = ZMIN + ((nz - 1) * increment)
-            local y = f(x, z)
+    local rx, ry, rz, y
+    for x = XMIN, XMAX, increment do
+        for z = ZMIN, ZMAX, increment do
 
-            local color = floor((y - FMIN) / (FMAX - FMIN) * (#iwools - 1))
-            local block = iwools[(color % #iwools) + 1]
+            y = fun(x, z)
 
-            place_relative(nx - 1, 0, nz - 1, block)
+            rx = (x - XMIN) / (XMAX - XMIN) * SIZE
+            ry = 0
+            rz = (z - ZMIN) / (ZMAX - ZMIN) * SIZE
+
+            place_relative(rx, ry, rz, color(y, FMIN, FMAX))
+
         end
     end
 end
 
-f = function(x, z) return cos(x + pi / 2) * sin(z) end
+fun = function(x, z) return cos(x + pi / 2) * sin(z) end
 
-plot2D(-2 * pi, 2 * pi, -2 * pi, 2 * pi, -1, 1, 100, f)    
+plot2D(-2 * pi, 2 * pi, -2 * pi, 2 * pi, -1, 1, 101, 100, fun)       
 ]]
 
 codeblock.examples.plot3D = [[
-function plot3D(XMIN, XMAX, ZMIN, ZMAX, FMIN, FMAX, NPOINTS, H, f)
+function plot3D(XMIN, XMAX, ZMIN, ZMAX, FMIN, FMAX, NPOINTS, SIZE, fun)
 
     local increment = (XMAX - XMIN) / (NPOINTS - 1)
 
-    for nx = 1, NPOINTS do
-        for nz = 1, NPOINTS do
-            local x = XMIN + ((nx - 1) * increment)
-            local z = ZMIN + ((nz - 1) * increment)
-            local y = f(x, z)
-            local h = floor((y - FMIN) / (FMAX - FMIN) * H)
+    local rx, ry, rz, y
+    for x = XMIN, XMAX, increment do
+        for z = ZMIN, ZMAX, increment do
 
-            local color = floor((y - FMIN) / (FMAX - FMIN) * (#iwools - 1))
-            local block = iwools[(color % #iwools) + 1]
+            y = fun(x, z)
 
-            place_relative(nx - 1, h, nz - 1, block)
+            rx = (x - XMIN) / (XMAX - XMIN) * SIZE
+            ry = (y - FMIN) / (FMAX - FMIN) * SIZE / 2
+            rz = (z - ZMIN) / (ZMAX - ZMIN) * SIZE
+
+            place_relative(rx, ry, rz, color(y, FMIN, FMAX))
+
         end
     end
 end
 
-f = function(x, z) return cos(x + pi / 2) * sin(z) end
+fun = function(x, z) return cos(x + pi / 2) * sin(z) end
 
-plot3D(-2 * pi, 2 * pi, -2 * pi, 2 * pi, -1, 1, 100, 100, f)    
+plot3D(-2 * pi, 2 * pi, -2 * pi, 2 * pi, -1, 1, 300, 100, fun)
 ]]
 
 codeblock.examples.menger = [[
@@ -300,8 +307,8 @@ codeblock.examples.death_star = [[
 local R1 = 30
 local R2 = R1
 
-local mvt = vector.new(-1, -1, -1)
-local pos = vector.floor(vector.multiply(vector.normalize(mvt), 0.95 * (R1 + R2)))
+local mvt = vector(-1, -1, -1)
+local pos = mvt:scale(0.95 * (R1 + R2)):floor()
 
 up(2 * R1 + R2)
 save('center')
@@ -318,28 +325,36 @@ for i = 1, 200, 1 do
 end    
 ]]
 
-codeblock.examples.planet = [[
-local R1 = 100
+codeblock.examples.moon = [[
+local R1 = 60
 
 up(2 * R1)
 save('center')
-centered.sphere(R1, blocks.desert_sandstone)
-centered.sphere(R1 - 2, blocks.silver_sandstone)
-local vcenter = vector.new(0, 0, 0)
+centered.sphere(R1, wools.grey)
+centered.sphere(R1 - 1, wools.black)
 
-for i = 1, 200 do
+for i = 1, 100 do
 
-    local theta = random() * pi
-    local phi = random() * 2 * pi
-    local r = random(5, 20)
+    local r = random(10, 25)
+    local pos = vector.random():scale(R1 + 0.90 * r)
 
-    local vrandom = vector.new(r * cos(phi) * sin(theta), r * sin(phi) * sin(theta),
-                            r * cos(theta))
-    local pos = vector.multiply(vector.direction(vcenter, vrandom), (R1 + r) * 0.95)
-
-    go('center')
-    move(pos.x, pos.y, pos.z)
+    go('center', pos.x, pos.y, pos.z)
     centered.sphere(r, blocks.air)
+
+end
+]]
+
+codeblock.examples.planet = [[
+up(100)
+save('origin')
+
+centered.sphere(40, blocks.desert_sandstone)
+
+for i = 1, 10000 do
+
+    local v = vector.prandom(60, 80):rotate_around(vector(1, 0, 1), pi / 6)
+
+    place_relative(v.x, v.y, v.z, blocks.obsidian, 'origin')
 
 end
 ]]

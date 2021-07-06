@@ -7,6 +7,40 @@ codeblock.sandbox = {}
 local S = codeblock.S
 local minetest_send_player = minetest.chat_send_player
 local Drone = codeblock.Drone
+local max = math.max
+local min = math.min
+local abs = math.abs
+
+local move = codeblock.commands.drone_move
+local forward = codeblock.commands.drone_forward
+local back = codeblock.commands.drone_back
+local right = codeblock.commands.drone_right
+local left = codeblock.commands.drone_left
+local up = codeblock.commands.drone_up
+local down = codeblock.commands.drone_down
+local turn_left = codeblock.commands.drone_turn_left
+local turn_right = codeblock.commands.drone_turn_right
+local turn = codeblock.commands.drone_turn
+local place_block = codeblock.commands.drone_place_block
+local place_relative = codeblock.commands.drone_place_relative
+local place_cube = codeblock.commands.drone_place_cube
+local place_ccube = codeblock.commands.drone_place_ccube
+local place_sphere = codeblock.commands.drone_place_sphere
+local place_csphere = codeblock.commands.drone_place_csphere
+local place_dome = codeblock.commands.drone_place_dome
+local place_cdome = codeblock.commands.drone_place_cdome
+local place_cylinder = codeblock.commands.drone_place_cylinder
+local place_ccylinder = codeblock.commands.drone_place_ccylinder
+local save_checkpoint = codeblock.commands.drone_save_checkpoint
+local goto_checkpoint = codeblock.commands.drone_goto_checkpoint
+local send_message = codeblock.commands.drone_send_message
+local use_call = codeblock.commands.drone_use_call
+
+local blocks = codeblock.utils.cubes_names
+local plants = codeblock.utils.plants_names
+local wools = codeblock.utils.wools_names
+local iwools = codeblock.utils.iwools_names
+local niwools = #iwools
 
 --------------------------------------------------------------------------------
 -- private
@@ -17,111 +51,120 @@ local function round(num, dec)
     return math.floor(num * mult + 0.5) / mult
 end
 
+local tmp1 = niwools - 1
+local function color(v, m, M)
+    local m = (type(m) == 'number') and m or 1
+    local M = (type(M) == 'number') and M or 11
+    m, M = min(m, M), max(m, M)
+    local i = round(((v - m) / (M - m) * tmp1) % niwools) + 1
+    return iwools[i]
+end
+
 local function getScriptEnv(drone)
 
     assert(drone, S("drone does not exist"))
 
     local name = drone.name
-    local cmd = codeblock.commands
     local utils = codeblock.utils
 
     local env = {
         move = function(x, y, z)
-            cmd.drone_move(drone, x, y, z)
+            move(drone, x, y, z)
             return
         end,
         forward = function(n)
-            cmd.drone_forward(drone, n)
+            forward(drone, n)
             return
         end,
         back = function(n)
-            cmd.drone_back(drone, n)
+            back(drone, n)
             return
         end,
         left = function(n)
-            cmd.drone_left(drone, n)
+            left(drone, n)
             return
         end,
         right = function(n)
-            cmd.drone_right(drone, n)
+            right(drone, n)
             return
         end,
         up = function(n)
-            cmd.drone_up(drone, n)
+            up(drone, n)
             return
         end,
         down = function(n)
-            cmd.drone_down(drone, n)
+            down(drone, n)
             return
         end,
         turn_left = function()
-            cmd.drone_turn_left(drone)
+            turn_left(drone)
             return
         end,
         turn_right = function()
-            cmd.drone_turn_right(drone)
+            turn_right(drone)
             return
         end,
         turn = function(quarters)
-            cmd.drone_turn(drone, quarters)
+            turn(drone, quarters)
             return
         end,
         place = function(block)
-            cmd.drone_place_block(drone, block)
+            place_block(drone, block)
             return
         end,
         place_relative = function(x, y, z, block, chkpt)
-            cmd.drone_place_relative(drone, x, y, z, block, chkpt)
+            place_relative(drone, x, y, z, block, chkpt)
         end,
-        save = function(chkpt) cmd.drone_save_checkpoint(drone, chkpt) end,
+        save = function(chkpt) save_checkpoint(drone, chkpt) end,
         go = function(chkpt, x, y, z)
-            cmd.drone_goto_checkpoint(drone, chkpt, x, y, z)
+            goto_checkpoint(drone, chkpt, x, y, z)
         end,
         cube = function(w, h, l, block, hollow)
-            cmd.drone_place_cube(drone, w, h, l, block, hollow)
+            place_cube(drone, w, h, l, block, hollow)
         end,
         sphere = function(r, block, hollow)
-            cmd.drone_place_sphere(drone, r, block, hollow)
+            place_sphere(drone, r, block, hollow)
         end,
         dome = function(r, block, hollow)
-            cmd.drone_place_dome(drone, r, block, hollow)
+            place_dome(drone, r, block, hollow)
         end,
         vertical = {
             cylinder = function(l, r, block, hollow)
-                cmd.drone_place_cylinder(drone, 'V', l, r, block, hollow)
+                place_cylinder(drone, 'V', l, r, block, hollow)
             end
         },
         horizontal = {
             cylinder = function(l, r, block, hollow)
-                cmd.drone_place_cylinder(drone, 'H', l, r, block, hollow)
+                place_cylinder(drone, 'H', l, r, block, hollow)
             end
         },
         centered = {
             cube = function(w, h, l, block, hollow)
-                cmd.drone_place_ccube(drone, w, h, l, block, hollow)
+                place_ccube(drone, w, h, l, block, hollow)
             end,
             sphere = function(r, block, hollow)
-                cmd.drone_place_csphere(drone, r, block, hollow)
+                place_csphere(drone, r, block, hollow)
             end,
             dome = function(r, block, hollow)
-                cmd.drone_place_cdome(drone, r, block, hollow)
+                place_cdome(drone, r, block, hollow)
             end,
             vertical = {
                 cylinder = function(l, r, block, hollow)
-                    cmd.drone_place_ccylinder(drone, 'V', l, r, block, hollow)
+                    place_ccylinder(drone, 'V', l, r, block, hollow)
                 end
             },
             horizontal = {
                 cylinder = function(l, r, block, hollow)
-                    cmd.drone_place_ccylinder(drone, 'H', l, r, block, hollow)
+                    place_ccylinder(drone, 'H', l, r, block, hollow)
                 end
             }
         },
-        print = function(str) return cmd.drone_send_message(drone, str) end,
-        blocks = codeblock.utils.cubes_names,
-        plants = codeblock.utils.plants_names,
-        wools = codeblock.utils.wools_names,
-        iwools = codeblock.utils.iwools_names,
+        print = function(str) return send_message(drone, str) end,
+        color = color,
+        blocks = blocks,
+        plants = plants,
+        wools = wools,
+        iwools = iwools,
         ipairs = ipairs,
         pairs = pairs,
         random = math.random,
@@ -152,7 +195,13 @@ local function getScriptEnv(drone)
         vector = vector3
     }
 
-    env._G = {print = env.print, error = env.error}
+    env._G = {
+        print = env.print,
+        error = env.error,
+        use_one_call = function()
+            --
+        end
+    }
     return env
 
 end

@@ -37,22 +37,21 @@ local DroneEntity = {
     owner = nil
 }
 
-local success, ret, drone, status
 local entity_mt = {
 
     __index = {
 
         on_step = function(self, dtime, moveresult)
 
-            drone = self._data
+            local drone = self._data
 
             if drone ~= nil and drone.cor ~= nil then
 
-                status = coroutine.status(drone.cor)
+                local status = coroutine.status(drone.cor)
 
                 if status == 'suspended' then
 
-                    success, ret = coroutine.resume(drone.cor)
+                    local success, ret = coroutine.resume(drone.cor)
 
                     if not success then
                         minetest_send_player(drone.name, S(
