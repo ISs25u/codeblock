@@ -6,7 +6,7 @@ codeblock.sandbox = {}
 
 local S = codeblock.S
 local minetest_send_player = minetest.chat_send_player
-local env_cache = {}
+local Drone = codeblock.Drone
 
 --------------------------------------------------------------------------------
 -- private
@@ -17,106 +17,107 @@ local function round(num, dec)
     return math.floor(num * mult + 0.5) / mult
 end
 
-local function getScriptEnv(name)
+local function getScriptEnv(drone)
 
-    if env_cache[name] ~= nil then return env_cache[name] end
+    assert(drone, S("drone does not exist"))
 
+    local name = drone.name
     local cmd = codeblock.commands
     local utils = codeblock.utils
 
     local env = {
         move = function(x, y, z)
-            cmd.drone_move(name, x, y, z)
+            cmd.drone_move(drone, x, y, z)
             return
         end,
         forward = function(n)
-            cmd.drone_forward(name, n)
+            cmd.drone_forward(drone, n)
             return
         end,
         back = function(n)
-            cmd.drone_back(name, n)
+            cmd.drone_back(drone, n)
             return
         end,
         left = function(n)
-            cmd.drone_left(name, n)
+            cmd.drone_left(drone, n)
             return
         end,
         right = function(n)
-            cmd.drone_right(name, n)
+            cmd.drone_right(drone, n)
             return
         end,
         up = function(n)
-            cmd.drone_up(name, n)
+            cmd.drone_up(drone, n)
             return
         end,
         down = function(n)
-            cmd.drone_down(name, n)
+            cmd.drone_down(drone, n)
             return
         end,
         turn_left = function()
-            cmd.drone_turn_left(name)
+            cmd.drone_turn_left(drone)
             return
         end,
         turn_right = function()
-            cmd.drone_turn_right(name)
+            cmd.drone_turn_right(drone)
             return
         end,
         turn = function(quarters)
-            cmd.drone_turn(name, quarters)
+            cmd.drone_turn(drone, quarters)
             return
         end,
         place = function(block)
-            cmd.drone_place_block(name, block)
+            cmd.drone_place_block(drone, block)
             return
         end,
         place_relative = function(x, y, z, block, chkpt)
-            cmd.drone_place_relative(name, x, y, z, block, chkpt)
+            cmd.drone_place_relative(drone, x, y, z, block, chkpt)
         end,
-        save = function(chkpt) cmd.drone_save_checkpoint(name, chkpt) end,
+        save = function(chkpt) cmd.drone_save_checkpoint(drone, chkpt) end,
         go = function(chkpt, x, y, z)
-            cmd.drone_goto_checkpoint(name, chkpt, x, y, z)
+            cmd.drone_goto_checkpoint(drone, chkpt, x, y, z)
         end,
         cube = function(w, h, l, block, hollow)
-            cmd.drone_place_cube(name, w, h, l, block, hollow)
+            cmd.drone_place_cube(drone, w, h, l, block, hollow)
         end,
         sphere = function(r, block, hollow)
-            cmd.drone_place_sphere(name, r, block, hollow)
+            cmd.drone_place_sphere(drone, r, block, hollow)
         end,
         dome = function(r, block, hollow)
-            cmd.drone_place_dome(name, r, block, hollow)
+            cmd.drone_place_dome(drone, r, block, hollow)
         end,
         vertical = {
             cylinder = function(l, r, block, hollow)
-                cmd.drone_place_cylinder(name, 'V', l, r, block, hollow)
+                cmd.drone_place_cylinder(drone, 'V', l, r, block, hollow)
             end
         },
         horizontal = {
             cylinder = function(l, r, block, hollow)
-                cmd.drone_place_cylinder(name, 'H', l, r, block, hollow)
+                cmd.drone_place_cylinder(drone, 'H', l, r, block, hollow)
             end
         },
         centered = {
             cube = function(w, h, l, block, hollow)
-                cmd.drone_place_ccube(name, w, h, l, block, hollow)
+                cmd.drone_place_ccube(drone, w, h, l, block, hollow)
             end,
             sphere = function(r, block, hollow)
-                cmd.drone_place_csphere(name, r, block, hollow)
+                cmd.drone_place_csphere(drone, r, block, hollow)
             end,
             dome = function(r, block, hollow)
-                cmd.drone_place_cdome(name, r, block, hollow)
+                cmd.drone_place_cdome(drone, r, block, hollow)
             end,
             vertical = {
                 cylinder = function(l, r, block, hollow)
-                    cmd.drone_place_ccylinder(name, 'V', l, r, block, hollow)
+                    cmd.drone_place_ccylinder(drone, 'V', l, r, block, hollow)
                 end
             },
             horizontal = {
                 cylinder = function(l, r, block, hollow)
-                    cmd.drone_place_ccylinder(name, 'H', l, r, block, hollow)
+                    cmd.drone_place_ccylinder(drone, 'H', l, r, block, hollow)
                 end
             }
         },
-        print = function(str) return cmd.drone_send_message(name, str) end,
+        print = function(str) return cmd.drone_send_message(drone, str) end,
         blocks = codeblock.utils.cubes_names,
         plants = codeblock.utils.plants_names,
         wools = codeblock.utils.wools_names,
@@ -151,8 +152,7 @@ local function getScriptEnv(name)
         vector = vector3
     }
 
-    env._G = env
-    env_cache[name] = env
+    env._G = {print = env.print, error = env.error}
     return env
 
 end
@@ -336,10 +336,13 @@ end
 -- public
 --------------------------------------------------------------------------------
 
-function codeblock.sandbox.get_safe_coroutine(name, file)
+function codeblock.sandbox.get_safe_coroutine(drone, file)
 
+    assert(drone)
     assert(file)
-    assert(name)
+
+    local name = drone.name
+    local file = drone.file
 
     -- loading file
 
@@ -373,7 +376,7 @@ function codeblock.sandbox.get_safe_coroutine(name, file)
 
     -- return it
 
-    setfenv(bytecode, getScriptEnv(name))
+    setfenv(bytecode, getScriptEnv(drone))
     return true, coroutine.create(bytecode)
 
 end

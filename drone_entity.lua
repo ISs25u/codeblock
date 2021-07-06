@@ -11,10 +11,10 @@ local minetest_send_player = minetest.chat_send_player
 local Drone = codeblock.Drone
 
 local tmp1 = 2 / pi
-local tmp3 = pi / 2
-local tmp4 = pi / 4
+local tmp2 = pi / 2
+local tmp3 = pi / 4
 
-local function dirtocardinal(dir) return floor((dir + tmp4) * tmp1) * tmp3 end
+local function dirtocardinal(dir) return floor((dir + tmp3) * tmp1) * tmp2 end
 
 --------------------------------------------------------------------------------
 -- private
@@ -133,7 +133,7 @@ function DroneEntity.run(user)
         return
     end
 
-    local suc, res = codeblock.sandbox.get_safe_coroutine(name, file)
+    local suc, res = codeblock.sandbox.get_safe_coroutine(drone, file)
 
     if not suc then
         Drone[name] = nil

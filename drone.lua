@@ -76,17 +76,7 @@ local drone_mt = {
 
     end,
 
-    __index = function(self, k)
-
-        local d = rawget(self.instances, k)
-
-        if d ~= nil and d.obj == nil then
-            return rawset(self.instances, k, nil)
-        end
-
-        return d
-
-    end,
+    __index = function(self, k) return rawget(self.instances, k) end,
 
     __newindex = function(self, k, v)
 
