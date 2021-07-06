@@ -68,8 +68,6 @@ minetest.register_on_joinplayer(function(player)
     player:set_moon({visible = false})
     player:set_clouds({density = 0})
 
-    -- player:get_meta():set_int('codeblock:last_index', 0)
-
 end)
 
 minetest.register_on_newplayer(function(player)

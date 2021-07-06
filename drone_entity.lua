@@ -156,13 +156,6 @@ function DroneEntity.setfilefromindex(player, index)
 
     local name = player:get_player_name()
 
-    local drone = Drone[name]
-
-    if not drone then
-        minetest_send_player(name, S("drone does not exist"))
-        return
-    end
-
     local path = codeblock.datapath .. name
 
     if not path then
@@ -187,8 +180,14 @@ function DroneEntity.setfilefromindex(player, index)
     minetest.get_player_by_name(name):get_meta():set_int('codeblock:last_index',
                                                          index)
 
-    drone.file = file
-    drone:update_entity()
+    local drone = Drone[name]
+
+    if drone then
+        drone.file = file
+        drone:update_entity()
+    end
+
+    return
 
 end
 
