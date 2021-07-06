@@ -10,11 +10,13 @@
 
 ### v0.4.0
 
-- repair examples, handle coroutine errors and speed
+- repair examples, handle coroutine and speed
+- remove drone indexing in commands
+- repair choose tool 
 
 - [x] use custom vector library
 - [x] save drone obj and cor in drone?
-- [x] use coroutine?
+- [x] use coroutine
 - [ ] limit movements
 - [ ] readme for vectors
 - [ ] use volume, surface, operations and calls to limit drone usage

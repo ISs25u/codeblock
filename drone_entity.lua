@@ -37,7 +37,7 @@ local DroneEntity = {
     owner = nil
 }
 
-local success, err, drone, status
+local success, ret, drone, status
 local entity_mt = {
 
     __index = {
@@ -50,14 +50,18 @@ local entity_mt = {
 
                 status = coroutine.status(drone.cor)
 
-                if status == 'dead' then
-                    Drone[drone.name] = nil
-                elseif status == 'suspended' then
-                    success, err = coroutine.resume(drone.cor)
+                if status == 'suspended' then
+
+                    success, ret = coroutine.resume(drone.cor)
 
                     if not success then
-                        minetest.chat_send_all(err)
+                        minetest_send_player(drone.name, S(
+                                                 'runtime error in @1',
+                                                 drone.file) .. '\n' .. ret)
                     end
+
+                elseif status == 'dead' then
+                    Drone[drone.name] = nil
                 end
 
             end
@@ -73,6 +77,7 @@ local entity_mt = {
         on_blast = function(self, damage) return end,
 
         on_deactivate = function(self, ...)
+            -- TODO
             -- Drone[self.owner] = nil
             return
         end
@@ -128,7 +133,15 @@ function DroneEntity.run(user)
         return
     end
 
-    drone.cor = codeblock.sandbox.run_safe_coroutine(name, file)
+    local suc, res = codeblock.sandbox.get_safe_coroutine(name, file)
+
+    if not suc then
+        Drone[name] = nil
+        minetest_send_player(name, res)
+        return
+    end
+
+    drone.cor = res
 
 end
 

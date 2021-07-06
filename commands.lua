@@ -47,10 +47,24 @@ local function check_volume(name, volume)
         if volume <= codeblock.max_volume then
             drone.volume = volume
         else
-            error(S('out of available volume'));
+            error(S('out of available volume'), 4);
             return false
         end
     end
+end
+
+local function check_and_yield(name, type)
+
+    local drone = Drone[name]
+    if not drone then error(S("drone does not exist")) end
+
+    -- TODO: temporary
+    if type > 0 then
+        return coroutine.yield()
+    else
+        return false
+    end
+
 end
 
 -------------------------------------------------------------------------------
@@ -88,6 +102,7 @@ function codeblock.commands.drone_move(name, x, y, z)
     end
 
     drone:update_entity()
+    check_and_yield(name, 0)
 
 end
 
@@ -112,6 +127,7 @@ function codeblock.commands.drone_forward(name, n)
     end
 
     drone:update_entity()
+    check_and_yield(name, 0)
 
 end
 
@@ -144,6 +160,7 @@ function codeblock.commands.drone_right(name, n)
     end
 
     drone:update_entity()
+    check_and_yield(name, 0)
 
 end
 
@@ -166,6 +183,7 @@ function codeblock.commands.drone_up(name, n)
     drone.y = drone.y + n
 
     drone:update_entity()
+    check_and_yield(name, 0)
 
 end
 
@@ -200,6 +218,7 @@ function codeblock.commands.drone_turn(name, quarters)
     drone.dir = (drone.dir + quarters * pi * 0.5) % (2 * pi)
 
     drone:update_entity()
+    check_and_yield(name, 0)
 
 end
 
@@ -219,6 +238,7 @@ function codeblock.commands.drone_place_block(name, block)
     check_volume(name, 1)
 
     place_block(drone.x, drone.y, drone.z, real_block)
+    check_and_yield(name, 1)
 
 end
 
@@ -270,6 +290,7 @@ function codeblock.commands.drone_place_relative(name, x, y, z, block, chkpt)
 
     drone:update_entity()
     place_block(drone.x, drone.y, drone.z, real_block)
+    check_and_yield(name, 1)
 
 end
 
@@ -318,6 +339,7 @@ function codeblock.commands.drone_place_cube(name, w, h, l, block, hollow)
     local pos = {x = x, y = y, z = z}
 
     count = worldedit.cube(pos, w, h, l, real_block, hollow)
+    check_and_yield(name, 2)
 
 end
 
@@ -351,6 +373,7 @@ function codeblock.commands.drone_place_ccube(name, w, h, l, block, hollow)
     local pos = {x = drone.x, y = drone.y, z = drone.z}
 
     count = worldedit.cube(pos, w, h, l, real_block, hollow)
+    check_and_yield(name, 2)
 
 end
 
@@ -389,6 +412,7 @@ function codeblock.commands.drone_place_sphere(name, r, block, hollow)
     local pos = {x = x, y = y, z = z}
 
     count = worldedit.sphere(pos, r, real_block, hollow)
+    check_and_yield(name, 2)
 
 end
 
@@ -408,6 +432,7 @@ function codeblock.commands.drone_place_csphere(name, r, block, hollow)
     check_volume(name, round(4 / 3 * pi * (r + 0.514) ^ 3))
 
     count = worldedit.sphere(pos, r, real_block, hollow)
+    check_and_yield(name, 2)
 
 end
 
@@ -446,6 +471,7 @@ function codeblock.commands.drone_place_dome(name, r, block, hollow)
     local pos = {x = x, y = y, z = z}
 
     count = worldedit.dome(pos, r, real_block, hollow)
+    check_and_yield(name, 2)
 
 end
 
@@ -465,6 +491,7 @@ function codeblock.commands.drone_place_cdome(name, r, block, hollow)
     check_volume(name, round(2 / 3 * pi * (r + 0.514) ^ 3))
 
     count = worldedit.dome(pos, r, real_block, hollow)
+    check_and_yield(name, 2)
 
 end
 
@@ -530,6 +557,7 @@ function codeblock.commands.drone_place_cylinder(name, o, l, r, block, hollow)
     local pos = {x = x, y = y, z = z}
 
     count = worldedit.cylinder(pos, axis, l, r, r, real_block, hollow)
+    check_and_yield(name, 2)
 
 end
 
@@ -586,6 +614,7 @@ function codeblock.commands.drone_place_ccylinder(name, o, l, r, block, hollow)
     local pos = {x = x, y = y, z = z}
 
     count = worldedit.cylinder(pos, axis, l, r, r, real_block, hollow)
+    check_and_yield(name, 2)
 
 end
 
@@ -606,6 +635,8 @@ function codeblock.commands.drone_save_checkpoint(name, chkpt)
         z = drone.z,
         dir = drone.dir
     }
+
+    check_and_yield(name, 0)
 
 end
 
@@ -647,5 +678,16 @@ function codeblock.commands.drone_goto_checkpoint(name, chkpt, x, y, z)
     end
 
     drone:update_entity()
+    check_and_yield(name, 0)
 
 end
+
+-------------------------------------------------------------------------------
+-- message
+-------------------------------------------------------------------------------
+
+function codeblock.commands.drone_send_message(name, string)
+    minetest_send_player(name, '> ' .. tostring(msg))
+    check_and_yield(name, 1)
+end
+
