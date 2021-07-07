@@ -8,14 +8,19 @@
 - [ ] In-game lua code editor
 - [ ] Blockly web-based editor
 
+Ideas (game?) :
+- generate flat world https://github.com/srifqi/superflat
+- give tools to new players
+- eternal day
+
 ### v0.4.0
 
 - [x] use custom vector library
 - [x] save drone obj and cor in drone
 - [x] use coroutine
+- [x] centered cube/cylinder placement
 - [ ] add surface and/or distance to limit drone usage
 - [ ] limit drone usage and speed with an auth_level
-- [ ] centered cube/dome placement
 - [ ] update readme (and ref to vector3)
 
 ### v0.3.0

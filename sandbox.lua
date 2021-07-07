@@ -53,7 +53,7 @@ end
 
 local function round(dec, num)
     local mult = 10 ^ (dec or 0)
-    return function(num) return math.floor(num * mult + 0.5) / mult end
+    return math.floor(num * mult + 0.5) / mult
 end
 
 local tmp1 = niwools - 1

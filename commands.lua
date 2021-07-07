@@ -59,8 +59,7 @@ local function check_drone_yield(drone, op_level)
     local operations = drone.operations + 1;
     if operations <= codeblock.max_ops then
         drone.operations = operations
-        minetest.chat_send_all(drone.operations)
-        if op_level > 4 then coroutine.yield() end
+        if op_level > 1 then coroutine.yield() end
     else
         error(S('ops limit (@1) exeeded', codeblock.max_ops), 4);
     end
@@ -401,7 +400,7 @@ local function drone_place_ccube(drone, w, h, l, block, hollow)
         w, l = l, w
     end
 
-    local pos = {x = drone.x, y = drone.y, z = drone.z}
+    local pos = {x = drone.x, y = drone.y - floor(0.5 * (h - 1)), z = drone.z}
 
     count = worldedit.cube(pos, w, h, l, real_block, hollow)
     check_drone_yield(drone, 2)
@@ -608,28 +607,25 @@ local function drone_place_ccylinder(drone, o, l, r, block, hollow)
     if (o == 'V') then
         axis = 'y'
         x = drone.x
-        y = drone.y
+        y = drone.y - floor(0.5 * (l - 1))
         z = drone.z
     elseif (o == 'H') then
+        y = drone.y
         if angle == 0 then
             axis = 'z'
             x = drone.x
-            y = drone.y
             z = drone.z - floor(l / 2)
         elseif angle == 1 then
             axis = 'x'
             x = drone.x - floor(l / 2)
-            y = drone.y
             z = drone.z
         elseif angle == 2 then
             axis = 'z'
             x = drone.x
-            y = drone.y
             z = drone.z - floor(l / 2)
         elseif angle == 3 then
             axis = 'x'
             x = drone.x - floor(l / 2)
-            y = drone.y
             z = drone.z
         end
     else
@@ -713,7 +709,7 @@ local function drone_send_message(drone, string)
 
     assert(drone, S("drone does not exist"))
 
-    minetest_send_player(drone.name, '> ' .. tostring(msg))
+    minetest_send_player(drone.name, '> ' .. tostring(string))
     check_drone_yield(drone, 1)
 end
 
