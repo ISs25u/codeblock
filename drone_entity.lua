@@ -60,6 +60,9 @@ local entity_mt = {
                     end
 
                 elseif status == 'dead' then
+                    -- TODO remove or change
+                    minetest_send_player(drone.name, 'Program ' .. drone.file ..
+                                             ' ended:\n' .. tostring(drone))
                     Drone[drone.name] = nil
                 end
 

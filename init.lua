@@ -11,7 +11,7 @@ codeblock.drones = {}
 codeblock.drone_entities = {}
 codeblock.max_calls = 1e7
 codeblock.max_volume = 1e7
-codeblock.max_ops = 1e6
+codeblock.max_commands = 1e6
 codeblock.max_place_value = 300 * 300
 codeblock.S = minetest.get_translator("codeblock")
 

@@ -21,6 +21,8 @@ Ideas (game?) :
 - [x] centered cube/cylinder placement
 - [ ] add surface and/or distance to limit drone usage
 - [ ] limit drone usage and speed with an auth_level
+    -> fix max surface to force reapeat WE commands and yield
+    -> yield every n 'move' commands if auth_level > 1
 - [ ] update readme (and ref to vector3)
 
 ### v0.3.0

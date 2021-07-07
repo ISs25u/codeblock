@@ -33,7 +33,13 @@ local instance_mt = {
 
         angle = function(self) return tmp1 * (self.dir % tmp2) end
 
-    }
+    },
+
+    __tostring = function(self)
+        return
+            'Cmd=' .. self.commands .. ' / Calls=' .. self.calls .. ' / Vol=' ..
+                self.volume
+    end
 }
 
 local drone_mt = {
@@ -53,7 +59,7 @@ local drone_mt = {
             checkpoints = {},
             volume = 0,
             calls = 0,
-            operations = 0,
+            commands = 0,
             cor = nil,
             obj = nil
         }

@@ -24,4 +24,4 @@ out of available volume (@1)=Maximum volume of blocks exceeded (@1)
 @1 is not allowed=@1 is not allowed!
 call limit (@1) exeeded=Call limit exeeded (@1)
 runtime error in @1=Runtime error in @1: 
-ops limit (@1) exeeded=Maximum number of operations reached (@1)
+ops limit (@1) exeeded=Maximum number of commands reached (@1)

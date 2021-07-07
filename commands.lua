@@ -56,12 +56,12 @@ end
 
 local function check_drone_yield(drone, op_level)
 
-    local operations = drone.operations + 1;
-    if operations <= codeblock.max_ops then
-        drone.operations = operations
+    local commands = drone.commands + 1;
+    if commands <= codeblock.max_commands then
+        drone.commands = commands
         if op_level > 1 then coroutine.yield() end
     else
-        error(S('ops limit (@1) exeeded', codeblock.max_ops), 4);
+        error(S('ops limit (@1) exeeded', codeblock.max_commands), 4);
     end
 
 end
