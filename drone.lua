@@ -26,7 +26,7 @@ local instance_mt = {
                 self.obj:set_rotation({x = 0, y = self.dir, z = 0})
                 self.obj:set_properties({
                     nametag = '[' .. self.obj:get_luaentity().owner .. '] ' ..
-                        self.file
+                        (self.file or '?.lua')
                 });
             end
         end,
@@ -56,6 +56,7 @@ local drone_mt = {
             z = pos.z,
             dir = dir or 0,
             file = file,
+            auth_level = 0,
             checkpoints = {},
             volume = 0,
             calls = 0,
@@ -74,9 +75,10 @@ local drone_mt = {
         setmetatable(drone, instance_mt)
 
         drone.obj = minetest.add_entity(pos, "codeblock:drone", nil)
-        drone.obj:set_rotation({x = 0, y = dir, z = 0})
         drone.obj:get_luaentity().owner = name
         drone.obj:get_luaentity()._data = drone
+
+        drone:update_entity()
 
         Drone[name] = drone
 

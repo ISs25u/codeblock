@@ -32,7 +32,7 @@ local DroneEntity = {
         physical = false,
         static_save = false
     },
-    nametag = '?.lua',
+    nametag = nil,
     _data = nil,
     owner = nil
 }
@@ -105,10 +105,10 @@ function DroneEntity.place(placer, pointed_thing)
 
     local dir = dirtocardinal(placer:get_look_horizontal())
 
-    local drone = Drone(name, pos, dir, nil)
+    local last_index = placer:get_meta():get_int('codeblock:last_index')
 
-    local meta = placer:get_meta()
-    local last_index = meta:get_int('codeblock:last_index')
+    Drone(name, pos, dir, nil)
+
     if not last_index or last_index == 0 then
         DroneEntity.showfileformspec(placer)
     else
@@ -154,40 +154,30 @@ function DroneEntity.remove_drone(player)
 
 end
 
+-- assume Drone exists
 function DroneEntity.setfilefromindex(player, index)
 
     local name = player:get_player_name()
 
     local path = codeblock.datapath .. name
 
-    if not path then
-        minetest_send_player(name, S("no file selected"))
-        return
-    end
+    local file, err = codeblock.filesystem.get_file_from_index(path, index)
 
-    local files = codeblock.filesystem.get_files(path)
-
-    if not files or #files == 0 then
+    if err then
         minetest_send_player(name, S('no files'))
         return
     end
 
-    local file = files[index]
-
-    if not file then
-        minetest_send_player(name, S('no file selected')) -- annoying
-        return
-    end
-
-    minetest.get_player_by_name(name):get_meta():set_int('codeblock:last_index',
-                                                         index)
-
     local drone = Drone[name]
 
     if drone then
+
         drone.file = file
         drone:update_entity()
+
     end
+
+    player:get_meta():set_int('codeblock:last_index', index)
 
     return
 
