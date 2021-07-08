@@ -19,10 +19,8 @@ Ideas (game?) :
 - [x] save drone obj and cor in drone
 - [x] use coroutine
 - [x] centered cube/cylinder placement
-- [ ] add surface and/or distance to limit drone usage
-- [ ] limit drone usage and speed with an auth_level
-    -> fix max surface to force reapeat WE commands and yield
-    -> yield every n 'move' commands if auth_level > 1
+- [x] add surface and/or distance to limit drone usage
+- [x] limit drone usage and speed with an auth_level
 - [ ] update readme (and ref to vector3)
 
 ### v0.3.0

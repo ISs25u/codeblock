@@ -62,7 +62,7 @@ local entity_mt = {
                 elseif status == 'dead' then
                     -- TODO remove or change
                     minetest_send_player(drone.name, 'Program ' .. drone.file ..
-                                             ' ended:\n' .. tostring(drone))
+                                             ' ended: ' .. tostring(drone))
                     Drone[drone.name] = nil
                 end
 
@@ -106,8 +106,9 @@ function DroneEntity.place(placer, pointed_thing)
     local dir = dirtocardinal(placer:get_look_horizontal())
 
     local last_index = placer:get_meta():get_int('codeblock:last_index')
+    local auth_level = placer:get_meta():get_int('codeblock:auth_level')
 
-    Drone(name, pos, dir, nil)
+    Drone(name, pos, dir, auth_level)
 
     if not last_index or last_index == 0 then
         DroneEntity.showfileformspec(placer)
@@ -143,6 +144,7 @@ function DroneEntity.run(user)
         return
     end
 
+    drone.tstart = os.clock()
     drone.cor = res
 
 end

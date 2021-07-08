@@ -8,6 +8,8 @@ local floor = math.floor
 local abs = math.abs
 local pi = math.pi
 local upper = string.upper
+local max = math.max
+local sqrt = math.sqrt
 
 local S = codeblock.S
 local cubes_names = codeblock.utils.cubes_names
@@ -16,6 +18,13 @@ local Drone = codeblock.Drone
 
 local minetest_send_player = minetest.chat_send_player
 local minetest_set_node = minetest.set_node
+
+local max_calls = codeblock.max_calls
+local max_volume = codeblock.max_volume
+local max_commands = codeblock.max_commands
+local max_distance = codeblock.max_distance
+local max_dimension = codeblock.max_dimension
+local commands_before_yield = codeblock.commands_before_yield
 
 local tmp1 = 2 * pi
 local tmp2 = pi / 2
@@ -34,34 +43,86 @@ end
 
 local function use_volume(drone, v_used)
 
+    local al = drone.auth_level
+
     local volume = drone.volume + v_used;
-    if volume <= codeblock.max_volume then
+    if volume <= max_volume[al] then
         drone.volume = volume
     else
-        error(S('out of available volume'), 4);
+        error(S('out of available volume (@1)', max_volume[al]), 4);
     end
 
 end
 
 local function use_call(drone)
 
+    local al = drone.auth_level
+
     local calls = drone.calls + 1;
-    if calls <= codeblock.max_calls then
+    if calls <= max_calls[al] then
         drone.calls = calls
     else
-        error(S('call limit (@1) exeeded', codeblock.max_calls), 4);
+        error(S('call limit (@1) exeeded', max_calls[al]), 4);
     end
 
 end
 
 local function check_drone_yield(drone, op_level)
 
+    -- op_level = 0  -> moves
+    -- op_level = 1  -> place
+    -- op_level = 2  -> world_edit
+
+    local al = drone.auth_level
     local commands = drone.commands + 1;
-    if commands <= codeblock.max_commands then
+
+    if commands <= max_commands[al] then
+        if al == 1 then -- yield every command
+            coroutine.yield()
+        elseif al == 2 then -- don't yield moves
+            if op_level > 0 or (commands % commands_before_yield[al] == 0) then
+                coroutine.yield()
+            end
+        elseif al == 3 then -- don't yield moves and place
+            if op_level > 1 or (commands % commands_before_yield[al] == 0) then
+                coroutine.yield()
+            end
+        elseif al == 4 then -- only yield every n commands
+            if commands % commands_before_yield[al] == 0 then
+                coroutine.yield()
+            end
+        else
+            coroutine.yield()
+        end
+
         drone.commands = commands
-        if op_level > 1 then coroutine.yield() end
+
     else
-        error(S('ops limit (@1) exeeded', codeblock.max_commands), 4);
+        error(S('ops limit (@1) exeeded', max_commands[al]), 4);
+    end
+
+end
+
+local function check_dimensions(drone, ...)
+
+    local al = drone.auth_level
+
+    local M = max(...)
+    if M > max_dimension[al] then
+        error(S('max dim @1 exeeded', max_dimension[al]), 4)
+    end
+
+end
+
+local function check_distance(drone, x, y, z)
+
+    local s = drone.spawn
+    local dx = x - s[1]
+    local dy = y - s[2]
+    local dz = z - s[3]
+    local d = dx * dx + dy * dy + dz * dz
+    if d > max_distance[drone.auth_level] then
+        error(S('too far away (@1)', sqrt(d)), 4)
     end
 
 end
@@ -98,6 +159,7 @@ local function drone_move(drone, x, y, z)
         drone.z = drone.z - x
     end
 
+    check_distance(drone, drone.x, drone.y, drone.z)
     drone:update_entity()
     check_drone_yield(drone, 0)
 
@@ -121,6 +183,7 @@ local function drone_forward(drone, n)
         drone.x = drone.x + n
     end
 
+    check_distance(drone, drone.x, drone.y, drone.z)
     drone:update_entity()
     check_drone_yield(drone, 0)
 
@@ -144,6 +207,7 @@ local function drone_back(drone, n)
         drone.x = drone.x - n
     end
 
+    check_distance(drone, drone.x, drone.y, drone.z)
     drone:update_entity()
     check_drone_yield(drone, 0)
 
@@ -167,6 +231,7 @@ local function drone_right(drone, n)
         drone.z = drone.z - n
     end
 
+    check_distance(drone, drone.x, drone.y, drone.z)
     drone:update_entity()
     check_drone_yield(drone, 0)
 
@@ -190,6 +255,7 @@ local function drone_left(drone, n)
         drone.z = drone.z + n
     end
 
+    check_distance(drone, drone.x, drone.y, drone.z)
     drone:update_entity()
     check_drone_yield(drone, 0)
 
@@ -203,6 +269,7 @@ local function drone_up(drone, n)
 
     drone.y = drone.y + n
 
+    check_distance(drone, drone.x, drone.y, drone.z)
     drone:update_entity()
     check_drone_yield(drone, 0)
 
@@ -216,6 +283,7 @@ local function drone_down(drone, n)
 
     drone.y = drone.y - n
 
+    check_distance(drone, drone.x, drone.y, drone.z)
     drone:update_entity()
     check_drone_yield(drone, 0)
 
@@ -287,11 +355,7 @@ local function drone_place_relative(drone, x, y, z, block, chkpt)
     local real_block = blocks[block]
     if not real_block then error(S('block not allowed')) end
 
-    if (x * x + y * y + z * z > codeblock.max_place_value) then
-        error(S('too far away'))
-    end
-
-    local chkpt = (type(chkpt) == 'string') and chkpt or 'start'
+    local chkpt = (type(chkpt) == 'string') and chkpt or 'spawn'
     if not drone.checkpoints[chkpt] then error(S("no chkpt @1", chkpt)) end
     local cp = drone.checkpoints[chkpt]
 
@@ -320,6 +384,8 @@ local function drone_place_relative(drone, x, y, z, block, chkpt)
         drone.dir = cp.dir
     end
 
+    check_distance(drone, drone.x, drone.y, drone.z)
+
     drone:update_entity()
     place_block(drone.x, drone.y, drone.z, real_block)
     check_drone_yield(drone, 1)
@@ -346,6 +412,7 @@ local function drone_place_cube(drone, w, h, l, block, hollow)
     local y = drone.y
     local z
 
+    check_dimensions(drone, w, h, l)
     use_volume(drone, w * h * l)
 
     local angle = drone:angle()
@@ -387,6 +454,7 @@ local function drone_place_ccube(drone, w, h, l, block, hollow)
     local h = (type(h) == 'number') and round0(abs(h)) or 10
     local l = (type(l) == 'number') and round0(abs(l)) or 10
 
+    check_dimensions(drone, w, h, l)
     use_volume(drone, w * h * l)
 
     local angle = drone:angle()
@@ -421,6 +489,7 @@ local function drone_place_sphere(drone, r, block, hollow)
     local y = drone.y + r
     local z
 
+    check_dimensions(drone, r * 2)
     use_volume(drone, round0(tmp3 * (r + 0.514) ^ 3))
 
     local angle = drone:angle()
@@ -457,6 +526,7 @@ local function drone_place_csphere(drone, r, block, hollow)
     local r = (type(r) == 'number') and round0(abs(r)) or 5
     local pos = {x = round0(drone.x), y = round0(drone.y), z = round0(drone.z)}
 
+    check_dimensions(drone, r * 2)
     use_volume(drone, round0(tmp3 * (r + 0.514) ^ 3))
 
     count = worldedit.sphere(pos, r, real_block, hollow)
@@ -478,6 +548,7 @@ local function drone_place_dome(drone, r, block, hollow)
     local y = drone.y
     local z
 
+    check_dimensions(drone, r * 2)
     use_volume(drone, round0(tmp4 * (r + 0.514) ^ 3))
 
     local angle = drone:angle()
@@ -514,6 +585,7 @@ local function drone_place_cdome(drone, r, block, hollow)
     local r = (type(r) == 'number') and round0(abs(r)) or 5
     local pos = {x = drone.x, y = drone.y, z = drone.z}
 
+    check_dimensions(drone, r * 2)
     use_volume(drone, round0(tmp4 * (r + 0.514) ^ 3))
 
     count = worldedit.dome(pos, r, real_block, hollow)
@@ -534,6 +606,7 @@ local function drone_place_cylinder(drone, o, l, r, block, hollow)
     local l = (type(l) == 'number') and round0(abs(l)) or 10
     local r = (type(r) == 'number') and round0(abs(r)) or 5
 
+    check_dimensions(drone, l, r * 2)
     use_volume(drone, round0((pi * l * (r + 0.514) ^ 2)))
 
     local axis
@@ -599,6 +672,7 @@ local function drone_place_ccylinder(drone, o, l, r, block, hollow)
     local l = (type(l) == 'number') and round0(abs(l)) or 10
     local r = (type(r) == 'number') and round0(abs(r)) or 5
 
+    check_dimensions(drone, l, r * 2)
     use_volume(drone, round0((pi * l * (r + 0.514) ^ 2)))
 
     local axis
@@ -668,11 +742,7 @@ local function drone_goto_checkpoint(drone, chkpt, x, y, z)
     local y = (type(y) == 'number') and round0(y) or 0
     local z = (type(z) == 'number') and round0(z) or 0
 
-    if (x * x + y * y + z * z > codeblock.max_place_value) then
-        error(S('too far away'))
-    end
-
-    local chkpt = (type(chkpt) == 'string') and chkpt or 'start'
+    local chkpt = (type(chkpt) == 'string') and chkpt or 'spawn'
     if not drone.checkpoints[chkpt] then error(S("no chkpt @1", chkpt)) end
     local cp = drone.checkpoints[chkpt]
 
@@ -696,6 +766,7 @@ local function drone_goto_checkpoint(drone, chkpt, x, y, z)
         drone.z = cp.z - x
     end
 
+    check_distance(drone, drone.x, drone.y, drone.z)
     drone:update_entity()
     check_drone_yield(drone, 0)
 

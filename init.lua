@@ -9,10 +9,15 @@ end
 
 codeblock.drones = {}
 codeblock.drone_entities = {}
-codeblock.max_calls = 1e7
-codeblock.max_volume = 1e7
-codeblock.max_commands = 1e6
-codeblock.max_place_value = 300 * 300
+---------------------------------- 1:limited 2:standard 3:privileged 4:trusted
+codeblock.auth_levels =           {1,       2,       3,       4} 
+codeblock.max_calls =             {1e6,     1e7,     1e8,     1e9}
+codeblock.max_volume =            {1e5,     1e6,     1e7,     1e8}
+codeblock.max_commands =          {1e4,     1e5,     1e6,     1e7}
+codeblock.max_distance =          {100 ^ 2, 200 ^ 2, 300 ^ 2, 500 ^ 2}
+codeblock.max_dimension =         {50,      100,     150,     250}
+codeblock.commands_before_yield = {1,       10,      20,      40}
+codeblock.default_auth_level = 2
 codeblock.S = minetest.get_translator("codeblock")
 
 dofile(codeblock.modpath .. "/utils.lua")

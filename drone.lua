@@ -6,9 +6,16 @@ codeblock.Drone = {}
 
 local S = codeblock.S
 local pi = math.pi
+local floor = math.floor
+local min = math.min
+local max = math.max
+
+local minetest_send_player = minetest.chat_send_player
+local check_auth_level = codeblock.utils.check_auth_level
 
 local tmp1 = 2 / pi
 local tmp2 = 2 * pi
+local tmp3 = pi / 2
 
 --------------------------------------------------------------------------------
 -- private
@@ -38,39 +45,42 @@ local instance_mt = {
     __tostring = function(self)
         return
             'Cmd=' .. self.commands .. ' / Calls=' .. self.calls .. ' / Vol=' ..
-                self.volume
+                self.volume .. ' / ' .. (os.clock() - self.tstart) .. 's'
     end
 }
 
 local drone_mt = {
 
-    __call = function(self, name, pos, dir, file)
+    __call = function(self, name, pos, dir, auth_level)
 
-        assert(name)
-        assert(pos)
+        assert(type(name) == 'string' and #name > 0, 'Wrong parameters')
+        assert(type(pos) == 'table' and
+                   (type(pos.x) == 'number' and type(pos.y) == 'number' and
+                       type(pos.z) == 'number'), 'Wrong parameters')
+        assert(check_auth_level(auth_level), 'Wrong parameters')
+
+        local px, py, pz = floor(pos.x), floor(pos.y), floor(pos.z)
+        local dir = (type(dir) == 'number' and dir % tmp3 == 0) and dir or 0
 
         local drone = {
             name = name,
-            x = pos.x,
-            y = pos.y,
-            z = pos.z,
-            dir = dir or 0,
-            file = file,
-            auth_level = 0,
+            x = px,
+            y = py,
+            z = pz,
+            spawn = {px, py, pz},
+            dir = dir,
+            auth_level = auth_level,
             checkpoints = {},
             volume = 0,
             calls = 0,
             commands = 0,
+            tstart = 0,
+            file = nil,
             cor = nil,
             obj = nil
         }
 
-        drone.checkpoints['start'] = {
-            x = drone.x,
-            y = drone.y,
-            z = drone.z,
-            dir = drone.dir
-        }
+        drone.checkpoints['spawn'] = {x = px, y = py, z = pz, dir = dir}
 
         setmetatable(drone, instance_mt)
 

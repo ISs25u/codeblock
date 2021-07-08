@@ -134,6 +134,9 @@ local function getScriptEnv(drone)
         dome = function(r, block, hollow)
             place_dome(drone, r, block, hollow)
         end,
+        cylinder = function(l, r, block, hollow)
+            place_cylinder(drone, 'V', l, r, block, hollow)
+        end,
         vertical = {
             cylinder = function(l, r, block, hollow)
                 place_cylinder(drone, 'V', l, r, block, hollow)
@@ -153,6 +156,9 @@ local function getScriptEnv(drone)
             end,
             dome = function(r, block, hollow)
                 place_cdome(drone, r, block, hollow)
+            end,
+            cylinder = function(l, r, block, hollow)
+                place_ccylinder(drone, 'V', l, r, block, hollow)
             end,
             vertical = {
                 cylinder = function(l, r, block, hollow)

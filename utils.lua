@@ -1,5 +1,19 @@
 codeblock.utils = {}
 
+local auth_levels = codeblock.auth_levels
+
+--------------------------------------------------------------------------------
+-- Misc
+--------------------------------------------------------------------------------
+
+function codeblock.utils.check_auth_level(auth_level)
+    if type(auth_level) == 'number' and auth_levels[auth_level] ~= nil then
+        return true, auth_level
+    else
+        return false, codeblock.default_auth_level
+    end
+end
+
 --------------------------------------------------------------------------------
 -- Allowed blocks
 --------------------------------------------------------------------------------

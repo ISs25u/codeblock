@@ -27,7 +27,6 @@ function recursion(checkpoint, block_list, MAX_DEPTH, depth)
 end
 
 ---
----
 
 save('origin')
 local mblocks = {blocks.stone, blocks.dirt, blocks.obsidian, blocks.sandstone}
@@ -131,19 +130,32 @@ plot2D(-2 * pi, 2 * pi, -2 * pi, 2 * pi, -1, 1, 101, 100, fun)
 codeblock.examples.plot3D = [[
 function plot3D(XMIN, XMAX, ZMIN, ZMAX, FMIN, FMAX, NPOINTS, SIZE, fun)
 
-    local increment = (XMAX - XMIN) / (NPOINTS - 1)
+    local visited = {}
+    for x = 1, NPOINTS do
+        for y = 1, NPOINTS do
+            for z = 1, NPOINTS do
+                visited[x + y * NPOINTS + z * NPOINTS ^ 2] = false
+            end
+        end
+    end
 
-    local rx, ry, rz, y
+    local increment = (XMAX - XMIN) / (NPOINTS - 1)
+    local rx, ry, rz, y, i
     for x = XMIN, XMAX, increment do
         for z = ZMIN, ZMAX, increment do
 
             y = fun(x, z)
 
-            rx = (x - XMIN) / (XMAX - XMIN) * SIZE
-            ry = (y - FMIN) / (FMAX - FMIN) * SIZE / 2
-            rz = (z - ZMIN) / (ZMAX - ZMIN) * SIZE
+            rx = round0((x - XMIN) / (XMAX - XMIN) * SIZE)
+            ry = round0((y - FMIN) / (FMAX - FMIN) * SIZE / 2)
+            rz = round0((z - ZMIN) / (ZMAX - ZMIN) * SIZE)
 
-            place_relative(rx, ry, rz, color(y, FMIN, FMAX))
+            i = (rx - XMIN) / NPOINTS + (ry - FMIN) / NPOINTS * NPOINTS +
+                    (rz - ZMIN) / NPOINTS * NPOINTS * NPOINTS + 3
+            if not visited[i] then
+                place_relative(rx, ry, rz, color(y, FMIN, FMAX))
+                visited[i] = true
+            end
 
         end
     end
@@ -319,44 +331,34 @@ move(pos.x, pos.y, pos.z)
 centered.sphere(R2, blocks.air)
 
 go('center')
-for i = 1, 200, 1 do
+for i = 1, 2 * R1 + R2, 1 do
     centered.sphere(2, blocks.meselamp)
     move(mvt.x, mvt.y, mvt.z)
 end    
 ]]
 
-codeblock.examples.moon = [[
-local R1 = 60
+codeblock.examples.planet = [[
+local R = 30
 
-up(2 * R1)
+up(R * 2)
 save('center')
-centered.sphere(R1, wools.grey)
-centered.sphere(R1 - 1, wools.black)
+centered.sphere(R, wools.grey)
+centered.sphere(R - 1, wools.black)
 
-for i = 1, 100 do
-
-    local r = random(10, 25)
-    local pos = vector.srandom(1, 1):scale(R1 + 0.90 * r)
-
+local r, pos
+for i = 1, R do
+    r = random(round0(R / 3), round0(R / 2))
+    pos = vector.srandom(1, 1):scale(R + 0.90 * r)
     go('center', pos.x, pos.y, pos.z)
     centered.sphere(r, blocks.air)
-
 end
-]]
 
-codeblock.examples.planet = [[
-up(100)
-save('origin')
-
-centered.sphere(40, blocks.desert_sandstone)
-
-for i = 1, 10000 do
-
-    local v = vector.prandom(60, 80):rotate_around(vector(1, 0, 1), pi / 6)
-
-    place_relative(v.x, v.y, v.z, blocks.obsidian, 'origin')
-
-end
+local v
+for i = 1, round0(R * R / 3) do
+    v = vector.prandom(round0(R * 2), round0(R * 3)):rotate_around(vector.xz, pi / 6)
+    go('center', v.x, v.y, v.z)
+    centered.sphere(random(1, 2), blocks.obsidian)
+end    
 ]]
 
 codeblock.examples.tests = [[
@@ -526,8 +528,6 @@ for A = 0, 2 * pi, 1 / (R + r) / 2 do
 end
 ]]
 
-
-
 codeblock.examples.donuts = [[
 function wavy_donut(r, R, H, block)
 
@@ -582,8 +582,6 @@ for nx = 0, 2 do
     end
 end
 ]]
-
-
 
 -- codeblock.examples.exampleN = [[
 
