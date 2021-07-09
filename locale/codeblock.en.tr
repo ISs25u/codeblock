@@ -31,3 +31,6 @@ Invalid authlevel=Invalid authlevel
 Player not found=Player not found
 examples generated=Examples generated
 error=Une erreur est survenue
+program @1 ended @2=Program '@1' completed: @2
+cmd @1 call @2 vol @3 time @4=commands=@1 volume=@3m³ calls=@2 duration=@4s
+drone entity removed=The drone has disappeared, program stopped

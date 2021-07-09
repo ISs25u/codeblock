@@ -9,11 +9,11 @@
 - [ ] Blockly web-based editor
 
 Ideas (game?) :
-- generate flat world https://github.com/srifqi/superflat
-- give tools to new players
-- eternal day
+- [ ] generate flat clean world https://github.com/srifqi/superflat
 
 ### v0.4.0
+
+todos
 
 - [x] use custom vector library
 - [x] save drone obj and cor in drone

@@ -60,9 +60,9 @@ local entity_mt = {
                     end
 
                 elseif status == 'dead' then
-                    -- TODO remove or change
-                    minetest_send_player(drone.name, 'Program ' .. drone.file ..
-                                             ' ended: ' .. tostring(drone))
+                    minetest_send_player(drone.name, S('program @1 ended @2',
+                                                       drone.file,
+                                                       tostring(drone)))
                     Drone[drone.name] = nil
                 end
 
@@ -79,8 +79,20 @@ local entity_mt = {
         on_blast = function(self, damage) return end,
 
         on_deactivate = function(self, ...)
-            -- TODO
-            -- Drone[self.owner] = nil
+            local drone = self._data
+            if drone ~= nil and drone.cor ~= nil then
+                local status = coroutine.status(drone.cor)
+                if status ~= 'dead' then
+
+                    minetest_send_player(drone.name, S('drone entity removed'))
+                    minetest_send_player(drone.name, S('program @1 ended @2',
+                                                       drone.file,
+                                                       tostring(drone)))
+                    drone.obj = nil
+                end
+
+            end
+
             return
         end
 

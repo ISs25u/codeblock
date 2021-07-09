@@ -43,9 +43,8 @@ local instance_mt = {
     },
 
     __tostring = function(self)
-        return
-            'Cmd=' .. self.commands .. ' / Calls=' .. self.calls .. ' / Vol=' ..
-                self.volume .. ' / ' .. (os.clock() - self.tstart) .. 's'
+        return S('cmd @1 call @2 vol @3 time @4', self.commands, self.calls,
+                 self.volume, (os.clock() - self.tstart))
     end
 }
 
@@ -96,21 +95,24 @@ local drone_mt = {
 
     end,
 
-    __index = function(self, k) return rawget(self.instances, k) end,
+    __index = function(self, k)
+        local d = rawget(self.instances, k)
+        if d ~= nil and d.obj == nil then
+            rawset(self.instances, k, nil)
+            return nil
+        else
+            return d
+        end
+    end,
 
     __newindex = function(self, k, v)
-
         local d = rawget(self.instances, k)
-
         if d ~= nil and d.obj ~= nil then
-
             d.obj:remove()
             return rawset(self.instances, k, v)
-
+        else
+            return rawset(self.instances, k, v)
         end
-
-        return rawset(self.instances, k, v)
-
     end,
 
     __tostring = function(self)
