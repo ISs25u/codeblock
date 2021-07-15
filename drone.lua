@@ -50,75 +50,77 @@ local instance_mt = {
 
 local drone_mt = {
 
-    __call = function(self, name, pos, dir, auth_level)
+    __index = {
 
-        assert(type(name) == 'string' and #name > 0, 'Wrong parameters')
-        assert(type(pos) == 'table' and
-                   (type(pos.x) == 'number' and type(pos.y) == 'number' and
-                       type(pos.z) == 'number'), 'Wrong parameters')
-        assert(check_auth_level(auth_level), 'Wrong parameters')
+        new = function(name, pos, dir, auth_level)
 
-        local px, py, pz = floor(pos.x), floor(pos.y), floor(pos.z)
-        local dir = (type(dir) == 'number' and dir % tmp3 == 0) and dir or 0
+            assert(type(name) == 'string' and #name > 0, 'Wrong parameters')
+            assert(type(pos) == 'table' and
+                       (type(pos.x) == 'number' and type(pos.y) == 'number' and
+                           type(pos.z) == 'number'), 'Wrong parameters')
+            assert(check_auth_level(auth_level), 'Wrong parameters')
 
-        local drone = {
-            name = name,
-            x = px,
-            y = py,
-            z = pz,
-            spawn = {px, py, pz},
-            dir = dir,
-            auth_level = auth_level,
-            checkpoints = {},
-            volume = 0,
-            calls = 0,
-            commands = 0,
-            tstart = 0,
-            file = nil,
-            cor = nil,
-            obj = nil
-        }
+            local px, py, pz = floor(pos.x), floor(pos.y), floor(pos.z)
+            local dir = (type(dir) == 'number' and dir % tmp3 == 0) and dir or 0
 
-        drone.checkpoints['spawn'] = {x = px, y = py, z = pz, dir = dir}
+            local drone = {
+                name = name,
+                x = px,
+                y = py,
+                z = pz,
+                spawn = {px, py, pz},
+                dir = dir,
+                auth_level = auth_level,
+                checkpoints = {},
+                volume = 0,
+                calls = 0,
+                commands = 0,
+                tstart = 0,
+                file = nil,
+                cor = nil,
+                obj = nil
+            }
 
-        setmetatable(drone, instance_mt)
+            drone.checkpoints['spawn'] = {x = px, y = py, z = pz, dir = dir}
 
-        drone.obj = minetest.add_entity(pos, "codeblock:drone", nil)
-        drone.obj:get_luaentity().owner = name
-        drone.obj:get_luaentity()._data = drone
+            setmetatable(drone, instance_mt)
 
-        drone:update_entity()
+            drone.obj = minetest.add_entity(pos, "codeblock:drone", nil)
+            drone.obj:get_luaentity().owner = name
+            drone.obj:get_luaentity()._data = drone
 
-        Drone[name] = drone
+            drone:update_entity()
 
-        return drone
+            Drone.set(name, drone)
 
-    end,
+            return drone
 
-    __index = function(self, k)
-        local d = rawget(self.instances, k)
-        if d ~= nil and d.obj == nil then
-            rawset(self.instances, k, nil)
+        end,
+
+        get = function(k) return rawget(Drone.instances, k) end,
+
+        set = function(k, v)
+            Drone.remove(k)
+            return rawset(Drone.instances, k, v)
+        end,
+        remove = function(k)
+            local d = rawget(Drone.instances, k)
+            if d ~= nil then
+                rawset(Drone.instances, k, nil) -- avoid obj:remove() to call remove() again
+                if d.obj ~= nil then d.obj:remove() end
+                d.obj = nil
+                d.cor = nil
+                return nil
+            end
             return nil
-        else
-            return d
         end
-    end,
 
-    __newindex = function(self, k, v)
-        local d = rawget(self.instances, k)
-        if d ~= nil and d.obj ~= nil then
-            d.obj:remove()
-            return rawset(self.instances, k, v)
-        else
-            return rawset(self.instances, k, v)
-        end
-    end,
+    },
 
-    __tostring = function(self)
+    __tostring = function()
 
         local s = ''
-        for k, v in pairs(self.instances) do
+        for k, v in pairs(Drone.instances) do
             s = s .. k .. ': ' .. tostring(v) .. '\n'
         end
         return s

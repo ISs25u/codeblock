@@ -13,15 +13,14 @@ Ideas (game?) :
 
 ### v0.4.0
 
-todos
-
 - [x] use custom vector library
 - [x] save drone obj and cor in drone
 - [x] use coroutine
 - [x] centered cube/cylinder placement
 - [x] add surface and/or distance to limit drone usage
 - [x] limit drone usage and speed with an auth_level
-- [ ] update readme (and ref to vector3)
+- [x] tools modified
+- [ ] update readme commands, authlevel, and ref to vector3
 
 ### v0.3.0
 

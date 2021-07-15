@@ -14,7 +14,6 @@ local sqrt = math.sqrt
 local S = codeblock.S
 local cubes_names = codeblock.utils.cubes_names
 local blocks = codeblock.utils.blocks
-local Drone = codeblock.Drone
 
 local minetest_send_player = minetest.chat_send_player
 local minetest_set_node = minetest.set_node

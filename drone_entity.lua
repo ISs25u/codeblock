@@ -8,7 +8,11 @@ local S = codeblock.S
 local floor = math.floor
 local pi = math.pi
 local minetest_send_player = minetest.chat_send_player
-local Drone = codeblock.Drone
+
+local drone_get = codeblock.Drone.get
+local drone_set = codeblock.Drone.set
+local drone_rmv = codeblock.Drone.remove
+local drone_new = codeblock.Drone.new
 
 local tmp1 = 2 / pi
 local tmp2 = pi / 2
@@ -43,27 +47,24 @@ local entity_mt = {
 
         on_step = function(self, dtime, moveresult)
 
-            local drone = self._data
+            local drone = self._data -- ok as long as entity is removed
 
-            if drone ~= nil and drone.cor ~= nil then
-
-                local status = coroutine.status(drone.cor)
-
-                if status == 'suspended' then
-
-                    local success, ret = coroutine.resume(drone.cor)
-
-                    if not success then
+            if drone ~= nil then
+                if drone.cor ~= nil then
+                    local status = coroutine.status(drone.cor)
+                    if status == 'suspended' then
+                        local success, ret = coroutine.resume(drone.cor)
+                        if not success then
+                            minetest_send_player(drone.name, S(
+                                                     'runtime error in @1',
+                                                     drone.file) .. '\n' .. ret)
+                        end
+                    elseif status == 'dead' then
                         minetest_send_player(drone.name, S(
-                                                 'runtime error in @1',
-                                                 drone.file) .. '\n' .. ret)
+                                                 'program @1 ended @2',
+                                                 drone.file, tostring(drone)))
+                        drone_rmv(drone.name)
                     end
-
-                elseif status == 'dead' then
-                    minetest_send_player(drone.name, S('program @1 ended @2',
-                                                       drone.file,
-                                                       tostring(drone)))
-                    Drone[drone.name] = nil
                 end
 
             end
@@ -79,18 +80,13 @@ local entity_mt = {
         on_blast = function(self, damage) return end,
 
         on_deactivate = function(self, ...)
-            local drone = self._data
-            if drone ~= nil and drone.cor ~= nil then
-                local status = coroutine.status(drone.cor)
-                if status ~= 'dead' then
-
-                    minetest_send_player(drone.name, S('drone entity removed'))
-                    minetest_send_player(drone.name, S('program @1 ended @2',
-                                                       drone.file,
-                                                       tostring(drone)))
-                    drone.obj = nil
-                end
-
+            -- check drone existence, not the cached value
+            local drone = drone_get(self._data.name)
+            if drone ~= nil then
+                minetest_send_player(drone.name, S('drone entity removed'))
+                minetest_send_player(drone.name, S('program @1 ended @2',
+                                                   drone.file, tostring(drone)))
+                drone_rmv(drone.name)
             end
 
             return
@@ -108,6 +104,13 @@ function DroneEntity.place(placer, pointed_thing)
 
     local name = placer:get_player_name()
 
+    local drone = drone_get(name)
+
+    if drone ~= nil and drone.cor ~= nil then
+        minetest_send_player(name, S('drone busy'))
+        return
+    end
+
     local pos = minetest.get_pointed_thing_position(pointed_thing)
 
     if not pos then
@@ -120,7 +123,7 @@ function DroneEntity.place(placer, pointed_thing)
     local last_index = placer:get_meta():get_int('codeblock:last_index')
     local auth_level = placer:get_meta():get_int('codeblock:auth_level')
 
-    Drone(name, pos, dir, auth_level)
+    drone_new(name, pos, dir, auth_level)
 
     if not last_index or last_index == 0 then
         DroneEntity.showfileformspec(placer)
@@ -134,11 +137,16 @@ function DroneEntity.run(user)
 
     local name = user:get_player_name()
 
-    local drone = Drone[name]
+    local drone = drone_get(name)
 
-    if not drone then
+    if drone == nil then
         minetest_send_player(name, S("drone does not exist"))
         return
+    else
+        if drone.cor ~= nil then
+            minetest_send_player(name, S('drone busy'))
+            return
+        end
     end
 
     local file = drone.file
@@ -151,7 +159,7 @@ function DroneEntity.run(user)
     local suc, res = codeblock.sandbox.get_safe_coroutine(drone, file)
 
     if not suc then
-        Drone[name] = nil
+        drone_rmv(name)
         minetest_send_player(name, res)
         return
     end
@@ -161,10 +169,21 @@ function DroneEntity.run(user)
 
 end
 
-function DroneEntity.remove_drone(player)
+function DroneEntity.remove(player)
 
     local name = player:get_player_name()
-    Drone[name] = nil
+
+    local drone = drone_get(name)
+
+    if drone ~= nil then
+        if drone.cor ~= nil then
+            minetest_send_player(drone.name, S('program @1 ended @2',
+                                               drone.file, tostring(drone)))
+            drone_rmv(name)
+        else
+            drone_rmv(name)
+        end
+    end
 
 end
 
@@ -182,7 +201,7 @@ function DroneEntity.setfilefromindex(player, index)
         return
     end
 
-    local drone = Drone[name]
+    local drone = drone_get(name)
 
     if drone then
 

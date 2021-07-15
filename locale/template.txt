@@ -1,12 +1,12 @@
 # textdomain: codeblock
-Drone Placer=
+Drone Poser=
+Drone Setter=
 @1 placing a drone at @2=
 not your drone=
 Please target node=
 drone does not exist=
 Starting drone @1/@2=
 Unknown position=
-Drone Starter=
 @1 not found=
 forward=
 block not allowed=
@@ -34,3 +34,4 @@ error=
 program @1 ended @2=
 cmd @1 call @2 vol @3 time @4=
 drone entity removed=
+drone busy=

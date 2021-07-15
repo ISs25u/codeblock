@@ -1,12 +1,12 @@
 # textdomain: codeblock
-Drone Placer=Poseur de drone
+Drone Poser=Poseur de drone
+Drone Setter=Régleur de drone
 @1 placing a drone at @2='@1' a placé un drone à @2
 not your drone=Ce drone n'est pas à vous !
 Please target node=Il faut viser un cube
 drone does not exist=Erreur, le drone n'existe pas
 Starting drone @1/@2=Démarrage du drone @1/@2
 Unknown position=Position manquante
-Drone Starter=Démarreur de drone
 @1 not found=@1 n'existe pas.
 forward=avance
 block not allowed=Impossible de placer ce bloc
@@ -34,3 +34,4 @@ error=An error occured
 program @1 ended @2=Programme '@1' terminé : @2
 cmd @1 call @2 vol @3 time @4=commandes=@1 volume=@3m³ appels=@2 durée=@4s
 drone entity removed=Le drone a disparu, programme stoppé...
+drone busy=Le drone est occupé, il faut patienter !

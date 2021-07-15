@@ -2,13 +2,14 @@
 -- local
 --------------------------------------------------------------------------------
 local S = codeblock.S
+local get_player_by_name = minetest.get_player_by_name
+
 local drone_run = codeblock.DroneEntity.run
 local drone_place = codeblock.DroneEntity.place
-local drone_remove = codeblock.DroneEntity.remove_drone
+local drone_remove = codeblock.DroneEntity.remove
 local drone_form = codeblock.DroneEntity.showfileformspec
 local drone_setfile = codeblock.DroneEntity.setfilefromindex
 local check_auth_level = codeblock.utils.check_auth_level
-local get_player_by_name = minetest.get_player_by_name
 
 --------------------------------------------------------------------------------
 -- private
@@ -16,8 +17,8 @@ local get_player_by_name = minetest.get_player_by_name
 
 local function give_tools(player)
     local inv = player:get_inventory()
-    inv:add_item('main', ItemStack('codeblock:drone_placer'))
-    inv:add_item('main', ItemStack('codeblock:drone_starter'))
+    inv:add_item('main', ItemStack('codeblock:poser'))
+    inv:add_item('main', ItemStack('codeblock:setter'))
 end
 
 local function generate_examples(player)
@@ -43,9 +44,9 @@ end
 -- tools
 --------------------------------------------------------------------------------
 
-minetest.register_tool("codeblock:drone_placer", {
-    description = S("Drone Placer"),
-    inventory_image = "drone_placer.png",
+minetest.register_tool("codeblock:poser", {
+    description = S("Drone Poser"),
+    inventory_image = "drone_poser.png",
     range = 128,
     stack_max = 1,
     on_use = function(itemstack, user, pointed_thing)
@@ -58,17 +59,21 @@ minetest.register_tool("codeblock:drone_placer", {
     end
 })
 
-minetest.register_tool("codeblock:drone_starter", {
-    description = S("Drone Starter"),
-    inventory_image = "drone_starter.png",
-    range = 128,
+minetest.register_tool("codeblock:setter", {
+    description = S("Drone Setter"),
+    inventory_image = "drone_setter.png",
+    range = 0,
     stack_max = 1,
     on_use = function(itemstack, user, pointed_thing)
-        drone_form(user)
+        drone_remove(user)
         return itemstack
     end,
     on_place = function(itemstack, placer, pointed_thing)
-        drone_remove(placer)
+        drone_form(placer)
+        return itemstack
+    end,
+    on_secondary_use = function(itemstack, user, pointed_thing)
+        drone_form(user)
         return itemstack
     end
 })
@@ -112,6 +117,7 @@ minetest.register_on_newplayer(function(player)
     local privs = minetest.get_player_privs(player:get_player_name())
     privs.fly = true
     privs.fast = true
+    privs.noclip = true
     minetest.set_player_privs(player:get_player_name(), privs)
 
 end)

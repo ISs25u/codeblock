@@ -6,7 +6,6 @@ codeblock.sandbox = {}
 
 local S = codeblock.S
 local minetest_send_player = minetest.chat_send_player
-local Drone = codeblock.Drone
 local max = math.max
 local min = math.min
 local abs = math.abs
