@@ -4,7 +4,7 @@ CodeBlock
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 [![ContentDB](https://content.minetest.net/packages/giga-turbo/codeblock/shields/downloads/)](https://content.minetest.net/packages/giga-turbo/codeblock/)
 
-**CodeBlock allows creating oniric sturctures in Minetest using `lua` code.**
+**CodeBlock allows creating oniric structures in Minetest using `lua` code.**
 
 **License:** GPLv3   
 **Credits:** inspired by [Gnancraft](http://gnancraft.net/), [ComputerCraft](http://www.computercraft.info/), [Visual Bots](https://content.minetest.net/packages/Nigel/vbots/), [TurtleMiner](https://content.minetest.net/packages/BirgitLachner/turtleminer/), [basic_robot](https://github.com/ac-minetest/basic_robot)
@@ -17,7 +17,7 @@ CodeBlock
 1. Create an empty (flat) world and enable `codeblock` mod ant its dependencies
 2. Enable creative mode and start the game
 3. Right click with the `drone_poser` tool on a block, choose a `lua` program to run, then left click to start the drone
-4. Right click with the `drone_setter` tool to change wich program your are using, or left click with it to stop and remove the drone
+4. Right click with the `drone_setter` tool to change which program your are using, or left click with it to stop and remove the drone
 5. Write your own programs in `~/.minetest/worlds/<worldname>/codeblock_lua_files/<user>/<filename.lua>`, they will appear when right clicking with the `drone_setter`
 
 ## Authlevel
@@ -231,7 +231,7 @@ See documentation [here](https://github.com/ISs25u/vector3) (replacing `vector3`
 
 Example:
 ```lua
-local u = vector3(1, 2, 3)
+local u = vector(1, 2, 3)
 local v = vector3(4, 5, 6)
 local w = (5 * u + u:dot(v) * u:cross(v:scale(5))):norm()
 local x, y, z = w:unpack()
