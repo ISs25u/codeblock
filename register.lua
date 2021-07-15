@@ -49,6 +49,8 @@ minetest.register_tool("codeblock:poser", {
     inventory_image = "drone_poser.png",
     range = 128,
     stack_max = 1,
+    liquids_pointable = true,
+    on_drop = function(itemstack, dropper, pos) return itemstack end,
     on_use = function(itemstack, user, pointed_thing)
         drone_run(user)
         return itemstack
@@ -56,7 +58,8 @@ minetest.register_tool("codeblock:poser", {
     on_place = function(itemstack, placer, pointed_thing)
         drone_place(placer, pointed_thing)
         return itemstack
-    end
+    end,
+    on_secondary_use = function(itemstack, user, pointed_thing) return end
 })
 
 minetest.register_tool("codeblock:setter", {
@@ -64,6 +67,7 @@ minetest.register_tool("codeblock:setter", {
     inventory_image = "drone_setter.png",
     range = 0,
     stack_max = 1,
+    on_drop = function(itemstack, dropper, pos) return itemstack end,
     on_use = function(itemstack, user, pointed_thing)
         drone_remove(user)
         return itemstack
