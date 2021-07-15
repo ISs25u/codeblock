@@ -15,8 +15,16 @@ local check_auth_level = codeblock.utils.check_auth_level
 -- private
 --------------------------------------------------------------------------------
 
-local function give_tools(player)
+local function set_tools(player)
     local inv = player:get_inventory()
+
+    local invs = {'main', 'craft', 'craftpreview', 'craftresult'}
+    for _, inv_name in ipairs(invs) do
+        for i = 1, inv:get_size(inv_name) do
+            inv:set_stack(inv_name, i, ItemStack())
+        end
+    end
+
     inv:add_item('main', ItemStack('codeblock:poser'))
     inv:add_item('main', ItemStack('codeblock:setter'))
 end
@@ -92,6 +100,22 @@ minetest.register_entity("codeblock:drone", codeblock.DroneEntity)
 -- players
 --------------------------------------------------------------------------------
 
+minetest.register_on_newplayer(function(player)
+
+    generate_examples(player)
+
+    local privs = minetest.get_player_privs(player:get_player_name())
+    privs.fly = true
+    privs.fast = true
+    privs.noclip = true
+    minetest.set_player_privs(player:get_player_name(), privs)
+
+    player:get_meta():set_int('codeblock:last_index', 0)
+    player:get_meta():set_int('codeblock:auth_level',
+                              codeblock.default_auth_level)
+
+end)
+
 minetest.register_on_joinplayer(function(player)
 
     local name = player:get_player_name()
@@ -101,28 +125,14 @@ minetest.register_on_joinplayer(function(player)
         minetest.chat_send_player(name, S('Cannot create @1', path))
     end
 
+    set_tools(player)
+
     -- TODO: TEMP fix ?
     player:override_day_night_ratio(1)
     player:set_stars({visible = false})
     player:set_sun({visible = false})
     player:set_moon({visible = false})
     player:set_clouds({density = 0})
-
-end)
-
-minetest.register_on_newplayer(function(player)
-
-    generate_examples(player)
-    give_tools(player)
-    player:get_meta():set_int('codeblock:last_index', 0)
-    player:get_meta():set_int('codeblock:auth_level',
-                              codeblock.default_auth_level)
-
-    local privs = minetest.get_player_privs(player:get_player_name())
-    privs.fly = true
-    privs.fast = true
-    privs.noclip = true
-    minetest.set_player_privs(player:get_player_name(), privs)
 
 end)
 
