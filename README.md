@@ -14,7 +14,7 @@ CodeBlock
 
 ## Tools usage
 
-1. Create an empty (flat) world and enable `codeblock` mod ant its dependencies (`worldedit` and `vector3`)
+1. Create an empty (flat) world and enable `codeblock` mod ant its dependencies
 2. Enable creative mode and start the game
 3. Right click with the `drone_poser` tool on a block, choose a `lua` program to run, then left click to start the drone
 4. Right click with the `drone_setter` tool to change wich program your are using, or left click with it to stop and remove the drone
@@ -34,11 +34,11 @@ Drone capacity depends on the user's _authlevel_ which can be set with the `/aut
 
 ## Chat commands
 
-### `/authlevel <playername> <1-4>`
+#### `/authlevel <playername> <1-4>`
 
 Set the authlevel of an user. Requires the `codeblock` privilege (`/grant <user> codeblock`).
 
-### `/codeblock_examples`
+#### `/codeblock_examples`
 
 Generates the examples programs in `~/.minetest/worlds/<worldname>/codeblock_lua_files/<user>/` for the user issuing the command.
 
@@ -95,60 +95,52 @@ go('place2') -- same as go('place2', 0, 0, 0)
 
 Placing blocks and building shapes requires a `block` parameter, which can be obtained with the following tables.
 
-#### `blocks` table
+#### `blocks`
+
+String-indexed table with the following values:
 
 ```lua
 air, stone, cobble, stonebrick, stone_block, mossycobble, desert_stone, desert_cobble, desert_stonebrick, desert_stone_block, sandstone, sandstonebrick, sandstone_block, desert_sandstone, desert_sandstone_brick, desert_sandstone_block, silver_sandstone, silver_sandstone_brick, silver_sandstone_block, obsidian, obsidianbrick, obsidian_block, dirt, dirt_with_grass, dirt_with_grass_footsteps, dirt_with_dry_grass, dirt_with_snow, dirt_with_rainforest_litter, dirt_with_coniferous_litter, dry_dirt, dry_dirt_with_dry_grass, permafrost, permafrost_with_stones, permafrost_with_moss, clay, snowblock, ice, cave_ice, tree, wood, leaves, jungletree, junglewood, jungleleaves, pine_tree, pine_wood, pine_needles, acacia_tree, acacia_wood, acacia_leaves, aspen_tree, aspen_wood, aspen_leaves, stone_with_coal, coalblock, stone_with_iron, steelblock, stone_with_copper, copperblock, stone_with_tin, tinblock, bronzeblock, stone_with_gold, goldblock, stone_with_mese, mese, stone_with_diamond, diamondblock, cactus, bush_leaves, acacia_bush_leaves, pine_bush_needles, bookshelf, glass, obsidian_glass, brick, meselamp
 ```
 
-Example:
-```lua
-local block1 = blocks.stone
-local block2 = blocks.glass
-```
+Example: `local b = blocks.glass`
 
-#### `plants` table
+#### `plants`
+
+String-indexed table with the following values:
 
 ```lua
 sapling, apple, junglesapling, emergent_jungle_sapling, pine_sapling, acacia_sapling, aspen_sapling, large_cactus_seedling, dry_shrub, grass_1, grass_2, grass_3, grass_4, grass_5, dry_grass_1, dry_grass_2, dry_grass_3, dry_grass_4, dry_grass_5, fern_1, fern_2, fern_3, marram_grass_1, marram_grass_2, marram_grass_3, bush_stem, bush_sapling, acacia_bush_stem, acacia_bush_sapling, pine_bush_stem, pine_bush_needles, pine_bush_sapling
 ```
 
-Example:
-```lua
-local plant1 = plants.large_cactus_seedling
-local plant2 = plants.glass
-```
+Example: `local p = plants.large_cactus_seedling`
 
-#### `wools` table
+#### `wools`
+
+String-indexed table with the following values:
 
 ```lua
 white, grey, dark_grey, black, violet, blue, cyan, dark_green, green, yellow, brown, orange, red, magenta, pink
 ```
 
-Example:
-```lua
-local red = wools.red
-local black = wools.black
-```
+Example: `local rw = wools.red`
 
 #### `iwools`
 
-Integer-indexed table, without white, black and greys, in pseudo-rainbow order:  `red`, `brown`, `orange`, `yellow`, `green`, `dark_green`, `cyan`, `blue`, `violet`, `magenta`, `pink`)
+Integer-indexed table, without white, black and greys, in pseudo-rainbow order (`red`, `brown`, `orange`, `yellow`, `green`, `dark_green`, `cyan`, `blue`, `violet`, `magenta`, `pink`), with the following values:
 
 ```lua
 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ```
 
-Example: 
-```lua
-local pink = iwools[3]
-local green = iwools[7]
-```
+Example: `local orange = iwools[3]`
 
-#### `color(x, m, M)` function (experimental)
+#### `color(x, m, M)`
 
-Return a wool color corresponding to the intensity of `x` on the scale `m` to `M`. If `m` and `M` are not specified then `x` is considered to be between 1 and 11.
+Experimental. Return a wool color corresponding to the intensity of `x` on the scale `m` to `M`. If `m` and `M` are not specified then `x` is considered to be between 1 and 11.
  
+Example: `local c = color(15, 1, 100)`
+
 ### Construction
 
 #### Placing one blocks
@@ -169,7 +161,7 @@ place_relative(0, 0, 1, wools.red, 'place2')
 
 #### Shapes
 
-Shapes are placed such that the drone position corresponds to the back-bottom-left of the shape (a cube will extend to the right-up-forward direction). `width` extends in the "right" direction, `height` extends in the "up" direction, `length` extends in the "forward" direction and `radius` extends in the remaining directions.
+Shapes are placed such that the drone position corresponds to the back-bottom-left of the shape (a cube will extend to the right-up-forward direction). `width` extends in the "right" direction, `height` extends in the "up" direction, `length` extends in the "forward" direction and `radius` extends in the remaining directions. `hollow` is `false` by default and default `block` is stone.
 
 ```lua
 cube(width, height, length, block, hollow)
@@ -179,6 +171,8 @@ cylinder(height, radius, block, hollow) -- short for vertical.cylinder
 vertical.cylinder(height, radius, block, hollow)
 horizontal.cylinder(length, radius, block, hollow)
 ```
+
+Example: `cylinder(10, 4, blocks.leaves)`
 
 #### Centered shapes
 
@@ -233,8 +227,15 @@ e
 
 #### Vectors
 
-See documentation [here](https://github.com/ISs25u/vector3) (replacing `vector3` by `vector`.)
+See documentation [here](https://github.com/ISs25u/vector3) (replacing `vector3` by `vector`).
 
+Example:
+```lua
+local u = vector3(1, 2, 3)
+local v = vector3(4, 5, 6)
+local w = (5 * u + u:dot(v) * u:cross(v:scale(5))):norm()
+local x, y, z = w:unpack()
+```
 
 ### Misc 
 

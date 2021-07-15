@@ -15,6 +15,7 @@
 - [ ] make mod configurable
 - [ ] generate flat clean world https://github.com/srifqi/superflat
 - [ ] optional depends on vector3 and worldedit
+- [ ] function that returns a block at random in a list of blocks
 
 ### v0.4.0
 
