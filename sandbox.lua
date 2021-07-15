@@ -5,7 +5,6 @@ codeblock.sandbox = {}
 --------------------------------------------------------------------------------
 
 local S = codeblock.S
-local minetest_send_player = minetest.chat_send_player
 local max = math.max
 local min = math.min
 local abs = math.abs
@@ -203,6 +202,7 @@ local function getScriptEnv(drone)
         atan = math.atan,
         atan2 = math.atan2,
         pi = math.pi,
+        e = math.exp(1),
         error = error,
         vector = vector3
     }

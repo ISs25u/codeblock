@@ -8,19 +8,20 @@
 - [ ] In-game lua code editor
 - [ ] Blockly web-based editor
 
-Ideas (game?) :
+### v0.5.0
+
+- [ ] fix color(v,m,M) function
+- [ ] fix place in not loaded chunks
+- [ ] make mod configurable
 - [ ] generate flat clean world https://github.com/srifqi/superflat
+- [ ] optional depends on vector3 and worldedit
 
 ### v0.4.0
 
-- [x] use custom vector library
-- [x] save drone obj and cor in drone
-- [x] use coroutine
-- [x] centered cube/cylinder placement
-- [x] add surface and/or distance to limit drone usage
-- [x] limit drone usage and speed with an auth_level
-- [x] tools modified
-- [ ] update readme commands, authlevel, and ref to vector3
+- [x] set drone limits/speed with authlevel (volume, calls, commands, dimension)
+- [x] api now have a custom vector library
+- [x] corrected centered shapes placement
+- [x] tool fixes/textures
 
 ### v0.3.0
 

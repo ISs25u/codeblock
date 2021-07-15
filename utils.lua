@@ -279,7 +279,8 @@ codeblock.utils.wools_names = {
 }
 
 codeblock.utils.iwools_names = {
-    'wool_magenta', 'wool_red', 'wool_pink', 'wool_brown', 'wool_orange',
-    'wool_yellow', 'wool_green', 'wool_dark_green', 'wool_cyan', 'wool_blue',
-    'wool_violet'
+    'wool_red', 'wool_brown', 'wool_orange', 'wool_yellow', 'wool_green',
+    'wool_dark_green', 'wool_cyan', 'wool_blue', 'wool_violet', 'wool_magenta',
+    'wool_pink'
+
 }

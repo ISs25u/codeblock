@@ -14,15 +14,44 @@ CodeBlock
 
 ## Tools usage
 
-1. Create an empty (flat) world and enable `codeblock` mod
-2. Enable creative mode or give yourself the tools `codeblock:drone_placer` and `codeblock:drone_starter`
-3. Right click with the `drone_placer` tool on a block, choose a `lua` program to run, then left click to start the drone
-4. Left click with the `drone_starter` to change wich program your are using
-5. Write your own programs in `~/.minetest/worlds/<worldname>/codeblock_lua_files/<user>/<filename.lua>`
+1. Create an empty (flat) world and enable `codeblock` mod ant its dependencies (`worldedit` and `vector3`)
+2. Enable creative mode and start the game
+3. Right click with the `drone_poser` tool on a block, choose a `lua` program to run, then left click to start the drone
+4. Right click with the `drone_setter` tool to change wich program your are using, or left click with it to stop and remove the drone
+5. Write your own programs in `~/.minetest/worlds/<worldname>/codeblock_lua_files/<user>/<filename.lua>`, they will appear when right clicking with the `drone_setter`
+
+## Authlevel
+
+Drone capacity depends on the user's _authlevel_ which can be set with the `/authlevel` command (see below). The higher the authlevel the quicker is the drone and the heavier the load on the server. High authlevel should be given carefully to users. Default authlevel is 1.
+
+| authlevel     | 1 (limited) | 2 (basic) | 3 (privileged) | 4 (trusted) |                                                                      |
+|---------------|-------------|-----------|----------------|-------------|----------------------------------------------------------------------|
+| max_calls     |         1e6 |       1e7 |            1e8 |         1e9 | max number of calls (function calls and loops)                       |
+| max_volume    |         1e5 |       1e6 |            1e7 |         1e8 | max build volume (1 block = 1m³)                                     |
+| max_commands  |         1e4 |       1e5 |            1e6 |         1e7 | max drone commands (movements, constructions, checkpoints, etc)      |
+| max_distance  |         150 |       300 |            700 |        1500 | max drone distance from drone spawn-point                            |
+| max_dimension |          15 |        30 |             70 |         150 | max dimension of shapes (either width or length or height or radius) |
+
+## Chat commands
+
+### `/authlevel <playername> <1-4>`
+
+Set the authlevel of an user. Requires the `codeblock` privilege (`/grant <user> codeblock`).
+
+### `/codeblock_examples`
+
+Generates the examples programs in `~/.minetest/worlds/<worldname>/codeblock_lua_files/<user>/` for the user issuing the command.
 
 ## Lua api
 
+The coordinate system used is relative to the player. When the drone is placed it is oriented in the player direction, going forwards. All movements on the 3 axis are always relative to the drone direction (left-right, up-down, forward-backward).
+
+The parameters `nr`, `nu`, `nf` denotes movements on the 3 axis, positive values going right/up/forward and negative values going left/down/backward.
+
+
 ### Movements
+
+#### Moving drone
 
 ```lua
 up(n)
@@ -31,64 +60,80 @@ forward(n)
 back(n)
 left(n)
 right(n)
-move(right,forward,up)
+move(nr, nu, nf)
+```
+
+Example: `move(-5, 1, 3)`
+
+#### Rotating drone
+
+```lua
 turn_right()
 turn_left()
-turn(n_quarters)
+turn(n_quarters_anti_clockwise)
 ```
 
-Example: `forward(5)`
+Example: `turn(2)`
 
-### Construction
 
-__Individual blocks__
+#### Checkpoints
 
 ```lua
-place(block)
-place_relative(x, y, z, block, checkpoint_name)
+save(name)
+go(name, nr, nu, nf)
 ```
 
-__Primitives ("back-bottom-left" placed)__
-
+Example:
 ```lua
-cube(width, height, length, block, hollow)
-sphere(radius, block, hollow)
-dome(radius, block, hollow)
-vertical.cylinder(height, radius, block, hollow)
-horizontal.cylinder(length, radius, block, hollow)
+save('place1')
+save('place2')
+go('place1', 10, -50, 1)
+go('place2') -- same as go('place2', 0, 0, 0)
 ```
 
-__Centered primitives__
+### Block types
 
-```lua
-centered.cube(width, height, length, block, hollow)
-centered.sphere(radius, block, hollow)
-centered.dome(radius, block, hollow)
-centered.vertical.cylinder(height, radius, block, hollow)
-centered.horizontal.cylinder(length, radius, block, hollow)
-```
+Placing blocks and building shapes requires a `block` parameter, which can be obtained with the following tables.
 
-### Types of blocks
-
-`blocks`
+#### `blocks` table
 
 ```lua
 air, stone, cobble, stonebrick, stone_block, mossycobble, desert_stone, desert_cobble, desert_stonebrick, desert_stone_block, sandstone, sandstonebrick, sandstone_block, desert_sandstone, desert_sandstone_brick, desert_sandstone_block, silver_sandstone, silver_sandstone_brick, silver_sandstone_block, obsidian, obsidianbrick, obsidian_block, dirt, dirt_with_grass, dirt_with_grass_footsteps, dirt_with_dry_grass, dirt_with_snow, dirt_with_rainforest_litter, dirt_with_coniferous_litter, dry_dirt, dry_dirt_with_dry_grass, permafrost, permafrost_with_stones, permafrost_with_moss, clay, snowblock, ice, cave_ice, tree, wood, leaves, jungletree, junglewood, jungleleaves, pine_tree, pine_wood, pine_needles, acacia_tree, acacia_wood, acacia_leaves, aspen_tree, aspen_wood, aspen_leaves, stone_with_coal, coalblock, stone_with_iron, steelblock, stone_with_copper, copperblock, stone_with_tin, tinblock, bronzeblock, stone_with_gold, goldblock, stone_with_mese, mese, stone_with_diamond, diamondblock, cactus, bush_leaves, acacia_bush_leaves, pine_bush_needles, bookshelf, glass, obsidian_glass, brick, meselamp
 ```
 
-`plants`
+Example:
+```lua
+local block1 = blocks.stone
+local block2 = blocks.glass
+```
+
+#### `plants` table
 
 ```lua
 sapling, apple, junglesapling, emergent_jungle_sapling, pine_sapling, acacia_sapling, aspen_sapling, large_cactus_seedling, dry_shrub, grass_1, grass_2, grass_3, grass_4, grass_5, dry_grass_1, dry_grass_2, dry_grass_3, dry_grass_4, dry_grass_5, fern_1, fern_2, fern_3, marram_grass_1, marram_grass_2, marram_grass_3, bush_stem, bush_sapling, acacia_bush_stem, acacia_bush_sapling, pine_bush_stem, pine_bush_needles, pine_bush_sapling
 ```
 
-`wools`
+Example:
+```lua
+local plant1 = plants.large_cactus_seedling
+local plant2 = plants.glass
+```
+
+#### `wools` table
 
 ```lua
 white, grey, dark_grey, black, violet, blue, cyan, dark_green, green, yellow, brown, orange, red, magenta, pink
 ```
 
-`iwools`
+Example:
+```lua
+local red = wools.red
+local black = wools.black
+```
+
+#### `iwools`
+
+Integer-indexed table, without white, black and greys, in pseudo-rainbow order:  `red`, `brown`, `orange`, `yellow`, `green`, `dark_green`, `cyan`, `blue`, `violet`, `magenta`, `pink`)
 
 ```lua
 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
@@ -96,64 +141,106 @@ white, grey, dark_grey, black, violet, blue, cyan, dark_green, green, yellow, br
 
 Example: 
 ```lua
-place(blocks.stone)
-up(1)
-place(plants.acacia_bush_stem)
-up(1)
-place(wools.blue)
-up(1)
-place(iwools[3])
+local pink = iwools[3]
+local green = iwools[7]
 ```
 
-### Checkpoints
+#### `color(x, m, M)` function (experimental)
+
+Return a wool color corresponding to the intensity of `x` on the scale `m` to `M`. If `m` and `M` are not specified then `x` is considered to be between 1 and 11.
+ 
+### Construction
+
+#### Placing one blocks
 
 ```lua
-save(name)
-go(name)
+place(block)
+place_relative(nr, nu, nf, block, checkpoint)
 ```
 
 Example:
 ```lua
-save('place1')
-move(0, 1, 1)
-place(wools.obsidian)
-go('place1')
-move(0, -1, -1)
-place(wools.glass)
+save('place2')
+place(blocks.stone)
+place_relative(1, 0, 0, wools.blue, 'place2')
+place_relative(0, 1, 0, wools.green, 'place2')
+place_relative(0, 0, 1, wools.red, 'place2')
+```
+
+#### Shapes
+
+Shapes are placed such that the drone position corresponds to the back-bottom-left of the shape (a cube will extend to the right-up-forward direction). `width` extends in the "right" direction, `height` extends in the "up" direction, `length` extends in the "forward" direction and `radius` extends in the remaining directions.
+
+```lua
+cube(width, height, length, block, hollow)
+sphere(radius, block, hollow)
+dome(radius, block, hollow)
+cylinder(height, radius, block, hollow) -- short for vertical.cylinder
+vertical.cylinder(height, radius, block, hollow)
+horizontal.cylinder(length, radius, block, hollow)
+```
+
+#### Centered shapes
+
+Shapes are placed such that the drone position corresponds to the center of the shape. For the dome it corresponds to the bottom of the dome and its center for the other coordinates. `width` extends in the "left-right" direction, `height` extends in the "up-down" direction, `length` extends in the "forward-backward" direction and `radius` extends in the remaining directions.
+
+```lua
+centered.cube(width, height, length, block, hollow)
+centered.sphere(radius, block, hollow)
+centered.dome(radius, block, hollow)
+centered.cylinder(height, radius, block, hollow) -- short for centered.vertical.cylinder
+centered.vertical.cylinder(height, radius, block, hollow)
+centered.horizontal.cylinder(length, radius, block, hollow)
 ```
 
 ### Math 
 
+#### Functions
+
 ```lua
-random(a,b)
-floor(x)
+random([m [, n]])
+round(x, num)
+round0(x)   -- short for round(x, 0) (integer rounding)
 ceil(x)
+floor(x)
 deg(x)
 rad(x)
 exp(x)
 log(x)
-max(a,b)
-min(a,b)
-pow(a,b)
-sqrt(x)
+max(x, ...)
+min(x, ...)
 abs(x)
+pow(x, y)
+sqrt(x)
 sin(x)
-sinh(x)
 asin(x)
+sinh(x)
 cos(x)
-cosh(x)
 acos(x)
+cosh(x)
 tan(x)
-tanh(x)
 atan(x)
-atan2(x)
-pi
+atan2(x, y)
+tanh(x)
 ```
+
+#### Values
+
+```lua
+pi
+e
+```
+
+#### Vectors
+
+See documentation [here](https://github.com/ISs25u/vector3) (replacing `vector3` by `vector`.)
+
 
 ### Misc 
 
 ```lua
 print(message)
-ipairs(array)
-pairs(array)
+error(message)
+ipairs(t)
+pairs(t)
 ```

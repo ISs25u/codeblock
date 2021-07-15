@@ -44,7 +44,7 @@ local instance_mt = {
 
     __tostring = function(self)
         return S('cmd @1 call @2 vol @3 time @4', self.commands, self.calls,
-                 self.volume, (os.clock() - self.tstart))
+                 self.volume, (os.clock() - (self.tstart or os.clock())))
     end
 }
 
@@ -75,7 +75,7 @@ local drone_mt = {
                 volume = 0,
                 calls = 0,
                 commands = 0,
-                tstart = 0,
+                tstart = nil,
                 file = nil,
                 cor = nil,
                 obj = nil
