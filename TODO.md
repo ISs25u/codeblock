@@ -11,11 +11,16 @@
 ### v0.5.0
 
 - [ ] fix color(v,m,M) function
-- [ ] fix place in not loaded chunks
+- [ ] fix place in non-loaded chunks
 - [ ] make mod configurable
-- [ ] generate flat clean world https://github.com/srifqi/superflat
 - [ ] optional depends on vector3 and worldedit
 - [ ] function that returns a block at random in a list of blocks
+
+Separate ?
+
+- [ ] generate flat clean world https://github.com/srifqi/superflat
+- [ ] teleport function?
+- [ ] always day, etc
 
 ### v0.4.0
 
