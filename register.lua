@@ -4,11 +4,11 @@
 local S = codeblock.S
 local get_player_by_name = minetest.get_player_by_name
 
-local drone_run = codeblock.DroneEntity.run
-local drone_place = codeblock.DroneEntity.place
-local drone_remove = codeblock.DroneEntity.remove
-local drone_form = codeblock.DroneEntity.showfileformspec
-local drone_setfile = codeblock.DroneEntity.setfilefromindex
+local drone_on_run = codeblock.DroneEntity.on_run
+local drone_on_place = codeblock.DroneEntity.on_place
+local drone_on_remove = codeblock.DroneEntity.on_remove
+local drone_show_set_file_form = codeblock.DroneEntity.show_set_file_formspec
+local drone_on_set_file_event = codeblock.DroneEntity.on_set_file_event
 local check_auth_level = codeblock.utils.check_auth_level
 
 --------------------------------------------------------------------------------
@@ -60,11 +60,12 @@ minetest.register_tool("codeblock:poser", {
     liquids_pointable = true,
     on_drop = function(itemstack, dropper, pos) return itemstack end,
     on_use = function(itemstack, user, pointed_thing)
-        drone_run(user)
+        local name = user:get_player_name()
+        drone_on_run(name)
         return itemstack
     end,
     on_place = function(itemstack, placer, pointed_thing)
-        drone_place(placer, pointed_thing)
+        drone_on_place(placer, pointed_thing)
         return itemstack
     end,
     on_secondary_use = function(itemstack, user, pointed_thing) return end
@@ -77,15 +78,18 @@ minetest.register_tool("codeblock:setter", {
     stack_max = 1,
     on_drop = function(itemstack, dropper, pos) return itemstack end,
     on_use = function(itemstack, user, pointed_thing)
-        drone_remove(user)
+        local name = user:get_player_name()
+        drone_on_remove(name)
         return itemstack
     end,
     on_place = function(itemstack, placer, pointed_thing)
-        drone_form(placer)
+        local name = placer:get_player_name()
+        drone_show_set_file_form(name)
         return itemstack
     end,
     on_secondary_use = function(itemstack, user, pointed_thing)
-        drone_form(user)
+        local name = user:get_player_name()
+        drone_show_set_file_form(name)
         return itemstack
     end
 })
@@ -136,8 +140,10 @@ minetest.register_on_joinplayer(function(player)
 
 end)
 
-minetest.register_on_leaveplayer(
-    function(player, timed_out) drone_remove(player) end)
+minetest.register_on_leaveplayer(function(player, timed_out)
+    local name = player:get_player_name()
+    drone_on_remove(name)
+end)
 
 --------------------------------------------------------------------------------
 -- Commands and privileges
@@ -202,17 +208,8 @@ minetest.register_on_player_receive_fields(
     function(player, formname, fields)
 
         if formname == "codeblock:choose_file" then
-
             local name = player:get_player_name()
-            local res = minetest.explode_textlist_event(fields.file)
-
-            if res.type == "DCL" then
-
-                minetest.close_formspec(name, 'codeblock:choose_file')
-                drone_setfile(player, res.index)
-
-            end
-
+            drone_on_set_file_event(name, fields)
         end
 
     end)

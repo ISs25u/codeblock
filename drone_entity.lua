@@ -7,7 +7,8 @@ codeblock.DroneEntity = {}
 local S = codeblock.S
 local floor = math.floor
 local pi = math.pi
-local minetest_send_player = minetest.chat_send_player
+local chat_send_player = minetest.chat_send_player
+local get_player_by_name = minetest.get_player_by_name
 
 local drone_get = codeblock.Drone.get
 local drone_set = codeblock.Drone.set
@@ -55,12 +56,12 @@ local entity_mt = {
                     if status == 'suspended' then
                         local success, ret = coroutine.resume(drone.cor)
                         if not success then
-                            minetest_send_player(drone.name, S(
+                            chat_send_player(drone.name, S(
                                                      'runtime error in @1',
                                                      drone.file) .. '\n' .. ret)
                         end
                     elseif status == 'dead' then
-                        minetest_send_player(drone.name, S(
+                        chat_send_player(drone.name, S(
                                                  'program @1 ended @2',
                                                  drone.file, tostring(drone)))
                         drone_rmv(drone.name)
@@ -83,8 +84,8 @@ local entity_mt = {
             -- check drone existence, not the cached value
             local drone = drone_get(self._data.name)
             if drone ~= nil then
-                minetest_send_player(drone.name, S('drone entity removed'))
-                minetest_send_player(drone.name, S('program @1 ended @2',
+                chat_send_player(drone.name, S('drone entity removed'))
+                chat_send_player(drone.name, S('program @1 ended @2',
                                                    drone.file, tostring(drone)))
                 drone_rmv(drone.name)
             end
@@ -100,21 +101,23 @@ local entity_mt = {
 -- static
 --------------------------------------------------------------------------------
 
-function DroneEntity.place(placer, pointed_thing)
+function DroneEntity.on_place(name, pointed_thing)
 
-    local name = placer:get_player_name()
+    local player = get_player_by_name(name)
+
+    if not player then return end
 
     local drone = drone_get(name)
 
     if drone ~= nil and drone.cor ~= nil then
-        minetest_send_player(name, S('drone busy'))
+        chat_send_player(name, S('drone busy'))
         return
     end
 
     local pos = minetest.get_pointed_thing_position(pointed_thing)
 
     if not pos then
-        minetest_send_player(name, S("Please target node"))
+        chat_send_player(name, S("Please target node"))
         return {}
     end
 
@@ -126,25 +129,23 @@ function DroneEntity.place(placer, pointed_thing)
     drone_new(name, pos, dir, auth_level)
 
     if not last_index or last_index == 0 then
-        DroneEntity.showfileformspec(placer)
+        DroneEntity.show_set_file_formspec(name)
     else
-        DroneEntity.setfilefromindex(placer, last_index)
+        DroneEntity.on_set_file_event(name, last_index)
     end
 
 end
 
-function DroneEntity.run(user)
-
-    local name = user:get_player_name()
+function DroneEntity.on_run(name)
 
     local drone = drone_get(name)
 
     if drone == nil then
-        minetest_send_player(name, S("drone does not exist"))
+        chat_send_player(name, S("drone does not exist"))
         return
     else
         if drone.cor ~= nil then
-            minetest_send_player(name, S('drone busy'))
+            chat_send_player(name, S('drone busy'))
             return
         end
     end
@@ -152,7 +153,7 @@ function DroneEntity.run(user)
     local file = drone.file
 
     if not file then
-        minetest_send_player(name, S("no file selected"))
+        chat_send_player(name, S("no file selected"))
         return
     end
 
@@ -160,7 +161,7 @@ function DroneEntity.run(user)
 
     if not suc then
         drone_rmv(name)
-        minetest_send_player(name, res)
+        chat_send_player(name, res)
         return
     end
 
@@ -169,15 +170,13 @@ function DroneEntity.run(user)
 
 end
 
-function DroneEntity.remove(player)
-
-    local name = player:get_player_name()
+function DroneEntity.on_remove(name)
 
     local drone = drone_get(name)
 
     if drone ~= nil then
         if drone.cor ~= nil then
-            minetest_send_player(drone.name, S('program @1 ended @2',
+            chat_send_player(drone.name, S('program @1 ended @2',
                                                drone.file, tostring(drone)))
             drone_rmv(name)
         else
@@ -188,48 +187,61 @@ function DroneEntity.remove(player)
 end
 
 -- assume Drone exists
-function DroneEntity.setfilefromindex(player, index)
+function DroneEntity.on_set_file_event(name, fields)
 
-    local name = player:get_player_name()
+    local function setfile(path, index)
+
+        local file, err = codeblock.filesystem.get_file_from_index(path, index)
+
+        if err then
+            chat_send_player(name, S('no files'))
+            return
+        end
+
+        local drone = drone_get(name)
+        if drone then
+            drone.file = file
+            drone:update_entity()
+        end
+
+        local player = get_player_by_name(name)
+        if player then
+            player:get_meta():set_int('codeblock:last_index', index)
+        end
+
+        return
+
+    end
+
+    --
 
     local path = codeblock.datapath .. name
 
-    local file, err = codeblock.filesystem.get_file_from_index(path, index)
-
-    if err then
-        minetest_send_player(name, S('no files'))
-        return
+    if type(fields) == 'number' then
+        setfile(path, fields)
+    else
+        local res = minetest.explode_textlist_event(fields.file)
+        if res.type == "DCL" then
+            minetest.close_formspec(name, 'codeblock:choose_file')
+            setfile(path, res.index)
+        end
     end
-
-    local drone = drone_get(name)
-
-    if drone then
-
-        drone.file = file
-        drone:update_entity()
-
-    end
-
-    player:get_meta():set_int('codeblock:last_index', index)
-
-    return
 
 end
 
-function DroneEntity.showfileformspec(player)
+function DroneEntity.show_set_file_formspec(name)
 
-    local name = player:get_player_name()
     local path = codeblock.datapath .. name
 
     if not path then
-        minetest_send_player(name, S("no file selected"))
+        chat_send_player(name, S("no file selected"))
         return
     end
 
     local files = codeblock.filesystem.get_files(path)
 
     if not files or #files == 0 then
-        minetest_send_player(name, S('no files'))
+        chat_send_player(name, S('no files'))
         return
     end
 

@@ -10,7 +10,7 @@ local floor = math.floor
 local min = math.min
 local max = math.max
 
-local minetest_send_player = minetest.chat_send_player
+local chat_send_player = minetest.chat_send_player
 local check_auth_level = codeblock.utils.check_auth_level
 
 local tmp1 = 2 / pi

@@ -15,8 +15,8 @@ local S = codeblock.S
 local cubes_names = codeblock.utils.cubes_names
 local blocks = codeblock.utils.blocks
 
-local minetest_send_player = minetest.chat_send_player
-local minetest_set_node = minetest.set_node
+local chat_send_player = minetest.chat_send_player
+local set_node = minetest.set_node
 
 local max_calls = codeblock.max_calls
 local max_volume = codeblock.max_volume
@@ -37,7 +37,7 @@ local tmp4 = 2 / 3 * pi
 local function round0(x) return floor(x + .5) end
 
 local function place_block(x, y, z, block)
-    minetest_set_node({x = x, y = y, z = z}, {name = block})
+    set_node({x = x, y = y, z = z}, {name = block})
 end
 
 local function use_volume(drone, v_used)
@@ -779,7 +779,7 @@ local function drone_send_message(drone, string)
 
     assert(drone, S("drone does not exist"))
 
-    minetest_send_player(drone.name, '> ' .. tostring(string))
+    chat_send_player(drone.name, '> ' .. tostring(string))
     check_drone_yield(drone, 1)
 end
 

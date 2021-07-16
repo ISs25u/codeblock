@@ -15,6 +15,16 @@
 - [ ] make mod configurable
 - [ ] optional depends on vector3 and worldedit
 - [ ] function that returns a block at random in a list of blocks
+- [ ] periodic auto restart
+
+- minetest.set_timeofday(val)
+- minetest.emerge_area(pos1, pos2, [callback], [param])
+- minetest.fix_light(pos1, pos2)
+- minetest.hash_node_position(pos)
+- minetest.string_to_pos(pos)
+- minetest.get_position_from_hash(hash)
+- minetest.is_protected(pos, name)
+- minetest.request_insecure_environment()
 
 Separate ?
 
