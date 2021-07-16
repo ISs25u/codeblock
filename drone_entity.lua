@@ -15,6 +15,8 @@ local drone_set = codeblock.Drone.set
 local drone_rmv = codeblock.Drone.remove
 local drone_new = codeblock.Drone.new
 
+local get_safe_coroutine = codeblock.sandbox.get_safe_coroutine
+
 local tmp1 = 2 / pi
 local tmp2 = pi / 2
 local tmp3 = pi / 4
@@ -155,7 +157,7 @@ function DroneEntity.on_run(name)
         return
     end
 
-    local suc, res = codeblock.sandbox.get_safe_coroutine(drone, file)
+    local suc, res = get_safe_coroutine(drone, file)
 
     if not suc then
         drone_rmv(name)

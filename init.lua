@@ -1,7 +1,7 @@
 codeblock = {}
 
 codeblock.modpath = minetest.get_modpath("codeblock")
-codeblock.datapath = minetest.get_worldpath() .. "/codeblock_lua_files/"
+codeblock.datapath = minetest.get_worldpath() .. "/lua_files/"
 
 if not minetest.mkdir(codeblock.datapath) then
     error("[editor] failed to create directory!")
@@ -20,12 +20,14 @@ codeblock.default_auth_level = 1
 codeblock.S = minetest.get_translator("codeblock")
 
 dofile(codeblock.modpath .. "/utils.lua")
+dofile(codeblock.modpath .. "/commands.lua")
+dofile(codeblock.modpath .. "/sandbox.lua")
+--
 dofile(codeblock.modpath .. "/drone.lua")
 dofile(codeblock.modpath .. "/drone_entity.lua")
 dofile(codeblock.modpath .. "/register.lua")
-dofile(codeblock.modpath .. "/commands.lua")
-dofile(codeblock.modpath .. "/sandbox.lua")
 dofile(codeblock.modpath .. "/formspecs.lua")
-dofile(codeblock.modpath .. "/filesystem.lua")
 dofile(codeblock.modpath .. "/examples.lua")
+--
+dofile(codeblock.modpath .. "/filesystem.lua")
 dofile(codeblock.modpath .. "/editor.lua")
