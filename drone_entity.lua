@@ -101,7 +101,7 @@ local entity_mt = {
 -- static
 --------------------------------------------------------------------------------
 
-function DroneEntity.on_place(name, pointed_thing)
+function DroneEntity.on_place(name, pos)
 
     local player = get_player_by_name(name)
 
@@ -114,17 +114,15 @@ function DroneEntity.on_place(name, pointed_thing)
         return
     end
 
-    local pos = minetest.get_pointed_thing_position(pointed_thing)
-
     if not pos then
         chat_send_player(name, S("Please target node"))
         return {}
     end
 
-    local dir = dirtocardinal(placer:get_look_horizontal())
+    local dir = dirtocardinal(player:get_look_horizontal())
 
-    local last_index = placer:get_meta():get_int('codeblock:last_index')
-    local auth_level = placer:get_meta():get_int('codeblock:auth_level')
+    local last_index = player:get_meta():get_int('codeblock:last_index')
+    local auth_level = player:get_meta():get_int('codeblock:auth_level')
 
     drone_new(name, pos, dir, auth_level)
 

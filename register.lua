@@ -3,6 +3,7 @@
 --------------------------------------------------------------------------------
 local S = codeblock.S
 local get_player_by_name = minetest.get_player_by_name
+local get_pointed_thing_position = minetest.get_pointed_thing_position
 
 local drone_on_run = codeblock.DroneEntity.on_run
 local drone_on_place = codeblock.DroneEntity.on_place
@@ -65,7 +66,9 @@ minetest.register_tool("codeblock:poser", {
         return itemstack
     end,
     on_place = function(itemstack, placer, pointed_thing)
-        drone_on_place(placer, pointed_thing)
+        local name = placer:get_player_name()
+        local pos = get_pointed_thing_position(pointed_thing)
+        drone_on_place(name, pos)
         return itemstack
     end,
     on_secondary_use = function(itemstack, user, pointed_thing) return end
