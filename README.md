@@ -161,7 +161,7 @@ place_relative(0, 0, 1, wools.red, 'place2')
 
 #### Shapes
 
-Shapes are placed such that the drone position corresponds to the back-bottom-left of the shape (a cube will extend to the right-up-forward direction). `width` extends in the "right" direction, `height` extends in the "up" direction, `length` extends in the "forward" direction and `radius` extends in the remaining directions. `hollow` is `false` by default and default `block` is stone.
+Shapes are placed such that the drone position corresponds to the back-bottom-left of the shape (a cube will extend to the right-up-forward direction). `width` extends in the *right* direction, `height` extends in the *up* direction, `length` extends in the *forward* direction and `radius` extends in the remaining directions. `hollow` is `false` by default and default `block` is stone.
 
 ```lua
 cube(width, height, length, block, hollow)
@@ -176,7 +176,7 @@ Example: `cylinder(10, 4, blocks.leaves)`
 
 #### Centered shapes
 
-Shapes are placed such that the drone position corresponds to the center of the shape. For the dome it corresponds to the bottom of the dome and its center for the other coordinates. `width` extends in the "left-right" direction, `height` extends in the "up-down" direction, `length` extends in the "forward-backward" direction and `radius` extends in the remaining directions.
+Shapes are placed such that the drone position corresponds to the center of the shape. For the dome it corresponds to the bottom of the dome and its center for the other coordinates. `width` extends in the *left-right* direction, `height` extends in the *up-down* direction, `length` extends in the *forward-backward* direction and `radius` extends in the remaining directions.
 
 ```lua
 centered.cube(width, height, length, block, hollow)
