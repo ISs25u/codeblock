@@ -17,6 +17,8 @@ codeblock.max_dimension =         {15,      30,      70,      150}
 codeblock.commands_before_yield = {1,       10,      20,      40}
 codeblock.default_auth_level = 1
 
+codeblock.lua_editor = lua_editor.editor:new("codeblock:lua_editor")
+
 codeblock.S = minetest.get_translator("codeblock")
 
 dofile(codeblock.modpath .. "/utils.lua")
