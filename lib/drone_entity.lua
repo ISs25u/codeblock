@@ -59,13 +59,13 @@ local entity_mt = {
                         local success, ret = coroutine.resume(drone.cor)
                         if not success then
                             chat_send_player(drone.name, S(
-                                                     'runtime error in @1',
-                                                     drone.file) .. '\n' .. ret)
+                                                 'runtime error in @1',
+                                                 drone.file) .. '\n' .. ret)
                         end
                     elseif status == 'dead' then
-                        chat_send_player(drone.name, S(
-                                                 'program @1 ended @2',
-                                                 drone.file, tostring(drone)))
+                        chat_send_player(drone.name, S('program @1 ended @2',
+                                                       drone.file,
+                                                       tostring(drone)))
                         drone_rmv(drone.name)
                     end
                 end
@@ -88,7 +88,7 @@ local entity_mt = {
             if drone ~= nil then
                 chat_send_player(drone.name, S('drone entity removed'))
                 chat_send_player(drone.name, S('program @1 ended @2',
-                                                   drone.file, tostring(drone)))
+                                               drone.file, tostring(drone)))
                 drone_rmv(drone.name)
             end
 
@@ -131,7 +131,7 @@ function DroneEntity.on_place(name, pos)
     if not last_index or last_index == 0 then
         DroneEntity.show_set_file_formspec(name)
     else
-        DroneEntity.on_set_file_event(name, last_index)
+        DroneEntity.set_file_from_index(name, last_index)
     end
 
 end
@@ -176,8 +176,8 @@ function DroneEntity.on_remove(name)
 
     if drone ~= nil then
         if drone.cor ~= nil then
-            chat_send_player(drone.name, S('program @1 ended @2',
-                                               drone.file, tostring(drone)))
+            chat_send_player(drone.name, S('program @1 ended @2', drone.file,
+                                           tostring(drone)))
             drone_rmv(name)
         else
             drone_rmv(name)
@@ -187,50 +187,31 @@ function DroneEntity.on_remove(name)
 end
 
 -- assume Drone exists
-function DroneEntity.on_set_file_event(name, fields)
-
-    local function setfile(path, index)
-
-        local file, err = codeblock.filesystem.get_file_from_index(path, index)
-
-        if err then
-            chat_send_player(name, S('no files'))
-            return
-        end
-
-        local drone = drone_get(name)
-        if drone then
-            drone.file = file
-            drone:update_entity()
-        end
-
-        local player = get_player_by_name(name)
-        if player then
-            player:get_meta():set_int('codeblock:last_index', index)
-        end
-
-        return
-
-    end
-
-    --
+function DroneEntity.set_file_from_index(name, index)
 
     local path = codeblock.datapath .. name
 
-    if type(fields) == 'number' then
-        setfile(path, fields)
-    else
-        local res = minetest.explode_textlist_event(fields.file)
-        if res.type == "DCL" then
-            minetest.close_formspec(name, 'codeblock:choose_file')
-            setfile(path, res.index)
-        end
+    local file, err = codeblock.filesystem.get_file_from_index(path, index)
+
+    if err then
+        chat_send_player(name, S('no files'))
+        return
     end
+
+    local drone = drone_get(name)
+    if drone then
+        drone.file = file
+        drone:update_entity()
+    end
+
+    local player = get_player_by_name(name)
+    if player then player:get_meta():set_int('codeblock:last_index', index) end
 
 end
 
 function DroneEntity.show_set_file_formspec(name)
 
+    local fs = codeblock.formspecs.file_chooser
     local path = codeblock.datapath .. name
 
     if not path then
@@ -245,8 +226,9 @@ function DroneEntity.show_set_file_formspec(name)
         return
     end
 
-    minetest.show_formspec(name, 'codeblock:choose_file',
-                           codeblock.formspecs.choose_file(files))
+    local meta = {files = files, selectedIndex = 0}
+
+    minetest.create_form(meta, name, fs.get_form(meta), fs.on_close)
 
 end
 

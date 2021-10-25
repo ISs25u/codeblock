@@ -24,6 +24,10 @@ end
 -- register
 --------------------------------------------------------------------------------
 
+
+
+
+
 minetest.register_chatcommand("lua_editor",
                               {func = function(name, param) cbe:show(name) end})
 

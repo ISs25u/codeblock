@@ -17,7 +17,5 @@ dofile(codeblock.modpath .. "/lib/commands.lua")
 dofile(codeblock.modpath .. "/lib/sandbox.lua")
 dofile(codeblock.modpath .. "/lib/drone.lua")
 dofile(codeblock.modpath .. "/lib/drone_entity.lua")
-dofile(codeblock.modpath .. "/lib/register.lua")
 dofile(codeblock.modpath .. "/lib/formspecs.lua")
-
--- dofile(codeblock.modpath .. "/lib/editor.lua")
+dofile(codeblock.modpath .. "/lib/register.lua")

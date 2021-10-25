@@ -9,7 +9,7 @@ local drone_on_run = codeblock.DroneEntity.on_run
 local drone_on_place = codeblock.DroneEntity.on_place
 local drone_on_remove = codeblock.DroneEntity.on_remove
 local drone_show_set_file_form = codeblock.DroneEntity.show_set_file_formspec
-local drone_on_set_file_event = codeblock.DroneEntity.on_set_file_event
+local drone_set_file_from_index = codeblock.DroneEntity.set_file_from_index
 local check_auth_level = codeblock.utils.check_auth_level
 
 --------------------------------------------------------------------------------
@@ -202,16 +202,19 @@ minetest.register_chatcommand("codeblock_examples", {
     end
 })
 
+minetest.register_chatcommand("luae", {
+    privs = {codeblock = true},
+    func = function(name, params)
+        local fe = codeblock.formspecs.file_editor
+        local meta = {
+            files = {[1] = 'file1.txt', [2] = 'file2.txt', [3] = 'file3.lua'},
+            tabs = {[2] = true, [3] = true},
+            openedId = 2
+        }
+        minetest.create_form(meta, name, fe.get_form(meta), fe.on_close)
+    end
+})
+
 --------------------------------------------------------------------------------
 -- formspecs
 --------------------------------------------------------------------------------
-
-minetest.register_on_player_receive_fields(
-    function(player, formname, fields)
-
-        if formname == "codeblock:choose_file" then
-            local name = player:get_player_name()
-            drone_on_set_file_event(name, fields)
-        end
-
-    end)

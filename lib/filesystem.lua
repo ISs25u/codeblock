@@ -14,7 +14,7 @@ local safe_file_write = minetest.safe_file_write
 local function get_files(dirpath)
     if not dirpath then return false, "Missing argument <path>" end
     if type(dirpath) ~= 'string' then return "<path> must be a string" end
-    local dirs = get_dir_list(dirpath)
+    local dirs = get_dir_list(dirpath, false)
     table.sort(dirs)
     return dirs
 end

@@ -4,18 +4,18 @@
 
 - [x] User associated filesystem to store programs
 - [x] Allow to set drone's file with in-game interface + remember last program started
-- [ ] Control drone operating speed
+- [x] Control drone operating speed
 - [ ] In-game lua code editor
 - [ ] Blockly web-based editor
 
 ### v0.5.0
 
-- [ ] fix color(v,m,M) function
-- [ ] fix place in non-loaded chunks
+- [ ] get block at drone position
+- [ ] fix color(v,m,M) function (or remove)
+- [ ] fix place() in non-loaded chunks
 - [ ] make mod configurable
-- [ ] optional depends on vector3 and worldedit
+- [ ] optional depends on vector3, worldedit, wool, etc
 - [ ] function that returns a block at random in a list of blocks
-- [ ] periodic auto restart
 
 - minetest.set_timeofday(val)
 - minetest.emerge_area(pos1, pos2, [callback], [param])
