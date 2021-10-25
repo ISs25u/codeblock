@@ -310,14 +310,12 @@ local function find_outside_string(script, pattern, pos, strings)
     return nil
 end
 
-local function preprocess_code(script) -- version 07/24/2018
+local function preprocess_code(script)
 
-    local call_limit = codeblock.call_limit
-
-    script = script:gsub("%-%-%[%[.*%-%-%]%]", ""):gsub("%-%-[^\n]*\n", "\n") -- strip comments
+    -- strip comments
+    script = script:gsub("%-%-%[%[.*%-%-%]%]", ""):gsub("%-%-[^\n]*\n", "\n")
 
     -- process script to insert call counter in every function
-
     local _use_call_code = " _G.use_call(); "
 
     local i1 = 0;

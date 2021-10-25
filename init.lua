@@ -1,35 +1,23 @@
-codeblock = {}
-
-codeblock.modpath = minetest.get_modpath("codeblock")
-codeblock.datapath = minetest.get_worldpath() .. "/lua_files/"
+codeblock = {
+    modpath = minetest.get_modpath("codeblock"),
+    datapath = minetest.get_worldpath() .. "/lua_files/"
+}
 
 if not minetest.mkdir(codeblock.datapath) then
     error("[editor] failed to create directory!")
 end
 
----------------------------------- 1:limited 2:standard 3:privileged 4:trusted
-codeblock.auth_levels =           {1,       2,       3,       4} 
-codeblock.max_calls =             {1e6,     1e7,     1e8,     1e9}
-codeblock.max_volume =            {1e5,     1e6,     1e7,     1e8}
-codeblock.max_commands =          {1e4,     1e5,     1e6,     1e7}
-codeblock.max_distance =          {150 ^ 2, 300 ^ 2, 700 ^ 2, 1500 ^ 2}
-codeblock.max_dimension =         {15,      30,      70,      150}
-codeblock.commands_before_yield = {1,       10,      20,      40}
-codeblock.default_auth_level = 1
-
-codeblock.lua_editor = lua_editor.editor:new("codeblock:lua_editor")
-
-codeblock.S = minetest.get_translator("codeblock")
-
-dofile(codeblock.modpath .. "/utils.lua")
-dofile(codeblock.modpath .. "/commands.lua")
-dofile(codeblock.modpath .. "/sandbox.lua")
+dofile(codeblock.modpath .. "/lib/intl.lua")
+dofile(codeblock.modpath .. "/lib/config.lua")
+dofile(codeblock.modpath .. "/lib/utils.lua")
+dofile(codeblock.modpath .. "/lib/filesystem.lua")
+dofile(codeblock.modpath .. "/lib/examples.lua")
 --
-dofile(codeblock.modpath .. "/drone.lua")
-dofile(codeblock.modpath .. "/drone_entity.lua")
-dofile(codeblock.modpath .. "/register.lua")
-dofile(codeblock.modpath .. "/formspecs.lua")
-dofile(codeblock.modpath .. "/examples.lua")
---
-dofile(codeblock.modpath .. "/filesystem.lua")
-dofile(codeblock.modpath .. "/editor.lua")
+dofile(codeblock.modpath .. "/lib/commands.lua")
+dofile(codeblock.modpath .. "/lib/sandbox.lua")
+dofile(codeblock.modpath .. "/lib/drone.lua")
+dofile(codeblock.modpath .. "/lib/drone_entity.lua")
+dofile(codeblock.modpath .. "/lib/register.lua")
+dofile(codeblock.modpath .. "/lib/formspecs.lua")
+
+-- dofile(codeblock.modpath .. "/lib/editor.lua")

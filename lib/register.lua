@@ -182,7 +182,6 @@ minetest.register_chatcommand("authlevel", {
 })
 
 minetest.register_chatcommand("codeblock_examples", {
-    privs = {codeblock = true},
     func = function(name, params)
 
         local pname = string.match(params, '^([%a%d_-]+)$')

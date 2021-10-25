@@ -18,12 +18,12 @@ local blocks = codeblock.utils.blocks
 local chat_send_player = minetest.chat_send_player
 local set_node = minetest.set_node
 
-local max_calls = codeblock.max_calls
-local max_volume = codeblock.max_volume
-local max_commands = codeblock.max_commands
-local max_distance = codeblock.max_distance
-local max_dimension = codeblock.max_dimension
-local commands_before_yield = codeblock.commands_before_yield
+local max_calls = codeblock.config.max_calls
+local max_volume = codeblock.config.max_volume
+local max_commands = codeblock.config.max_commands
+local max_distance = codeblock.config.max_distance
+local max_dimension = codeblock.config.max_dimension
+local commands_before_yield = codeblock.config.commands_before_yield
 
 local tmp1 = 2 * pi
 local tmp2 = pi / 2
