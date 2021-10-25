@@ -8,11 +8,13 @@ local S = codeblock.S
 
 local formspec_escape = minetest.formspec_escape
 local chat_send_all = minetest.chat_send_all
+local chat_send_player = minetest.chat_send_player
 local destroy_form = minetest.destroy_form
 local update_form = minetest.update_form
 local explode_textlist_event = minetest.explode_textlist_event
 
 local drone_set_file_from_index = codeblock.DroneEntity.set_file_from_index
+local get_file_from_index = codeblock.filesystem.get_file_from_index
 
 --------------------------------------------------------------------------------
 -- private
@@ -82,34 +84,33 @@ local file_editor = {
 
         local fs = "size[12,6.75]"
 
-        fs = fs .. 'tabheader[0,0;tabs;'
-        local oidx = 1
-        local i = 1
-        for id, v in pairs(meta.tabs) do
-            if i ~= 1 then fs = fs .. ',' end
-            fs = fs .. formspec_escape(meta.files[id])
-            if id == meta.openedId then oidx = i end
-            i = i + 1
+        if #meta.tabs ~= 0 then
+            fs = fs .. 'tabheader[0,0;tabs;'
+            for i, id in pairs(meta.tabs) do
+                if i ~= 1 then fs = fs .. ',' end
+                fs = fs .. formspec_escape(meta.files[id])
+            end
+            fs = fs .. ';' .. meta.activeN .. ';false;false]'
         end
-        fs = fs .. ';' .. oidx .. ';false;false]'
 
         fs = fs .. 'textlist[0,0;2.75,6.9;files;'
-        sidx = 0
-        for i, filename in ipairs(meta.files) do
+        for i, filename in pairs(meta.files) do
             if i ~= 1 then fs = fs .. ',' end
             fs = fs .. formspec_escape(filename)
-            if i == meta.openedId then sidx = i end
         end
-        fs = fs .. ';' .. sidx .. ']'
+        fs = fs .. ';' .. meta.activeId .. ']'
 
-        fs = fs .. 'button[3,0;1.25,0.75;save;SAVE]'
-        fs = fs .. 'button[4.25,0;1.25,0.75;load;LOAD]'
-        fs = fs .. 'button[11,0;1,0.75;close;X]'
+        if meta.activeId ~= 0 then
+            fs = fs .. 'button[3,0;1.25,0.75;save;SAVE]'
+            fs = fs .. 'button[4.25,0;1.25,0.75;load;LOAD]'
+            fs = fs .. 'button[11,0;1,0.75;close;X]'
+        end
 
-        if meta.openedId ~= 0 then
-            local text = 'TODO'
-            fs = fs .. "textarea[3.25,0.8;9,7.2;content;;" ..
-                     minetest.formspec_escape(text) .. "]"
+        if meta.activeId ~= 0 then
+            local text = formspec_escape(meta.tabsContents[meta.activeN])
+            fs = fs .. 'textarea[3.25,0.8;9,7.2;content;;' .. text .. ']'
+        else
+            fs = fs .. 'label[4.5,3;' .. S('click to select a file') .. ']'
         end
 
         return fs
@@ -120,41 +121,99 @@ local file_editor = {
         local name = player:get_player_name()
 
         local function cancel()
+            chat_send_all('cancel')
             destroy_form(name, minetest.FORMSPEC_SIGEXIT)
         end
 
-        local function save()
-            
+        local function save_active(content)
+            chat_send_all('save_active')
+            local dpath = codeblock.datapath .. name
+            local file, err = get_file_from_index(dpath, meta.activeId)
+            if err then
+                chat_send_player(name, S('no files'))
+                return
+            end
+            local fpath = dpath .. '/' .. file
+            local suc = codeblock.filesystem.write(fpath, content)
+            if not suc then
+                chat_send_player(name, S('cannot write file'))
+                return
+            end
+            meta.tabsContents[meta.activeN] = content
+            update_form(name, codeblock.formspecs.file_editor.get_form(meta))
         end
 
-        local function open()
-            
+        local function select(itab)
+            chat_send_all('select')
+            meta.activeN = itab
+            meta.activeId = meta.tabs[itab]
+            update_form(name, codeblock.formspecs.file_editor.get_form(meta))
         end
+
+        local function open(eindex)
+            chat_send_all('open')
+            local dpath = codeblock.datapath .. name
+            local file, err = get_file_from_index(dpath, eindex)
+            if err then
+                chat_send_player(name, S('no files'))
+                return
+            end
+            local fpath = dpath .. '/' .. file
+            local fcontent = codeblock.filesystem.read(fpath)
+            if fcontent:byte(1) == 27 then
+                return false, S("Error in @1", file) ..
+                           S("binary bytecode prohibited")
+            end
+
+            table.insert(meta.tabsContents, fcontent) -- load content of opened file
+            table.insert(meta.tabs, eindex) -- set active tab
+            meta.activeId = eindex -- set opened id
+            meta.activeN = #meta.tabs -- set opened id
+
+            update_form(name, codeblock.formspecs.file_editor.get_form(meta))
+        end
+
+        local function close_active(eindex)
+            chat_send_all('close_active')
+            if meta.activeN == 0 or meta.activeId == 0 then return end
+            if #meta.tabs == 0 then return end
+            table.remove(meta.tabs, meta.activeN) -- remove the tab
+            table.remove(meta.tabsContents, meta.activeN) -- remove content of closed file -- TODO save instead?
+            if #meta.tabs > 0 then
+                for i, id in pairs(meta.tabs) do -- find new activeId
+                    meta.activeId = id
+                    meta.activeN = i
+                end
+            else
+                meta.activeId = 0
+                meta.activeN = 0
+            end
+            update_form(name, codeblock.formspecs.file_editor.get_form(meta))
+        end
+
+        -- FIELDS INPUTS
 
         if fields.close then
-            meta.tabs[meta.openedId] = nil
-            for id, v in pairs(meta.tabs) do meta.openedId = id end
-            update_form(name, codeblock.formspecs.file_editor.get_form(meta))
+            local eindex = meta.activeId
+            close_active()
         elseif fields.tabs then
-            local eindex = tonumber(fields.tabs)
-            meta.openedId = eindex
+            local i = tonumber(fields.tabs)
+            select(i)
         elseif fields.files then
             local exp = explode_textlist_event(fields.files)
             local etype = exp.type
             local eindex = exp.index
             if etype == 'DCL' then
-                if type(meta.tabs[eindex]) == 'nil' then
-                    meta.tabs[eindex] = true
-                    meta.openedId = eindex
-                    update_form(name,
-                                codeblock.formspecs.file_editor.get_form(meta))
-                else
-                    meta.openedId = eindex
-                    update_form(name,
-                                codeblock.formspecs.file_editor.get_form(meta))
+                for i, id in pairs(meta.tabs) do
+                    if eindex == id then
+                        select(i)
+                        return
+                    end -- already open
                 end
+                open(eindex)
             end
-
+        elseif fields.save then
+            save_active(fields.content)
         end
 
     end

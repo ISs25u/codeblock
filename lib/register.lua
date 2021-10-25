@@ -206,10 +206,23 @@ minetest.register_chatcommand("luae", {
     privs = {codeblock = true},
     func = function(name, params)
         local fe = codeblock.formspecs.file_editor
+        local path = codeblock.datapath .. name
+        if not path then
+            chat_send_player(name, S("no file selected"))
+            return
+        end
+        local files = codeblock.filesystem.get_files(path)
+        if not files or #files == 0 then
+            chat_send_player(name, S('no files'))
+            return
+        end
+
         local meta = {
-            files = {[1] = 'file1.txt', [2] = 'file2.txt', [3] = 'file3.lua'},
-            tabs = {[2] = true, [3] = true},
-            openedId = 2
+            files = files,
+            tabs = {},
+            tabsContents = {},
+            activeId = 0,
+            activeN = 0
         }
         minetest.create_form(meta, name, fe.get_form(meta), fe.on_close)
     end
