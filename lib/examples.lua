@@ -1,5 +1,16 @@
 codeblock.examples = {}
 
+codeblock.examples.example = [[
+up(1)
+place(blocks.obsidian) 
+right(1)
+place(blocks.sandstone)
+up(1)
+place(blocks.ice)
+left(1)
+place(blocks.stonebrick)
+]]
+
 codeblock.examples.recursion = [[
 function recursion(checkpoint, block_list, MAX_DEPTH, depth)
 

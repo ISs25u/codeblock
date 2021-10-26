@@ -40,3 +40,5 @@ cancel=Annuler
 choose=Choisir
 choose a file=Choisissez un fichier :
 click to select a file=Double-cliquez sur un fichier pour l'ouvrir
+save=Enregistrer
+load and close=Charger et fermer

@@ -54,13 +54,13 @@ The parameters `nr`, `nu`, `nf` denotes movements on the 3 axis, positive values
 #### Moving drone
 
 ```lua
-up(n)
+up(n) 
 down(n)
 forward(n)
 back(n)
 left(n)
 right(n)
-move(nr, nu, nf)
+move(n_right, n_up, n_forward)
 ```
 
 Example: `move(-5, 1, 3)`
@@ -79,8 +79,8 @@ Example: `turn(2)`
 #### Checkpoints
 
 ```lua
-save(name)
-go(name, nr, nu, nf)
+save(name) -- creates a checkpoint with name `name`
+go(name, offset_right, offset_up, offset_forward) -- move Drone to checkpoint `name` with offsets
 ```
 
 Example:
@@ -143,11 +143,11 @@ Example: `local c = color(15, 1, 100)`
 
 ### Construction
 
-#### Placing one blocks
+#### Placing one block
 
 ```lua
-place(block)
-place_relative(nr, nu, nf, block, checkpoint)
+place(block) -- place one block at Drone location
+place_relative(offset_right, offset_up, offset_forward, block, checkpoint) -- place one block at checkpoint location with offsets
 ```
 
 Example:
@@ -189,8 +189,6 @@ centered.horizontal.cylinder(length, radius, block, hollow)
 
 ### Math 
 
-#### Functions
-
 ```lua
 random([m [, n]])
 round(x, num)
@@ -216,11 +214,6 @@ tan(x)
 atan(x)
 atan2(x, y)
 tanh(x)
-```
-
-#### Values
-
-```lua
 pi
 e
 ```
@@ -232,7 +225,7 @@ See documentation [here](https://github.com/ISs25u/vector3) (replacing `vector3`
 Example:
 ```lua
 local u = vector(1, 2, 3)
-local v = vector3(4, 5, 6)
+local v = vector(4, 5, 6)
 local w = (5 * u + u:dot(v) * u:cross(v:scale(5))):norm()
 local x, y, z = w:unpack()
 ```
@@ -240,8 +233,8 @@ local x, y, z = w:unpack()
 ### Misc 
 
 ```lua
-print(message)
-error(message)
-ipairs(t)
-pairs(t)
+print(message) -- print `message` in minetest chat
+error(message) -- stops the program and prints `message`
+ipairs(table)
+pairs(table)
 ```

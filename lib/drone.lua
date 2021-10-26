@@ -58,7 +58,8 @@ local drone_mt = {
             assert(type(pos) == 'table' and
                        (type(pos.x) == 'number' and type(pos.y) == 'number' and
                            type(pos.z) == 'number'), 'Wrong parameters')
-            assert(check_auth_level(auth_level), 'Wrong parameters')
+            assert(check_auth_level(auth_level),
+                   'Wrong parameters (' .. auth_level .. ')')
 
             local px, py, pz = floor(pos.x), floor(pos.y), floor(pos.z)
             local dir = (type(dir) == 'number' and dir % tmp3 == 0) and dir or 0

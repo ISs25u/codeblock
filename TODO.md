@@ -8,7 +8,8 @@
 - [ ] In-game lua code editor
 - [ ] Blockly web-based editor
 
-### v0.5.0
+
+### v0.6.0
 
 - [ ] get block at drone position
 - [ ] fix color(v,m,M) function (or remove)
@@ -17,20 +18,14 @@
 - [ ] optional depends on vector3, worldedit, wool, etc
 - [ ] function that returns a block at random in a list of blocks
 
-- minetest.set_timeofday(val)
-- minetest.emerge_area(pos1, pos2, [callback], [param])
-- minetest.fix_light(pos1, pos2)
-- minetest.hash_node_position(pos)
-- minetest.string_to_pos(pos)
-- minetest.get_position_from_hash(hash)
-- minetest.is_protected(pos, name)
-- minetest.request_insecure_environment()
+### v0.5.0
 
-Separate ?
-
-- [ ] generate flat clean world https://github.com/srifqi/superflat
-- [ ] teleport function?
-- [ ] always day, etc
+- [ ] code editor
+- [ ] editor : add checkboxes to save/load on exit (fix bug?)
+- [ ] editor : add options to create/remove files
+- [ ] filesystem : change to file names instead of indexes
+- [ ] file : put an initial simple example.lua ready to use
+- [ ] filesystem : handle removed/added files when restoring editor state
 
 ### v0.4.0
 
@@ -66,3 +61,22 @@ Separate ?
 - [x] default drone move by 1
 - [x] drone label with program
 - [x] remove drone on leave
+
+
+## Other idead
+
+- minetest.set_timeofday(val)
+- minetest.emerge_area(pos1, pos2, [callback], [param])
+- minetest.fix_light(pos1, pos2)
+- minetest.hash_node_position(pos)
+- minetest.string_to_pos(pos)
+- minetest.get_position_from_hash(hash)
+- minetest.is_protected(pos, name)
+- minetest.request_insecure_environment()
+- lua formatter ? https://github.com/LuaDevelopmentTools/luaformatter/blob/master/formatter.lua
+
+Separate ?
+
+- [ ] generate flat clean world https://github.com/srifqi/superflat
+- [ ] teleport function?
+- [ ] always day, etc
