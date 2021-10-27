@@ -11,6 +11,8 @@ local safe_file_write = minetest.safe_file_write
 local mkdir = minetest.mkdir
 local path_join = codeblock.utils.path_join
 
+local base_path = 'codeblock_users_lua_files'
+
 -------------------------------------------------------------------------------
 -- private
 -------------------------------------------------------------------------------
@@ -18,7 +20,7 @@ local path_join = codeblock.utils.path_join
 local user_data = {}
 
 local function get_file_path(name, filename)
-    return path_join(codeblock.datapath, name, filename)
+    return path_join(minetest.get_worldpath(), base_path, name, filename) -- TODO change
 end
 
 local function get_user_files(name)
@@ -67,9 +69,10 @@ local function get_itf(name, i, forceRefresh)
 end
 
 local function read_file(name, filename)
-    local file, err = io.open(filepath, "rb")
+    local path = get_file_path(name, filename)
+    local file, err = io.open(path, 'rb')
     if err then return nil, err end
-    local content = file:read("*a")
+    local content = file:read('*a')
     file:close()
     if content then
         return content

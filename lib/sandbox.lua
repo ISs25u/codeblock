@@ -383,32 +383,31 @@ end
 -- public
 --------------------------------------------------------------------------------
 
-function codeblock.sandbox.get_safe_coroutine(drone, file)
+function codeblock.sandbox.get_safe_coroutine(drone, filename)
 
     assert(drone)
-    assert(file)
+    assert(filename)
 
     local name = drone.name
-    local file = drone.file
+    local filename = drone.file
 
     -- loading file
-
-    local path = codeblock.datapath .. name .. '/' .. file
-    local untrusted_code = codeblock.filesystem.read(path)
+    local untrusted_code = codeblock.filesystem.read_file(name, filename)
 
     if not untrusted_code then
-        return false, S("Error in @1", file) .. S('@1 not found', file)
+        return false, S("Error in @1", filename) .. S('@1 not found', filename)
     end
 
     if untrusted_code:byte(1) == 27 then
-        return false, S("Error in @1", file) .. S("binary bytecode prohibited")
+        return false,
+               S("Error in @1", filename) .. S("binary bytecode prohibited")
     end
 
     -- checking forbiden things
 
     local err = check_code(untrusted_code);
 
-    if err then return false, S("Error in @1", file) .. '\n' .. err end
+    if err then return false, S("Error in @1", filename) .. '\n' .. err end
 
     -- preprocessing code
 
@@ -418,7 +417,7 @@ function codeblock.sandbox.get_safe_coroutine(drone, file)
 
     local bytecode, message = loadstring(safe_code)
     if not bytecode then
-        return false, S("Error in @1", file) .. '\n' .. message
+        return false, S("Error in @1", filename) .. '\n' .. message
     end
 
     -- return it
