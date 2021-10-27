@@ -4,8 +4,11 @@ codeblock.filesystem = {}
 -- local
 -------------------------------------------------------------------------------
 
+local S = codeblock.S
+
 local get_dir_list = minetest.get_dir_list
 local safe_file_write = minetest.safe_file_write
+local mkdir = minetest.mkdir
 local path_join = codeblock.utils.path_join
 
 -------------------------------------------------------------------------------
@@ -28,7 +31,7 @@ end
 local function get_user_data(name, forceRefresh)
     local ud
     if user_data[name] == nil or forceRefresh then
-        local itf = get_user_files(name)
+        local itf = get_user_files(name) or {}
         local ftp = {}
         local fti = {}
         for i, f in ipairs(itf) do
@@ -62,6 +65,32 @@ local function get_itf(name, i, forceRefresh)
     local ud = get_user_data(name, forceRefresh)
     return ud.itf[i]
 end
+
+local function read_file(name, filename)
+    local file, err = io.open(filepath, "rb")
+    if err then return nil, err end
+    local content = file:read("*a")
+    file:close()
+    if content then
+        return content
+    else
+        return nil, S('cannot read file') .. ' ' .. filename
+    end
+end
+
+local function write_file(name, filename, content)
+    local path = get_file_path(name, filename)
+    local success = safe_file_write(path, content)
+    if not success then return S('cannot write file') .. ' ' .. filename end
+end
+
+local function make_user_dir(name)
+    local path = path_join(codeblock.datapath, name)
+    local success = mkdir(codeblock.datapath .. name)
+    if not success then return S('Cannot create @1', path) end
+end
+
+-- old ------------------
 
 local function get_files(dirpath)
     if not dirpath then return false, "Missing argument <path>" end
@@ -100,5 +129,12 @@ codeblock.filesystem.get_files = get_files
 codeblock.filesystem.get_file_from_index = get_file_from_index
 codeblock.filesystem.read = read
 codeblock.filesystem.write = write
-codeblock.filesystem.get_user_data = get_user_data
 
+codeblock.filesystem.get_user_data = get_user_data
+codeblock.filesystem.read_file = read_file
+codeblock.filesystem.write_file = write_file
+codeblock.filesystem.get_ftp = get_ftp
+codeblock.filesystem.get_itp = get_itp
+codeblock.filesystem.get_fti = get_fti
+codeblock.filesystem.get_itf = get_itf
+codeblock.filesystem.make_user_dir = make_user_dir

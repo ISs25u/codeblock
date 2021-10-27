@@ -4,6 +4,7 @@
 local S = codeblock.S
 local get_player_by_name = minetest.get_player_by_name
 local get_pointed_thing_position = minetest.get_pointed_thing_position
+local chat_send_player = minetest.chat_send_player
 
 local drone_on_run = codeblock.DroneEntity.on_run
 local drone_on_place = codeblock.DroneEntity.on_place
@@ -35,39 +36,35 @@ end
 
 local function generate_examples(player)
 
-    local name = player:get_player_name()
-    local path = codeblock.datapath .. name
+    local name = type(player) == 'string' and player or player:get_player_name()
 
-    if not minetest.mkdir(codeblock.datapath .. name) then
-        minetest.chat_send_player(name, S('Cannot create @1', path))
-        return false
+    local err = codeblock.filesystem.make_user_dir(name)
+    if not err then
+        for ex_name, content in pairs(codeblock.examples) do
+            local filename = ex_name .. '.lua'
+            codeblock.filesystem.write_file(name, filename, content)
+        end
+        return nil
+    else
+        chat_send_player(name, err)
+        return err
     end
-
-    for ename, content in pairs(codeblock.examples) do
-        local file_path = path .. '/' .. ename .. '.lua'
-        codeblock.filesystem.write(file_path, content)
-        -- codeblock.filesystem.write(file_path, file_path)
-    end
-
-    return true
-
 end
 
 local function generate_simple_example(player)
 
-    local name = player:get_player_name()
-    local path = codeblock.datapath .. name
+    local name = type(player) == 'string' and player or player:get_player_name()
 
-    if not minetest.mkdir(codeblock.datapath .. name) then
-        minetest.chat_send_player(name, S('Cannot create @1', path))
-        return false
+    local err = codeblock.filesystem.make_user_dir(name)
+    if not err then
+        local filename = 'example.lua'
+        local content = codeblock.examples.example
+        codeblock.filesystem.write_file(name, filename, content)
+        return nil
+    else
+        chat_send_player(name, err)
+        return err
     end
-
-    local file_path = path .. '/' .. 'example.lua'
-    codeblock.filesystem.write(file_path, codeblock.examples.example)
-
-    return true
-
 end
 
 --------------------------------------------------------------------------------
@@ -130,14 +127,18 @@ minetest.register_entity("codeblock:drone", codeblock.DroneEntity)
 
 minetest.register_on_newplayer(function(player)
 
-    generate_simple_example(player)
+    -- example
+    local name = player:get_player_name()
+    generate_simple_example(name)
 
+    -- privs
     local privs = minetest.get_player_privs(player:get_player_name())
     privs.fly = true
     privs.fast = true
     privs.noclip = true
     minetest.set_player_privs(player:get_player_name(), privs)
 
+    -- meta
     local meta = player:get_meta()
     meta:set_int('codeblock:last_index', 0)
     meta:set_int('codeblock:auth_level', codeblock.config.default_auth_level)
@@ -148,18 +149,18 @@ end)
 
 minetest.register_on_joinplayer(function(player)
 
+    -- lua dir
     local name = player:get_player_name()
-    local path = codeblock.datapath .. name
-
-    if not minetest.mkdir(codeblock.datapath .. name) then
-        minetest.chat_send_player(name, S('Cannot create @1', path))
+    local err = codeblock.filesystem.make_user_dir(name)
+    if err then
+        chat_send_player(name, err)
+        return err
     end
 
+    -- tools
     set_tools(player)
 
-    minetest.chat_send_player(name,
-                              dump(codeblock.filesystem.get_user_data(name)))
-
+    -- overrides
     -- TODO: TEMP fix ?
     player:override_day_night_ratio(1)
     player:set_stars({visible = false})
@@ -167,6 +168,7 @@ minetest.register_on_joinplayer(function(player)
     player:set_moon({visible = false})
     player:set_clouds({density = 0})
 
+    -- meta
     -- TODO : carefully restore this?
     -- local meta = player:get_meta()
     -- meta:set_string('codeblock:editor_state_tabs', "")
