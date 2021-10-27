@@ -1,6 +1,6 @@
 codeblock = {
     modpath = minetest.get_modpath("codeblock"),
-    datapath = minetest.get_worldpath() .. "/lua_files/"
+    datapath = minetest.get_worldpath() .. "/codeblock_users_lua_files/"
 }
 
 if not minetest.mkdir(codeblock.datapath) then
@@ -10,6 +10,7 @@ end
 dofile(codeblock.modpath .. "/lib/intl.lua")
 dofile(codeblock.modpath .. "/lib/config.lua")
 dofile(codeblock.modpath .. "/lib/utils.lua")
+dofile(codeblock.modpath .. "/lib/pathjoin.lua")
 dofile(codeblock.modpath .. "/lib/filesystem.lua")
 dofile(codeblock.modpath .. "/lib/examples.lua")
 --

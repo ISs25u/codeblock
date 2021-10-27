@@ -157,6 +157,9 @@ minetest.register_on_joinplayer(function(player)
 
     set_tools(player)
 
+    minetest.chat_send_player(name,
+                              dump(codeblock.filesystem.get_user_data(name)))
+
     -- TODO: TEMP fix ?
     player:override_day_night_ratio(1)
     player:set_stars({visible = false})
