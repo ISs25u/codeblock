@@ -15,6 +15,10 @@ local drone_set = codeblock.Drone.set
 local drone_rmv = codeblock.Drone.remove
 local drone_new = codeblock.Drone.new
 
+local get_user_data = codeblock.filesystem.get_user_data
+local read_file = codeblock.filesystem.read_file
+local exists = codeblock.filesystem.exists
+
 local split = codeblock.utils.split
 local get_safe_coroutine = codeblock.sandbox.get_safe_coroutine
 
@@ -124,15 +128,15 @@ function DroneEntity.on_place(name, pos)
 
     local dir = dirtocardinal(player:get_look_horizontal())
 
-    local last_index = player:get_meta():get_int('codeblock:last_index')
+    local last_file = player:get_meta():get_string('codeblock:last_file')
     local auth_level = player:get_meta():get_int('codeblock:auth_level')
 
     drone_new(name, pos, dir, auth_level)
 
-    if not last_index or last_index == 0 then
+    if (not last_file) or last_file == "" then
         DroneEntity.show_set_file_form(name)
     else
-        DroneEntity.set_file_from_index(name, last_index)
+        DroneEntity.set_file(name, last_file)
     end
 
 end
@@ -187,61 +191,28 @@ function DroneEntity.on_remove(name)
 
 end
 
--- assume Drone exists
-function DroneEntity.set_file_from_index(name, index)
+function DroneEntity.set_file(name, filename)
 
-    local path = codeblock.datapath .. name
+    local player = get_player_by_name(name)
 
-    local file, err = codeblock.filesystem.get_file_from_index(path, index)
+    local err = exists(name, filename)
 
-    if err then return S('no files') end
+    if err then
+        chat_send_player(name, err)
+        return err
+    end
 
+    -- set the drone file if drone exist
     local drone = drone_get(name)
     if drone then
-        drone.file = file
+        drone.file = filename
         drone:update_entity()
     end
 
-    local player = get_player_by_name(name)
-    if player then player:get_meta():set_int('codeblock:last_index', index) end
-
-    return nil
-
-end
-
-function DroneEntity.read_file_from_index(name, index)
-
-    local dpath = codeblock.datapath .. name
-
-    local file, err = codeblock.filesystem.get_file_from_index(dpath, index)
-
-    if err then return true, S('no files') end
-
-    local fpath = dpath .. '/' .. file
-
-    local fcontent = codeblock.filesystem.read(fpath)
-
-    if fcontent:byte(1) == 27 then
-        return true, S("Error in @1", file) .. S('binary bytecode prohibited')
+    -- set last_file for next drone placing
+    if player then
+        player:get_meta():set_string('codeblock:last_file', filename)
     end
-
-    return fcontent
-
-end
-
-function DroneEntity.write_file_from_index(name, index, content)
-
-    local dpath = codeblock.datapath .. name
-
-    local file, err = codeblock.filesystem.get_file_from_index(dpath, index)
-
-    if err then return S('no files') end
-
-    local fpath = dpath .. '/' .. file
-
-    local suc = codeblock.filesystem.write(fpath, content)
-
-    if not suc then return S('cannot write file') end
 
     return nil
 
@@ -249,84 +220,63 @@ end
 
 function DroneEntity.show_set_file_form(name)
 
+    local ud = codeblock.filesystem.get_user_data(name)
+    local meta = {name = name, selectedIndex = 0}
     local fs = codeblock.formspecs.file_chooser
-    local path = codeblock.datapath .. name
-
-    if not path then
-        chat_send_player(name, S("no file selected"))
-        return
-    end
-
-    local files = codeblock.filesystem.get_files(path)
-
-    if not files or #files == 0 then
-        chat_send_player(name, S('no files'))
-        return
-    end
-
-    local meta = {files = files, selectedIndex = 0}
-
     minetest.create_form(meta, name, fs.get_form(meta), fs.on_close)
 
 end
 
 function DroneEntity.show_file_editor_form(name)
 
-    local fe = codeblock.formspecs.file_editor
-    local path = codeblock.datapath .. name
-
-    if not path then
-        chat_send_player(name, S("no file selected"))
-        return
-    end
-
-    local files = codeblock.filesystem.get_files(path)
-
-    if not files or #files == 0 then
-        chat_send_player(name, S('no files'))
-        return
-    end
+    local ud = codeblock.filesystem.get_user_data(name, true)
 
     -- load saved state
-
     local tabs = {}
-    local tabsContents = {}
-    local activeN = 0
-    local activeId = 0
-
+    local contents = {}
+    local active = 0
+    local soe = false
+    local loe = false
+    local sos = false
     local player = get_player_by_name(name)
     if player then
-        -- load tabs
-        local stabs = {}
-        local es = player:get_meta():get_string('codeblock:editor_state_tabs')
-        if es and es ~= "" then stabs = split(es, ',') end
-        local id, content
-        for i, sid in pairs(stabs) do
-            id = tonumber(sid)
-            content = DroneEntity.read_file_from_index(name, id)
-            table.insert(tabs, id)
-            table.insert(tabsContents, content)
-        end
-
-        -- load active tab
-        activeId = player:get_meta():get_int('codeblock:editor_state_active')
-        for i, id in pairs(tabs) do
-            if id == activeId then
-                activeN = i
-                break
+        local meta = player:get_meta()
+        soe = meta:get_int('codeblock:save_on_exit')
+        loe = meta:get_int('codeblock:load_on_exit')
+        sos = meta:get_int('codeblock:save_on_switch')
+        local saved_active = meta:get_string('codeblock:editor_state_active')
+        local saved_tabs = meta:get_string('codeblock:editor_state_tabs')
+        if saved_tabs ~= "" then
+            local pot_tabs = split(saved_tabs, ',')
+            for i, filename in ipairs(pot_tabs) do
+                if ud.ftp[filename] then
+                    local content, err = read_file(name, filename, true)
+                    if not err then
+                        table.insert(tabs, filename)
+                        table.insert(contents, content)
+                        if saved_active ~= "" and filename == saved_active then
+                            active = #tabs
+                        end
+                    else
+                        chat_send_player(name, err)
+                    end
+                end
             end
         end
-        if activeN == 0 then activeId = 0 end
     end
 
     local meta = {
-        files = files,
+        name = name,
         tabs = tabs,
-        tabsContents = tabsContents,
-        activeId = activeId,
-        activeN = activeN
+        contents = contents,
+        active = active,
+        soe = soe,
+        loe = loe,
+        sos = sos
     }
+    local fe = codeblock.formspecs.file_editor
     minetest.create_form(meta, name, fe.get_form(meta), fe.on_close)
+    -- minetest.get_form_timer(name).start(1)
 
 end
 

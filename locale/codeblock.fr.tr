@@ -42,3 +42,4 @@ choose a file=Choisissez un fichier :
 click to select a file=Double-cliquez sur un fichier pour l'ouvrir
 save=Enregistrer
 load and close=Charger et fermer
+no such file @1=Le fichier @1 n'existe pas

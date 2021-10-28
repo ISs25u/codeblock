@@ -42,3 +42,4 @@ choose a file=Choose a file:
 click to select a file=Double click a file to open it
 save=Save
 load and close=Load and close
+no such file @1=File @1 does not exists

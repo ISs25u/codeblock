@@ -11,10 +11,13 @@ local drone_on_place = codeblock.DroneEntity.on_place
 local drone_on_remove = codeblock.DroneEntity.on_remove
 local drone_show_set_file_form = codeblock.DroneEntity.show_set_file_form
 local drone_show_file_editor_form = codeblock.DroneEntity.show_file_editor_form
-local drone_set_file_from_index = codeblock.DroneEntity.set_file_from_index
-local drone_read_file_from_index = codeblock.DroneEntity.read_file_from_index
-local drone_write_file_from_index = codeblock.DroneEntity.write_file_from_index
+
 local check_auth_level = codeblock.utils.check_auth_level
+
+local get_user_data = codeblock.filesystem.get_user_data
+local write_file = codeblock.filesystem.write_file
+local remove_user_data = codeblock.filesystem.remove_user_data
+local make_user_dir = codeblock.filesystem.make_user_dir
 
 --------------------------------------------------------------------------------
 -- private
@@ -38,11 +41,11 @@ local function generate_examples(player)
 
     local name = type(player) == 'string' and player or player:get_player_name()
 
-    local err = codeblock.filesystem.make_user_dir(name)
+    local err = make_user_dir(name)
     if not err then
         for ex_name, content in pairs(codeblock.examples) do
             local filename = ex_name .. '.lua'
-            codeblock.filesystem.write_file(name, filename, content)
+            write_file(name, filename, content)
         end
         return nil
     else
@@ -55,11 +58,11 @@ local function generate_simple_example(player)
 
     local name = type(player) == 'string' and player or player:get_player_name()
 
-    local err = codeblock.filesystem.make_user_dir(name)
+    local err = make_user_dir(name)
     if not err then
         local filename = 'example.lua'
         local content = codeblock.examples.example
-        codeblock.filesystem.write_file(name, filename, content)
+        write_file(name, filename, content)
         return nil
     else
         chat_send_player(name, err)
@@ -141,21 +144,26 @@ minetest.register_on_newplayer(function(player)
     -- meta
     local meta = player:get_meta()
     meta:set_int('codeblock:last_index', 0)
+    meta:set_string('codeblock:last_file', "")
     meta:set_int('codeblock:auth_level', codeblock.config.default_auth_level)
     meta:set_string('codeblock:editor_state_tabs', "")
-    meta:set_int('codeblock:editor_state_active', 0)
+    meta:set_string('codeblock:editor_state_active', 0)
+    meta:set_int('codeblock:save_on_exit', 0)
+    meta:set_int('codeblock:load_on_exit', 0)
+    meta:set_int('codeblock:save_on_switch', 0)
 
 end)
 
 minetest.register_on_joinplayer(function(player)
 
-    -- lua dir
+    -- create lua dir and initialize user_data
     local name = player:get_player_name()
-    local err = codeblock.filesystem.make_user_dir(name)
+    local err = make_user_dir(name)
     if err then
         chat_send_player(name, err)
         return err
     end
+    get_user_data(name)
 
     -- tools
     set_tools(player)
@@ -168,6 +176,13 @@ minetest.register_on_joinplayer(function(player)
     player:set_moon({visible = false})
     player:set_clouds({density = 0})
 
+    -- local meta = player:get_meta()
+    -- meta:set_int('codeblock:last_index', 0)
+    -- meta:set_string('codeblock:last_file', "")
+    -- meta:set_int('codeblock:auth_level', codeblock.config.default_auth_level)
+    -- meta:set_string('codeblock:editor_state_tabs', "")
+    -- meta:set_string('codeblock:editor_state_active', 0)
+
     -- meta
     -- TODO : carefully restore this?
     -- local meta = player:get_meta()
@@ -179,6 +194,7 @@ end)
 minetest.register_on_leaveplayer(function(player, timed_out)
     local name = player:get_player_name()
     drone_on_remove(name)
+    remove_user_data(name)
 end)
 
 --------------------------------------------------------------------------------
@@ -222,11 +238,11 @@ minetest.register_chatcommand("codeblock_examples", {
         local player = get_player_by_name(pname or name or '')
 
         if player then
-            local res = generate_examples(player)
-            if res then
-                return true, S('examples generated')
-            else
+            local err = generate_examples(player)
+            if err then
                 return false, S('error')
+            else
+                return true, S('examples generated')
             end
         else
             return false, S('Player not found')
