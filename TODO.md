@@ -8,8 +8,7 @@
 - [ ] In-game lua code editor
 - [ ] Blockly web-based editor
 
-
-### v0.6.0
+### v.later
 
 - [ ] get block at drone position
 - [ ] fix color(v,m,M) function (or remove)
@@ -17,15 +16,18 @@
 - [ ] make mod configurable
 - [ ] optional depends on vector3, worldedit, wool, etc
 - [ ] function that returns a block at random in a list of blocks
+- [ ] add help next to code editor (commands and block list)
 
 ### v0.5.0
 
-- [ ] code editor
-- [ ] editor : add checkboxes to save/load on exit (fix bug?)
+- [ ] check player metaa state on join
+- [ ] change to 'close file'
+- [ ] checkboxes translations
 - [ ] editor : add options to create/remove files
-- [ ] filesystem : change to file names instead of indexes
-- [ ] file : put an initial simple example.lua ready to use
-- [ ] filesystem : handle removed/added files when restoring editor state
+- [x] editor : add checkboxes to save/load on exit (fix bug?)
+- [x] filesystem : change to file names instead of indexes
+- [x] file : put an initial simple example.lua ready to use
+- [x] filesystem : handle removed/added files when restoring editor state
 
 ### v0.4.0
 
@@ -63,19 +65,17 @@
 - [x] remove drone on leave
 
 
-## Other idead
+## Other ideas
 
 - minetest.set_timeofday(val)
 - minetest.emerge_area(pos1, pos2, [callback], [param])
 - minetest.fix_light(pos1, pos2)
-- minetest.hash_node_position(pos)
-- minetest.string_to_pos(pos)
-- minetest.get_position_from_hash(hash)
 - minetest.is_protected(pos, name)
-- minetest.request_insecure_environment()
-- lua formatter ? https://github.com/LuaDevelopmentTools/luaformatter/blob/master/formatter.lua
+- format lua when saving ? https://github.com/LuaDevelopmentTools/luaformatter/blob/master/formatter.lua
+- render code with html widget? (highlight)
+- show line error on save?
 
-Separate ?
+Game
 
 - [ ] generate flat clean world https://github.com/srifqi/superflat
 - [ ] teleport function?
