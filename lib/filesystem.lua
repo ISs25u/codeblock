@@ -194,3 +194,4 @@ codeblock.filesystem.get_itf = get_itf
 codeblock.filesystem.get_ftc = get_ftc
 codeblock.filesystem.get_itc = get_itc
 codeblock.filesystem.make_user_dir = make_user_dir
+codeblock.filesystem.data_path = data_path

@@ -5,10 +5,6 @@ codeblock = {
     is_wool_enabled = (minetest.get_modpath('wool') ~= nil)
 }
 
-if not minetest.mkdir(codeblock.datapath) then
-    error("[editor] failed to create directory!")
-end
-
 dofile(codeblock.modpath .. "/lib/intl.lua")
 dofile(codeblock.modpath .. "/lib/config.lua")
 dofile(codeblock.modpath .. "/lib/utils.lua")
@@ -22,3 +18,8 @@ dofile(codeblock.modpath .. "/lib/drone.lua")
 dofile(codeblock.modpath .. "/lib/drone_entity.lua")
 dofile(codeblock.modpath .. "/lib/formspecs.lua")
 dofile(codeblock.modpath .. "/lib/register.lua")
+
+
+if not minetest.mkdir(codeblock.filesystem.data_path) then
+    error("[editor] failed to create directory!")
+end

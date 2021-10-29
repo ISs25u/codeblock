@@ -193,6 +193,8 @@ end
 
 function DroneEntity.set_file(name, filename)
 
+    assert(filename)
+
     local player = get_player_by_name(name)
 
     local err = exists(name, filename)

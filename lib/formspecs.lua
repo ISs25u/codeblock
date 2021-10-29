@@ -95,7 +95,9 @@ local file_editor = {
         end
 
         local function load_active()
-            set_file(name, meta.tabs[meta.active])
+            if meta.active ~= 0 then
+                set_file(name, meta.tabs[meta.active])
+            end
         end
 
         local function save_active()

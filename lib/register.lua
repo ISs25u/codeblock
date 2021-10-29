@@ -206,17 +206,32 @@ minetest.register_privilege("codeblock", {
     give_to_singleplayer = false
 })
 
-minetest.register_chatcommand("authlevel", {
+minetest.register_chatcommand("codelevel", {
     privs = {codeblock = true},
     func = function(name, params)
 
-        local pname, pal = string.match(params, '^([%a%d_-]+) (%d)$')
+        local pname, pal
+        pname, pal = string.match(params, '([%w_-]*)%s*([%d]*)')
+        if type(tonumber(pname)) == 'number' and pal == '' then -- autoname
+            pal = tonumber(pname)
+            if minetest.is_singleplayer() then
+                pname = 'singleplayer'
+            else
+                pname = name
+            end
+        elseif type(pname) == 'string' and type(pal) == 'string' then
+            if pname == '' and pal == '' then
+                chat_send_player(name, S('codelevel usage'))
+                return
+            else
+                pal = tonumber(pal)
+            end
+        end
 
-        local valid_al, al = check_auth_level(tonumber(pal))
+        local valid, al = check_auth_level(tonumber(pal))
 
-        local player = get_player_by_name(pname or '')
-
-        if valid_al then
+        if valid then
+            local player = get_player_by_name(pname or '')
             if player then
                 player:get_meta():set_int('codeblock:auth_level', al)
                 return true, S('@1 auth_level set to @2', pname, al)
@@ -230,13 +245,20 @@ minetest.register_chatcommand("authlevel", {
     end
 })
 
-minetest.register_chatcommand("codeblock_examples", {
+minetest.register_chatcommand("codegenerate", {
     func = function(name, params)
 
-        local pname = string.match(params, '^([%a%d_-]+)$')
+        local pname = string.match(params, '([%w_-]*)')
 
-        local player = get_player_by_name(pname or name or '')
+        if pname == '' then
+            if minetest.is_singleplayer() then
+                pname = 'singleplayer'
+            else
+                pname = name
+            end
+        end
 
+        local player = get_player_by_name(pname or '')
         if player then
             local err = generate_examples(player)
             if err then
@@ -250,13 +272,6 @@ minetest.register_chatcommand("codeblock_examples", {
 
     end
 })
-
--- minetest.register_chatcommand("luae", {
---     privs = {codeblock = true},
---     func = function(name, params)
-
---     end
--- })
 
 --------------------------------------------------------------------------------
 -- formspecs
