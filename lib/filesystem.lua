@@ -10,8 +10,7 @@ local get_dir_list = minetest.get_dir_list
 local safe_file_write = minetest.safe_file_write
 local mkdir = minetest.mkdir
 local path_join = codeblock.utils.path_join
-
-local base_path = 'codeblock_users_lua_files'
+local data_path = path_join(minetest.get_worldpath(), codeblock.config.lua_dir)
 
 -------------------------------------------------------------------------------
 -- private
@@ -20,11 +19,11 @@ local base_path = 'codeblock_users_lua_files'
 local user_data = {}
 
 local function get_file_path(name, filename)
-    return path_join(minetest.get_worldpath(), base_path, name, filename) -- TODO change
+    return path_join(data_path, name, filename)
 end
 
 local function get_user_files(name)
-    local path = path_join(codeblock.datapath, name)
+    local path = path_join(data_path, name)
     local files = get_dir_list(path, false)
     table.sort(files)
     return files
@@ -169,8 +168,8 @@ local function exists(name, filename, forceRefresh)
 end
 
 local function make_user_dir(name)
-    local path = path_join(codeblock.datapath, name)
-    local success = mkdir(codeblock.datapath .. name)
+    local path = path_join(data_path, name)
+    local success = mkdir(path)
     if not success then return S('Cannot create @1', path) end
 end
 

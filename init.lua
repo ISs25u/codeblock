@@ -1,6 +1,8 @@
 codeblock = {
-    modpath = minetest.get_modpath("codeblock"),
-    datapath = minetest.get_worldpath() .. "/codeblock_users_lua_files/"
+    modpath = minetest.get_modpath('codeblock'),
+    is_vector3_enabled = (minetest.get_modpath('vector3') ~= nil),
+    is_worldedit_enabled = (minetest.get_modpath('worldedit') ~= nil),
+    is_wool_enabled = (minetest.get_modpath('wool') ~= nil)
 }
 
 if not minetest.mkdir(codeblock.datapath) then

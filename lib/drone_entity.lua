@@ -220,7 +220,7 @@ end
 
 function DroneEntity.show_set_file_form(name)
 
-    local ud = codeblock.filesystem.get_user_data(name)
+    local ud = get_user_data(name)
     local meta = {name = name, selectedIndex = 0}
     local fs = codeblock.formspecs.file_chooser
     minetest.create_form(meta, name, fs.get_form(meta), fs.on_close)
@@ -229,7 +229,7 @@ end
 
 function DroneEntity.show_file_editor_form(name)
 
-    local ud = codeblock.filesystem.get_user_data(name, true)
+    local ud = get_user_data(name, true)
 
     -- load saved state
     local tabs = {}

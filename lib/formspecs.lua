@@ -17,12 +17,7 @@ local get_player_by_name = minetest.get_player_by_name
 local get_user_data = codeblock.filesystem.get_user_data
 local read_file = codeblock.filesystem.read_file
 local write_file = codeblock.filesystem.write_file
-local get_ftp = codeblock.filesystem.get_ftp
-local get_itp = codeblock.filesystem.get_itp
-local get_fti = codeblock.filesystem.get_fti
 local get_itf = codeblock.filesystem.get_itf
-local get_ftc = codeblock.filesystem.get_ftc
-local get_itc = codeblock.filesystem.get_itc
 
 local set_file = codeblock.DroneEntity.set_file
 

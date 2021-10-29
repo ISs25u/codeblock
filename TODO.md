@@ -20,7 +20,7 @@
 
 ### v0.5.0
 
-- [ ] check player metaa state on join
+- [ ] check player meta state on join
 - [ ] change to 'close file'
 - [ ] checkboxes translations
 - [ ] editor : add options to create/remove files
