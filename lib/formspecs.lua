@@ -17,7 +17,9 @@ local get_player_by_name = minetest.get_player_by_name
 local get_user_data = codeblock.filesystem.get_user_data
 local read_file = codeblock.filesystem.read_file
 local write_file = codeblock.filesystem.write_file
+local remove_file = codeblock.filesystem.remove_file
 local get_itf = codeblock.filesystem.get_itf
+local get_fti = codeblock.filesystem.get_fti
 
 local set_file = codeblock.DroneEntity.set_file
 
@@ -34,6 +36,11 @@ local file_editor = {
         local ud = get_user_data(meta.name)
         local fs = "size[16,10.5]"
 
+        -- styles 
+        fs = fs .. 'style[remove;bgcolor=red]'
+        fs = fs .. 'style[content;font=mono;font_size=-2;textcolor=#115555]'
+        fs = fs .. 'style[create;bgcolor=green]'
+
         -- tabs
         if #meta.tabs > 0 then
             fs = fs .. 'tabheader[0,0;tabs;'
@@ -45,27 +52,35 @@ local file_editor = {
         end
 
         -- files
-        fs = fs .. 'textlist[0, 0; 3, 10;files;'
+        fs = fs .. 'textlist[0, 0; 3, 8.75;files;'
         for i, filename in ipairs(ud.itf) do
             if i ~= 1 then fs = fs .. ',' end
             fs = fs .. formspec_escape(filename)
         end
         fs = fs .. ';' .. (ud.fti[meta.tabs[meta.active]] or 0) .. ']'
 
+        -- new file
+        fs = fs .. 'field_close_on_enter[newfile;false]'
+        fs = fs .. 'field[0.27, 9.5;2.5, 1;newfile;' .. S('new file') .. ';' ..
+                 meta.newfile .. ']'
+        fs = fs .. 'button[2.25, 9.20;1, 1;create;+]'
+
         -- buttons
         if meta.active ~= 0 then
             fs = fs .. 'button[3.25 ,0 ;2 ,0.75;save;' .. S('save') .. ']'
             fs = fs .. 'button[5.25 ,0 ;3 ,0.75;load;' .. S('load and close') ..
                      ']'
-            fs = fs .. 'button[15,0;1,0.75;close;X]'
+            fs = fs .. 'button[8.25 ,0;3, 0.75;remove;' .. S('remove file') ..
+                     ']'
+            fs = fs .. 'button[13   ,0;3, 0.75;close;' .. S('close tab') .. ']'
         end
 
         -- checkboxes
         -- fs = fs .. 'checkbox[0,10;soe;Save on exit;' ..
         --          (meta.soe == 0 and 'false' or 'true') .. ']'
-        fs = fs .. 'checkbox[0,10;loe;Load on exit;' ..
+        fs = fs .. 'checkbox[0,10;loe;' .. S('load and exit') .. ';' ..
                  (meta.loe == 0 and 'false' or 'true') .. ']'
-        fs = fs .. 'checkbox[3,10;sos;Save on switch;' ..
+        fs = fs .. 'checkbox[5,10;sos;' .. S('Save on switch') .. ';' ..
                  (meta.sos == 0 and 'false' or 'true') .. ']'
 
         -- textarea
@@ -106,6 +121,24 @@ local file_editor = {
             if err then chat_send_player(name, err) end
         end
 
+        local function remove_active()
+            if meta.active == 0 then return end
+            if #meta.tabs == 0 then return end
+            local err = remove_file(name, meta.tabs[meta.active])
+            if err then
+                chat_send_player(name, err)
+            else
+                table.remove(meta.tabs, meta.active)
+                table.remove(meta.contents, meta.active)
+                meta.active = 0
+                if #meta.tabs > 0 then
+                    for i, filename in ipairs(meta.tabs) do
+                        meta.active = i
+                    end
+                end
+            end
+        end
+
         local function update_active_content(content)
             meta.contents[meta.active] = content
         end
@@ -122,6 +155,24 @@ local file_editor = {
             else
                 chat_send_player(name, err)
             end
+        end
+
+        local function create_file(filename)
+            if (not filename) or filename == '' then return nil end
+            local parts = codeblock.utils.split(filename, '.')
+            if #parts > 0 then
+                filename = parts[1]
+                filename = string.gsub(filename, '[^%w_-]', '')
+                filename = string.sub(filename, 1, 15)
+                filename = filename .. '.lua'
+                if not get_user_data(name).ftp[filename] then
+                    write_file(name, filename,
+                               '-- ' .. filename .. '\n\nup()\nplace()\n')
+                    meta.newfile = ''
+                    return filename
+                end
+            end
+            return nil
         end
 
         local function close_active()
@@ -171,6 +222,15 @@ local file_editor = {
             update_active_content(fields.content)
             save_active()
             update()
+        elseif fields.create then
+            local filename = create_file(fields.newfile)
+            if filename then
+                open(get_fti(name, filename))
+                update()
+            end
+        elseif fields.remove then
+            remove_active()
+            update()
         elseif fields.soe then
             meta.soe = (fields.soe == 'true') and 1 or 0
             update()
@@ -200,6 +260,12 @@ local file_editor = {
         elseif fields.quit == 'true' then -- fields.content cannot be accessed here
             if meta.loe then load_active() end
             save_editor_state()
+        elseif fields.newfile then -- last because sent everytime
+            local filename = create_file(fields.newfile)
+            if filename then
+                open(get_fti(name, filename))
+                update()
+            end
         end
 
     end

@@ -141,10 +141,11 @@ local function read_file(name, filename, forceRefresh)
 end
 
 local function write_file(name, filename, content)
+    local content = content or ''
     local path = get_file_path(name, filename)
     local success = safe_file_write(path, content)
     if success then
-        if user_data[name].ftp then
+        if user_data[name].ftp[filename] then
             user_data[name].ftc[filename] = content
             return nil
         else
@@ -167,6 +168,18 @@ local function exists(name, filename, forceRefresh)
     end
 end
 
+local function remove_file(name, filename)
+    if user_data[name].ftp[filename] then
+        local nul, err = os.remove(get_file_path(name, filename))
+        if err then
+            return S('failed remove file @1', filename)
+        else
+            get_user_data(name, true)
+            return nil
+        end
+    end
+end
+
 local function make_user_dir(name)
     local path = path_join(data_path, name)
     local success = mkdir(path)
@@ -186,6 +199,7 @@ codeblock.filesystem.get_user_data = get_user_data
 codeblock.filesystem.remove_user_data = remove_user_data
 codeblock.filesystem.read_file = read_file
 codeblock.filesystem.write_file = write_file
+codeblock.filesystem.remove_file = remove_file
 codeblock.filesystem.exists = exists
 codeblock.filesystem.get_ftp = get_ftp
 codeblock.filesystem.get_itp = get_itp

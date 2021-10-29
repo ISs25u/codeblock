@@ -274,7 +274,8 @@ function DroneEntity.show_file_editor_form(name)
         active = active,
         soe = soe,
         loe = loe,
-        sos = sos
+        sos = sos,
+        newfile = ''
     }
     local fe = codeblock.formspecs.file_editor
     minetest.create_form(meta, name, fe.get_form(meta), fe.on_close)
