@@ -17,6 +17,8 @@
 - [ ] optional depends on vector3, worldedit, wool, etc
 - [ ] function that returns a block at random in a list of blocks
 - [ ] add help next to code editor (commands and block list)
+- [ ] option to set drone default block to place!
+- [ ] option to pause the drone a certain time?
 
 ### v0.5.0
 
