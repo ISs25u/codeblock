@@ -5,7 +5,7 @@
 - [x] User associated filesystem to store programs
 - [x] Allow to set drone's file with in-game interface + remember last program started
 - [x] Control drone operating speed
-- [ ] In-game lua code editor
+- [x] In-game lua code editor
 - [ ] Blockly web-based editor
 
 ### v.later
@@ -20,10 +20,11 @@
 
 ### v0.5.0
 
-- [ ] check player meta state on join
-- [ ] change to 'close file'
-- [ ] checkboxes translations
-- [ ] editor : add options to create/remove files
+- [ ] update README (commands, directory)
+- [x] check player meta state on join
+- [x] editor : add options to create/remove files
+- [x] change to 'close file'
+- [x] checkboxes translations
 - [x] editor : add checkboxes to save/load on exit (fix bug?)
 - [x] filesystem : change to file names instead of indexes
 - [x] file : put an initial simple example.lua ready to use

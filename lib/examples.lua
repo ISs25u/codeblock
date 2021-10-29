@@ -1,14 +1,11 @@
 codeblock.examples = {}
 
 codeblock.examples.example = [[
-up(1)
-place(blocks.obsidian) 
-right(1)
-place(blocks.sandstone)
-up(1)
-place(blocks.ice)
-left(1)
-place(blocks.stonebrick)
+for i = 1, 10 do
+    place(blocks.obsidian)
+    up(1)
+    forward(1)
+end
 ]]
 
 codeblock.examples.recursion = [[

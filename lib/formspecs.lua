@@ -62,7 +62,7 @@ local file_editor = {
         -- new file
         fs = fs .. 'field_close_on_enter[newfile;false]'
         fs = fs .. 'field[0.27, 9.5;2.5, 1;newfile;' .. S('new file') .. ';' ..
-                 meta.newfile .. ']'
+                 formspec_escape(meta.newfile) .. ']'
         fs = fs .. 'button[2.25, 9.20;1, 1;create;+]'
 
         -- buttons
@@ -164,10 +164,11 @@ local file_editor = {
                 filename = parts[1]
                 filename = string.gsub(filename, '[^%w_-]', '')
                 filename = string.sub(filename, 1, 15)
+                if #filename == 0 then return end
                 filename = filename .. '.lua'
                 if not get_user_data(name).ftp[filename] then
-                    write_file(name, filename,
-                               '-- ' .. filename .. '\n\nup()\nplace()\n')
+                    write_file(name, filename, '-- ' .. filename .. '\n\n' ..
+                                   codeblock.examples.example .. '\n')
                     meta.newfile = ''
                     return filename
                 end
@@ -278,7 +279,7 @@ local file_chooser = {
 
     get_form = function(meta)
         local files_txt = {}
-        for i, filename in ipairs(get_user_data(name).itf) do
+        for i, filename in ipairs(get_user_data(meta.name).itf) do
             table.insert(files_txt, formspec_escape(filename))
         end
         files_txt = table.concat(files_txt, ',')

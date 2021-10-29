@@ -12,19 +12,33 @@ CodeBlock
 
 ![screenshot](screenshot.png)
 
-## Tools usage
+## Quick start
 
-1. Create an empty (flat) world and enable `codeblock` mod ant its dependencies
+### Run your first program
+
+1. Create an empty (flat) world, enable `codeblock` mod ant its dependencies
 2. Enable creative mode and start the game
-3. Right click with the `drone_poser` tool on a block, choose a `lua` program to run, then left click to start the drone
-4. Right click with the `drone_setter` tool to change which program your are using, or left click with it to stop and remove the drone
-5. Write your own programs in `~/.minetest/worlds/<worldname>/codeblock_lua_files/<user>/<filename.lua>`, they will appear when right clicking with the `drone_setter`
+3. Right click with ![License](https://github.com/gigaturbo/codeblock/blob/master/textures/dp32.png) tool on a block, choose a `example.lua`, then left click with ![License](https://github.com/gigaturbo/codeblock/blob/master/textures/dp32.png) to start the drone
 
-## Authlevel
+### Write your first program
 
-Drone capacity depends on the user's _authlevel_ which can be set with the `/authlevel` command (see below). The higher the authlevel the quicker is the drone and the heavier the load on the server. High authlevel should be given carefully to users. Default authlevel is 1.
+1. Right click with ![License](https://github.com/gigaturbo/codeblock/blob/master/textures/ds32.png) tool to open the `lua` editor
+2. Create a new file with the `new file` field and write some code on the main window
+3. Click `load and exit` to load your code in the drone
+4. Right click with ![License](https://github.com/gigaturbo/codeblock/blob/master/textures/dp32.png) tool on a block, your code is already loaded. Run it with a left click on ![License](https://github.com/gigaturbo/codeblock/blob/master/textures/dp32.png)
 
-| authlevel     | 1 (limited) | 2 (basic) | 3 (privileged) | 4 (trusted) |                                                                      |
+### More examples
+
+1. Generate built-in examples by tyoing in chat: `/codegenerate`
+2. Open the `lua` editor and choose an example to run
+3. Some examples require greater permisison to be run : grant yourself the mod permission with `/grantme codeblock` and use `/codelevel 4` to grant you full power
+4. Read the API below to know which commands you can use!
+
+## Codelevel
+
+Drone capacities depends on the user's _codelevel_ which can be set with the `/codelevel` command (see below). The higher the codelevel the quicker is the drone and the heavier the load on the server. High codelevel should be given carefully to users. Default codelevel is 1.
+
+| codelevel     | 1 (limited) | 2 (basic) | 3 (privileged) | 4 (trusted) |                                                                      |
 |---------------|-------------|-----------|----------------|-------------|----------------------------------------------------------------------|
 | max_calls     |         1e6 |       1e7 |            1e8 |         1e9 | max number of calls (function calls and loops)                       |
 | max_volume    |         1e5 |       1e6 |            1e7 |         1e8 | max build volume (1 block = 1m³)                                     |
@@ -34,13 +48,13 @@ Drone capacity depends on the user's _authlevel_ which can be set with the `/aut
 
 ## Chat commands
 
-#### `/authlevel <playername> <1-4>`
+#### `/codelevel <playername> <1-4>`
 
-Set the authlevel of an user. Requires the `codeblock` privilege (`/grant <user> codeblock`).
+Set the codelevel of an user. Requires the `codeblock` privilege (`/grant <user> codeblock`).
 
-#### `/codeblock_examples`
+#### `/codegenerate`
 
-Generates the examples programs in `~/.minetest/worlds/<worldname>/codeblock_lua_files/<user>/` for the user issuing the command.
+Generates the examples programs in for the user issuing the command.
 
 ## Lua api
 

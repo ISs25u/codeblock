@@ -37,9 +37,7 @@ local function set_tools(player)
     inv:add_item('main', ItemStack('codeblock:setter'))
 end
 
-local function generate_examples(player)
-
-    local name = type(player) == 'string' and player or player:get_player_name()
+local function generate_examples(name)
 
     local err = make_user_dir(name)
     if not err then
@@ -54,9 +52,7 @@ local function generate_examples(player)
     end
 end
 
-local function generate_simple_example(player)
-
-    local name = type(player) == 'string' and player or player:get_player_name()
+local function generate_simple_example(name)
 
     local err = make_user_dir(name)
     if not err then
@@ -130,8 +126,12 @@ minetest.register_entity("codeblock:drone", codeblock.DroneEntity)
 
 minetest.register_on_newplayer(function(player)
 
-    -- example
     local name = player:get_player_name()
+
+    -- init user data
+    get_user_data(name)
+
+    -- example
     generate_simple_example(name)
 
     -- privs
@@ -143,7 +143,6 @@ minetest.register_on_newplayer(function(player)
 
     -- meta
     local meta = player:get_meta()
-    meta:set_int('codeblock:last_index', 0)
     meta:set_string('codeblock:last_file', "")
     meta:set_int('codeblock:auth_level', codeblock.config.default_auth_level)
     meta:set_string('codeblock:editor_state_tabs', "")
@@ -169,25 +168,12 @@ minetest.register_on_joinplayer(function(player)
     set_tools(player)
 
     -- overrides
-    -- TODO: TEMP fix ?
+    -- TODO: TEMP fix
     player:override_day_night_ratio(1)
     player:set_stars({visible = false})
     player:set_sun({visible = false})
     player:set_moon({visible = false})
     player:set_clouds({density = 0})
-
-    -- local meta = player:get_meta()
-    -- meta:set_int('codeblock:last_index', 0)
-    -- meta:set_string('codeblock:last_file', "")
-    -- meta:set_int('codeblock:auth_level', codeblock.config.default_auth_level)
-    -- meta:set_string('codeblock:editor_state_tabs', "")
-    -- meta:set_string('codeblock:editor_state_active', 0)
-
-    -- meta
-    -- TODO : carefully restore this?
-    -- local meta = player:get_meta()
-    -- meta:set_string('codeblock:editor_state_tabs', "")
-    -- meta:set_int('codeblock:editor_state_active', 0)
 
 end)
 
@@ -260,7 +246,7 @@ minetest.register_chatcommand("codegenerate", {
 
         local player = get_player_by_name(pname or '')
         if player then
-            local err = generate_examples(player)
+            local err = generate_examples(name)
             if err then
                 return false, S('error')
             else

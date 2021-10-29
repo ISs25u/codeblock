@@ -133,7 +133,8 @@ function DroneEntity.on_place(name, pos)
 
     drone_new(name, pos, dir, auth_level)
 
-    if (not last_file) or last_file == "" then
+    if (not last_file) or last_file == "" or
+        (not get_user_data(name).ftp[last_file]) then
         DroneEntity.show_set_file_form(name)
     else
         DroneEntity.set_file(name, last_file)
