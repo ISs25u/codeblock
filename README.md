@@ -25,7 +25,7 @@ CodeBlock
 2. Create a new file with the `new file` field and write some code on the main window
 3. Click `load and exit` to load your code in the drone
 4. Right click with ![License](https://github.com/gigaturbo/codeblock/blob/master/textures/dp.ico) tool on a block and run the code with a left click on ![License](https://github.com/gigaturbo/codeblock/blob/master/textures/dp.ico)
-5. Read the [API](https://github.com/gigaturbo/codeblock#lua-api) below to know which commands and blocks you can use!
+5. Read the [API](https://github.com/gigaturbo/codeblock/blob/master/doc/api.md) to know which commands and blocks you can use!
 
 ### More examples
 

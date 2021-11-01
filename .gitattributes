@@ -2,3 +2,4 @@
 *.zip           export-ignore
 TODO.md         export-ignore
 screenshots/**  export-ignore
+screenshot.png
