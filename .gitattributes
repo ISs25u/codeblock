@@ -1,5 +1,4 @@
 .*              export-ignore
 *.zip           export-ignore
-screenshot.png  export-ignore
 TODO.md         export-ignore
 screenshots/**  export-ignore

@@ -22,7 +22,7 @@
 
 ### v0.5.0
 
-- [ ] update README (commands, directory)
+- [x] update README (commands, directory)
 - [x] check player meta state on join
 - [x] editor : add options to create/remove files
 - [x] change to 'close file'
