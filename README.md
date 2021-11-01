@@ -17,14 +17,14 @@ CodeBlock
 
 1. Create an empty (flat) world, enable `codeblock` mod ant its dependencies
 2. Enable creative mode and start the game
-3. Right click with ![License](https://github.com/gigaturbo/codeblock/blob/master/textures/dp.ico) tool on a block, choose `example.lua` then left click with ![License](https://github.com/gigaturbo/codeblock/blob/master/textures/dp.ico) to start the drone
+3. Right click with ![drone_poser](https://raw.githubusercontent.com/gigaturbo/codeblock/master/doc/dp.png) tool on a block, choose `example.lua` then left click with ![drone_poser](https://raw.githubusercontent.com/gigaturbo/codeblock/master/doc/dp.png) to start the drone
 
 ### Write your first program
 
-1. Right click with ![License](https://github.com/gigaturbo/codeblock/blob/master/textures/ds.ico) tool to open the `lua` editor
+1. Right click with ![drone_setter](https://raw.githubusercontent.com/gigaturbo/codeblock/master/doc/ds.png) tool to open the `lua` editor
 2. Create a new file with the `new file` field and write some code on the main window
 3. Click `load and exit` to load your code in the drone
-4. Right click with ![License](https://github.com/gigaturbo/codeblock/blob/master/textures/dp.ico) tool on a block and run the code with a left click on ![License](https://github.com/gigaturbo/codeblock/blob/master/textures/dp.ico)
+4. Right click with ![drone_poser](https://raw.githubusercontent.com/gigaturbo/codeblock/master/doc/dp.png) tool on a block and run the code with a left click on ![drone_poser](https://raw.githubusercontent.com/gigaturbo/codeblock/master/doc/dp.png)
 5. Read the [API](https://github.com/gigaturbo/codeblock/blob/master/doc/api.md) to know which commands and blocks you can use!
 
 ### More examples
