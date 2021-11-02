@@ -11,14 +11,21 @@
 ### v.later
 
 - [ ] get block at drone position
-- [ ] fix color(v,m,M) function (or remove)
-- [ ] fix place() in non-loaded chunks
-- [ ] make mod configurable
+- [ ] option to set drone default block to place
 - [ ] optional depends on vector3, worldedit, wool, etc
-- [ ] function that returns a block at random in a list of blocks
 - [ ] add help next to code editor (commands and block list)
-- [ ] option to set drone default block to place!
+- [x] function that returns a block at random in a list of blocks
+
+#### Low priority
+
 - [ ] option to pause the drone a certain time?
+- [ ] make mod configurable
+- [ ] fix place() in non-loaded chunks
+    - minetest.emerge_area(pos1, pos2, [callback], [param])
+    - minetest.get_node_or_nil(pos) (if unloaded)
+    - minetest.emerge_area(pos1, pos2, [callback], [param]) (does not trigger emerge)
+    - minetest.compare_block_status(pos, condition)
+- [ ] fix color(v,m,M) function (or remove)
 
 ### v0.5.0
 
@@ -71,9 +78,11 @@
 ## Other ideas
 
 - minetest.set_timeofday(val)
-- minetest.emerge_area(pos1, pos2, [callback], [param])
 - minetest.fix_light(pos1, pos2)
 - minetest.is_protected(pos, name)
+- minetest.place_schematic(pos, schematic, rotation, replacements, force_placement, flags)
+- minetest.create_schematic(p1, p2, probability_list, filename, slice_prob_list)
+- HTTPApiTable.fetch(HTTPRequest req, callback)
 - format lua when saving ? https://github.com/LuaDevelopmentTools/luaformatter/blob/master/formatter.lua
 - render code with html widget? (highlight)
 - show line error on save?

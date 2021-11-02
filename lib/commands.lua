@@ -11,12 +11,16 @@ local upper = string.upper
 local max = math.max
 local sqrt = math.sqrt
 
-local S = codeblock.S
-local cubes_names = codeblock.utils.cubes_names
-local blocks = codeblock.utils.blocks
-
 local chat_send_player = minetest.chat_send_player
 local set_node = minetest.set_node
+local get_node = minetest.get_node
+
+local S = codeblock.S
+local cubes_names = codeblock.utils.cubes_names
+local plants_names = codeblock.utils.plants_names
+local wools_names = codeblock.utils.wools_names
+local blocks = codeblock.utils.blocks
+local table_reverse = codeblock.utils.table_reverse
 
 local max_calls = codeblock.config.max_calls
 local max_volume = codeblock.config.max_volume
@@ -29,6 +33,7 @@ local tmp1 = 2 * pi
 local tmp2 = pi / 2
 local tmp3 = 4 / 3 * pi
 local tmp4 = 2 / 3 * pi
+local rev_blocks = table_reverse(blocks)
 
 -------------------------------------------------------------------------------
 -- private
@@ -39,6 +44,8 @@ local function round0(x) return floor(x + .5) end
 local function place_block(x, y, z, block)
     set_node({x = x, y = y, z = z}, {name = block})
 end
+
+local function get_block(x, y, z) return get_node({x = x, y = y, z = z}) end
 
 local function use_volume(drone, v_used)
 
@@ -772,6 +779,31 @@ local function drone_goto_checkpoint(drone, chkpt, x, y, z)
 end
 
 -------------------------------------------------------------------------------
+-- utilities
+-------------------------------------------------------------------------------
+
+local function drone_get_block(drone)
+
+    assert(drone, S("drone does not exist"))
+
+    local block_name = get_node({x = drone.x, y = drone.y, z = drone.z}).name
+
+    if block_name == 'ignore' then
+        check_drone_yield(drone, 0)
+        return nil
+    else
+        check_drone_yield(drone, 0)
+        local rblock = rev_blocks[block_name]
+        if rblock then
+            return rblock
+        else
+            return false
+        end
+    end
+
+end
+
+-------------------------------------------------------------------------------
 -- message
 -------------------------------------------------------------------------------
 
@@ -811,3 +843,4 @@ codeblock.commands.drone_save_checkpoint = drone_save_checkpoint
 codeblock.commands.drone_goto_checkpoint = drone_goto_checkpoint
 codeblock.commands.drone_send_message = drone_send_message
 codeblock.commands.drone_use_call = use_call
+codeblock.commands.drone_get_block = drone_get_block

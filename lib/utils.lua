@@ -24,6 +24,19 @@ function codeblock.utils.split(inputstr, sep)
     return t
 end
 
+function codeblock.utils.table_reverse(tbl)
+    local rev = {}
+    for k, v in pairs(tbl) do rev[v] = k end
+    return rev
+end
+
+function codeblock.utils.table_randomizer(tbl)
+    local keys = {}
+    local random = math.random
+    for k in pairs(tbl) do table.insert(keys, k) end
+    return function() return tbl[keys[random(#keys)]] end
+end
+
 --------------------------------------------------------------------------------
 -- Allowed blocks
 --------------------------------------------------------------------------------

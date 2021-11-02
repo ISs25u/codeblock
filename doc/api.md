@@ -118,6 +118,21 @@ Integer-indexed table, without white, black and greys, in pseudo-rainbow order (
 
 Example: `local orange = iwools[3]`
 
+
+### Random blocks
+
+```lua
+random.block()
+random.plant()
+random.wool()
+```
+
+### Block at drone position
+
+```lua
+get_block()
+```
+
 ## Construction
 
 ### Placing one block
@@ -219,4 +234,14 @@ print(message) -- print `message` in minetest chat
 error(message) -- stops the program and prints `message`
 ipairs(table)
 pairs(table)
+table.randomizer(t) -- returns a table randomizer
+```
+
+Example:
+```lua
+local my_random = table.randomizer({blocks.ice, blocks.brick})
+for i = 1, 10 do
+    place(my_random()) 
+    up()
+end
 ```

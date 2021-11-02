@@ -8,6 +8,7 @@ local S = codeblock.S
 local max = math.max
 local min = math.min
 local abs = math.abs
+local floor = math.floor
 
 local move = codeblock.commands.drone_move
 local forward = codeblock.commands.drone_forward
@@ -33,35 +34,36 @@ local save_checkpoint = codeblock.commands.drone_save_checkpoint
 local goto_checkpoint = codeblock.commands.drone_goto_checkpoint
 local send_message = codeblock.commands.drone_send_message
 local use_call = codeblock.commands.drone_use_call
+local drone_get_block = codeblock.commands.drone_get_block
 
-local blocks = codeblock.utils.cubes_names
+local cubes = codeblock.utils.cubes_names
 local plants = codeblock.utils.plants_names
 local wools = codeblock.utils.wools_names
 local iwools = codeblock.utils.iwools_names
 local niwools = #iwools
+local table_randomizer = codeblock.utils.table_randomizer
 
 --------------------------------------------------------------------------------
 -- private
 --------------------------------------------------------------------------------
 
-local function gen_round(dec)
-    local mult = 10 ^ (dec or 0)
-    return function(num) return math.floor(num * mult + 0.5) / mult end
-end
-
 local function round(dec, num)
     local mult = 10 ^ (dec or 0)
-    return math.floor(num * mult + 0.5) / mult
+    return floor(num * mult + 0.5) / mult
 end
 
-local tmp1 = niwools - 1
-local round0 = gen_round(0)
-local function color(v, m, M)
-    local m = (type(m) == 'number') and m or 1
-    local M = (type(M) == 'number') and M or 11
-    m, M = min(m, M), max(m, M)
-    local i = round0(((v - m) / (M - m) * tmp1) % niwools) + 1
-    return iwools[i]
+local function round0(num) return floor(num + 0.5) end
+
+local color
+do
+    local tmp1 = niwools - 1
+    color = function(v, m, M)
+        local m = (type(m) == 'number') and m or 1
+        local M = (type(M) == 'number') and M or 11
+        m, M = min(m, M), max(m, M)
+        local i = round0(((v - m) / (M - m) * tmp1) % niwools) + 1
+        return iwools[i]
+    end
 end
 
 local function getScriptEnv(drone)
@@ -69,7 +71,6 @@ local function getScriptEnv(drone)
     assert(drone, S("drone does not exist"))
 
     local name = drone.name
-    local utils = codeblock.utils
 
     local env = {
         move = function(x, y, z)
@@ -169,15 +170,24 @@ local function getScriptEnv(drone)
                 end
             }
         },
+        get_block = function() return drone_get_block(drone) end,
         print = function(str) return send_message(drone, str) end,
         color = color,
-        blocks = blocks,
+        blocks = cubes,
         plants = plants,
         wools = wools,
         iwools = iwools,
         ipairs = ipairs,
         pairs = pairs,
-        random = math.random,
+        random = setmetatable({}, {
+            __index = {
+                block = table_randomizer(cubes),
+                plant = table_randomizer(plants),
+                wool = table_randomizer(wools)
+            },
+            __call = function(self, ...) return math.random(...) end
+        }),
+        table = {randomizer = table_randomizer},
         floor = math.floor,
         ceil = math.ceil,
         round = round,
