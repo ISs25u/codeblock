@@ -2,13 +2,15 @@
 
 Drone capacities depends on the user's _codelevel_ which can be set with the `/codelevel` [command](https://github.com/gigaturbo/codeblock#chat-commands) (see below). High codelevels should be given carefully to users as program could overload the server and crash it. Default codelevel is `1`.
 
-| codelevel     | 1 (limited) | 2 (basic) | 3 (privileged) | 4 (trusted) |                                                                      |
-|---------------|-------------|-----------|----------------|-------------|----------------------------------------------------------------------|
-| max_calls     |         1e6 |       1e7 |            1e8 |         1e9 | max number of calls (function calls and loops)                       |
-| max_volume    |         1e5 |       1e6 |            1e7 |         1e8 | max build volume (1 block = 1m³)                                     |
-| max_commands  |         1e4 |       1e5 |            1e6 |         1e7 | max drone commands (movements, constructions, checkpoints, etc)      |
-| max_distance  |         150 |       300 |            700 |        1500 | max drone distance from drone spawn-point                            |
-| max_dimension |          15 |        30 |             70 |         150 | max dimension of shapes (either width, length, height or radius) |
+| codelevel             | 1 (limited) | 2 (basic) | 3 (privileged) | 4 (trusted) |                                                                      |
+|-----------------------|-------------|-----------|----------------|-------------|----------------------------------------------------------------------|
+| max_calls             |         1e6 |       1e7 |            1e8 |         1e9 | max number of calls (function calls and loops)                       |
+| max_volume            |         1e5 |       1e6 |            1e7 |         1e8 | max build volume (1 block = 1m³)                                     |
+| max_commands          |         1e4 |       1e5 |            1e6 |         1e7 | max drone commands (movements, constructions, checkpoints, etc)      |
+| max_distance          |         150 |       300 |            700 |        1500 | max drone distance from drone spawn-point                            |
+| max_dimension         |          15 |        30 |             70 |         150 | max dimension of shapes (either width, length, height or radius)     |
+| commands_before_yield |           1 |        10 |             20 |          40 | number of codeblock commands before releasing control to Minetest    |
+| calls_before_yield    |           1 |        10 |             20 |          40 | number of function/loop calls before releasing control to Minetest   |
 
 Codelevel definitions can be modified by editing `lib/config.lua`.
 

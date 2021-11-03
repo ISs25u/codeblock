@@ -402,7 +402,7 @@ function codeblock.sandbox.get_safe_coroutine(drone, filename)
     local filename = drone.file
 
     -- loading file
-    local untrusted_code = codeblock.filesystem.read_file(name, filename)
+    local untrusted_code = codeblock.filesystem.read_file(name, filename, true)
 
     if not untrusted_code then
         return false, S("Error in @1", filename) .. S('@1 not found', filename)

@@ -28,6 +28,7 @@ local max_commands = codeblock.config.max_commands
 local max_distance = codeblock.config.max_distance
 local max_dimension = codeblock.config.max_dimension
 local commands_before_yield = codeblock.config.commands_before_yield
+local calls_before_yield = codeblock.config.calls_before_yield
 
 local tmp1 = 2 * pi
 local tmp2 = pi / 2
@@ -66,6 +67,7 @@ local function use_call(drone)
 
     local calls = drone.calls + 1;
     if calls <= max_calls[al] then
+        if (calls % calls_before_yield[al] == 0) then coroutine.yield() end
         drone.calls = calls
     else
         error(S('call limit (@1) exeeded', max_calls[al]), 4);
