@@ -19,7 +19,6 @@ dofile(codeblock.modpath .. "/lib/drone_entity.lua")
 dofile(codeblock.modpath .. "/lib/formspecs.lua")
 dofile(codeblock.modpath .. "/lib/register.lua")
 
-
 if not minetest.mkdir(codeblock.filesystem.data_path) then
     error("[editor] failed to create directory!")
 end

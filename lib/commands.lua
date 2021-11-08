@@ -17,8 +17,6 @@ local get_node = minetest.get_node
 
 local S = codeblock.S
 local cubes_names = codeblock.utils.cubes_names
-local plants_names = codeblock.utils.plants_names
-local wools_names = codeblock.utils.wools_names
 local blocks = codeblock.utils.blocks
 local table_reverse = codeblock.utils.table_reverse
 
@@ -342,7 +340,7 @@ local function drone_place_block(drone, block)
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed')) end
+    if not real_block then error(S('block not allowed'), 3) end
 
     use_volume(drone, 1)
 
@@ -361,7 +359,7 @@ local function drone_place_relative(drone, x, y, z, block, chkpt)
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed')) end
+    if not real_block then error(S('block not allowed'), 3) end
 
     local chkpt = (type(chkpt) == 'string') and chkpt or 'spawn'
     if not drone.checkpoints[chkpt] then error(S("no chkpt @1", chkpt)) end
@@ -410,7 +408,7 @@ local function drone_place_cube(drone, w, h, l, block, hollow)
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed')) end
+    if not real_block then error(S('block not allowed'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local w = (type(w) == 'number') and round0(abs(w)) or 10
@@ -455,7 +453,7 @@ local function drone_place_ccube(drone, w, h, l, block, hollow)
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed')) end
+    if not real_block then error(S('block not allowed'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local w = (type(w) == 'number') and round0(abs(w)) or 10
@@ -489,7 +487,7 @@ local function drone_place_sphere(drone, r, block, hollow)
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed')) end
+    if not real_block then error(S('block not allowed'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local r = (type(r) == 'number') and round0(abs(r)) or 5
@@ -528,7 +526,7 @@ local function drone_place_csphere(drone, r, block, hollow)
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed')) end
+    if not real_block then error(S('block not allowed'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local r = (type(r) == 'number') and round0(abs(r)) or 5
@@ -548,7 +546,7 @@ local function drone_place_dome(drone, r, block, hollow)
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed')) end
+    if not real_block then error(S('block not allowed'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local r = (type(r) == 'number') and round0(abs(r)) or 5
@@ -587,7 +585,7 @@ local function drone_place_cdome(drone, r, block, hollow)
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed')) end
+    if not real_block then error(S('block not allowed'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local r = (type(r) == 'number') and round0(abs(r)) or 5
@@ -607,7 +605,7 @@ local function drone_place_cylinder(drone, o, l, r, block, hollow)
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed')) end
+    if not real_block then error(S('block not allowed'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local o = (type(o) == 'string') and upper(o) or 'V'
@@ -673,7 +671,7 @@ local function drone_place_ccylinder(drone, o, l, r, block, hollow)
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed')) end
+    if not real_block then error(S('block not allowed'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local o = (type(o) == 'string') and upper(o) or 'V'
@@ -821,6 +819,7 @@ end
 -- export
 -------------------------------------------------------------------------------
 
+-- movements
 codeblock.commands.drone_move = drone_move
 codeblock.commands.drone_forward = drone_forward
 codeblock.commands.drone_back = drone_back
@@ -833,6 +832,9 @@ codeblock.commands.drone_turn_right = drone_turn_right
 codeblock.commands.drone_turn = drone_turn
 codeblock.commands.drone_place_block = drone_place_block
 codeblock.commands.drone_place_relative = drone_place_relative
+codeblock.commands.drone_save_checkpoint = drone_save_checkpoint
+codeblock.commands.drone_goto_checkpoint = drone_goto_checkpoint
+-- worldedit
 codeblock.commands.drone_place_cube = drone_place_cube
 codeblock.commands.drone_place_ccube = drone_place_ccube
 codeblock.commands.drone_place_sphere = drone_place_sphere
@@ -841,8 +843,7 @@ codeblock.commands.drone_place_dome = drone_place_dome
 codeblock.commands.drone_place_cdome = drone_place_cdome
 codeblock.commands.drone_place_cylinder = drone_place_cylinder
 codeblock.commands.drone_place_ccylinder = drone_place_ccylinder
-codeblock.commands.drone_save_checkpoint = drone_save_checkpoint
-codeblock.commands.drone_goto_checkpoint = drone_goto_checkpoint
+-- utilities
 codeblock.commands.drone_send_message = drone_send_message
 codeblock.commands.drone_use_call = use_call
 codeblock.commands.drone_get_block = drone_get_block

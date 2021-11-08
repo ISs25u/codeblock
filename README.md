@@ -25,7 +25,7 @@ CodeBlock
 2. Create a new file with the `new file` field and write some code on the main window
 3. Click `load and exit` to load your code in the drone
 4. Right click with ![drone_poser](https://raw.githubusercontent.com/gigaturbo/codeblock/master/doc/dp.png) tool on a block and run the code with a left click on ![drone_poser](https://raw.githubusercontent.com/gigaturbo/codeblock/master/doc/dp.png)
-5. Read the [API](https://github.com/gigaturbo/codeblock/blob/master/doc/api.md) to know which commands and blocks you can use!
+5. Read the [API](https://github.com/gigaturbo/codeblock/blob/master/doc/api.md) in `doc/api.md` to know which commands and blocks you can use!
 
 ### More examples
 

@@ -104,11 +104,3 @@ local function pathJoin(...)
 end
 
 codeblock.utils.path_join = pathJoin
-
--- return {
---     isWindows = isWindows,
---     getPrefix = getPrefix,
---     splitPath = splitPath,
---     joinParts = joinParts,
---     pathJoin = pathJoin
--- }

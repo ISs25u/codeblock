@@ -10,10 +10,12 @@
 
 ### v.later
 
-- [ ] get block at drone position
 - [ ] option to set drone default block to place
-- [ ] optional depends on vector3, worldedit, wool, etc
 - [ ] add help next to code editor (commands and block list)
+- [ ] full compat with windows paths (init.lua)
+- [x] optional depends on vector3, worldedit, wool, etc
+- [x] added max number of functions/loops calls before yield
+- [x] get block at drone position
 - [x] function that returns a block at random in a list of blocks
 
 #### Low priority
