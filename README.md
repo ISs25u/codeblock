@@ -9,7 +9,7 @@ CodeBlock
 **License:** GPLv3   
 **Credits:** inspired by [Gnancraft](http://gnancraft.net/), [ComputerCraft](http://www.computercraft.info/), [Visual Bots](https://content.minetest.net/packages/Nigel/vbots/), [TurtleMiner](https://content.minetest.net/packages/BirgitLachner/turtleminer/), [basic_robot](https://github.com/ac-minetest/basic_robot)
 
-![screenshot](screenshot.png)
+![screenshot](https://raw.githubusercontent.com/gigaturbo/codeblock/master/screenshot.png)
 
 ## Quick start
 

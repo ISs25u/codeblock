@@ -18,4 +18,4 @@ printf \
     "website": null,
     "issue_tracker": "https://github.com/gigaturbo/codeblock/issues",
     "forums": null
-}' "$(grep -v "screenshot.png" README.md | perl -0777 -pe 's|\n|\\n|gs')" >.cdb.json
+}' "$(perl -0777 -pe 's|\n|\\n|gs' README.md)" >.cdb.json
