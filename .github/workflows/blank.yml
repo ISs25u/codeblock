@@ -4,9 +4,9 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
@@ -14,8 +14,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Run a multi-line script
+      - name: Generate files
         run: |
           sudo apt-get install pandoc
           ./gen_cdb_json.sh
           ./gen_doc_html.sh
+      - name: contentdb file production
+        uses: actions/upload-artifact@v2
+        with:
+          name: documentation
+          path: .cdb.json
+      - name: Documentation production
+        uses: actions/upload-artifact@v2
+        with:
+          name: documentation
+          path: doc/api.html
