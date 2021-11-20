@@ -22,7 +22,7 @@ jobs:
       - name: contentdb file production
         uses: actions/upload-artifact@v2
         with:
-          name: documentation
+          name: contentdb
           path: .cdb.json
       - name: Documentation production
         uses: actions/upload-artifact@v2
