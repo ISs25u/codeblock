@@ -21,7 +21,7 @@
 #### Low priority
 
 - [ ] option to pause the drone a certain time?
-- [ ] make mod configurable
+- [ ] make mod configurable (see https://github.com/AntumMT/mod-hovercraft/)
 - [ ] fix place() in non-loaded chunks
     - minetest.emerge_area(pos1, pos2, [callback], [param])
     - minetest.get_node_or_nil(pos) (if unloaded)

@@ -31,4 +31,4 @@ CodeBlock
 
 1. Generate built-in examples by typing in chat `/codegenerate`
 2. Open the editor and choose an example to run
-3. Some examples require greater [permisisons](https://github.com/gigaturbo/codeblock#codelevel) to be run and running the program will return an error. In this case grant yourself the mod permission with `/grantme codeblock` and use `/codelevel 4` to grant you full power
+3. Some examples require greater [permisisons](https://github.com/gigaturbo/codeblock/blob/master/doc/api.md#codelevel) to be run and running the program will return an error. In this case grant yourself the mod permission with `/grantme codeblock` and use `/codelevel 4` to grant you full power (see [chat commands](https://github.com/gigaturbo/codeblock/blob/master/doc/api.md#chat-commands)).
