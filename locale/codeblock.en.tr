@@ -53,3 +53,7 @@ new file=New file:
 worldedit not enabled=WorldEdit mod is not enabled
 vector3 not enabled=vector3 mod is not enabled
 wool not enabled=wool mod is not enabled
+help cubes=Blocks
+help plants=Plants
+help wools=Wools
+help commands=API

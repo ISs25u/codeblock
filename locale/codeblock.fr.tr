@@ -53,3 +53,7 @@ new file=Nouveau fichier :
 worldedit not enabled=Le mod WorldEdit n'est pas activé
 vector3 not enabled=Le mod vector3 n'est pas activé
 wool not enabled=Le mod wool n'est pas activé
+help cubes=Blocs
+help plants=Plantes
+help wools=Laines
+help commands=API

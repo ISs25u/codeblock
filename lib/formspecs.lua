@@ -6,6 +6,8 @@ codeblock.formspecs = {}
 
 local S = codeblock.S
 
+local tcik = codeblock.utils.table_convert_ik
+
 local formspec_escape = minetest.formspec_escape
 local chat_send_all = minetest.chat_send_all
 local chat_send_player = minetest.chat_send_player
@@ -13,6 +15,13 @@ local destroy_form = minetest.destroy_form
 local update_form = minetest.update_form
 local explode_textlist_event = minetest.explode_textlist_event
 local get_player_by_name = minetest.get_player_by_name
+local blocks = codeblock.utils.blocks
+local cubes = codeblock.utils.cubes_names
+local plants = codeblock.utils.plants_names
+local wools = codeblock.utils.wools_names
+local cubes_ik = tcik(cubes)
+local plants_ik = tcik(plants)
+local wools_ik = tcik(wools)
 
 local get_user_data = codeblock.filesystem.get_user_data
 local read_file = codeblock.filesystem.read_file
@@ -34,12 +43,16 @@ local file_editor = {
     get_form = function(meta)
 
         local ud = get_user_data(meta.name)
-        local fs = "size[16,10.5]"
+        local fs = "size[20,10.5]"
 
         -- styles 
         fs = fs .. 'style[remove;bgcolor=red]'
         fs = fs .. 'style[content;font=mono;font_size=-2;textcolor=#115555]'
         fs = fs .. 'style[create;bgcolor=green]'
+        fs = fs .. 'style[help_cubes;bgcolor=blue]'
+        fs = fs .. 'style[help_plants;bgcolor=blue]'
+        fs = fs .. 'style[help_wools;bgcolor=blue]'
+        fs = fs .. 'style[help_cmds;bgcolor=blue]'
 
         -- tabs
         if #meta.tabs > 0 then
@@ -70,9 +83,19 @@ local file_editor = {
             fs = fs .. 'button[3.25 ,0 ;2 ,0.75;save;' .. S('save') .. ']'
             fs = fs .. 'button[5.25 ,0 ;3 ,0.75;load;' .. S('load and close') ..
                      ']'
-            fs = fs .. 'button[8.25 ,0;3, 0.75;remove;' .. S('remove file') ..
+            fs = fs .. 'button[8.25 ,0 ;3, 0.75;remove;' .. S('remove file') ..
                      ']'
-            fs = fs .. 'button[13   ,0;3, 0.75;close;' .. S('close tab') .. ']'
+            fs = fs .. 'button[11.25,0;2.83, 0.75;close;' .. S('close tab') ..
+                     ']'
+
+            fs = fs .. 'button[14,0;1.5, 0.75;help_cubes;' .. S('help cubes') ..
+                     ']'
+            fs = fs .. 'button[15.5,0;1.5, 0.75;help_plants;' ..
+                     S('help plants') .. ']'
+            fs = fs .. 'button[17,0;1.5, 0.75;help_wools;' .. S('help wools') ..
+                     ']'
+            fs = fs .. 'button[18.5,0;1.5, 0.75;help_cmds;' ..
+                     S('help commands') .. ']'
         end
 
         -- checkboxes
@@ -87,11 +110,77 @@ local file_editor = {
         local text = meta.contents[meta.active]
         if meta.active ~= 0 and text then
             local etext = formspec_escape(text)
-            fs = fs .. 'textarea[3.5,0.75;12.75,11;content;;' .. etext .. ']'
+            fs = fs .. 'textarea[3.5,0.75;10.85,11;content;;' .. etext .. ']'
         elseif meta.active == 0 then
             fs = fs .. 'label[4.5,3;' .. S('click to select a file') .. ']'
         else
             fs = fs .. 'label[4.5,3;' .. S('cannot read file') .. ']'
+        end
+
+        -- help
+        if meta.help == 'cubes' then
+            fs = fs .. 'scrollbaroptions[min=0;max=' .. #cubes_ik - 1 ..
+                     ';smallstep=1;largestep=5]'
+            fs = fs .. 'scrollbar[19.5, 1;0.3, 9.25;vertical;c_scroll;' ..
+                     meta.scroll_c .. ']'
+            fs = fs ..
+                     'scroll_container[17.75, 1.25;7.25, 10.75;c_scroll;vertical;' ..
+                     1.04 .. ']'
+            local yi, yl
+            for i, v in pairs(cubes_ik) do
+                yi = tostring(i - 1 - 0.25)
+                yl = tostring(i - 1)
+                fs =
+                    fs .. 'item_image[' .. '0,' .. yi .. ';1,1;' .. blocks[v] ..
+                        ']'
+                fs = fs .. 'label[1,' .. yl .. ';blocks.' .. v .. ']'
+            end
+            fs = fs .. 'scroll_container_end[]'
+
+        elseif meta.help == 'plants' then
+
+            fs = fs .. 'scrollbaroptions[min=0;max=' .. #plants_ik - 1 ..
+                     ';smallstep=1;largestep=5]'
+            fs = fs .. 'scrollbar[19.5, 1;0.3, 9.25;vertical;p_scroll;' ..
+                     meta.scroll_p .. ']'
+            fs = fs ..
+                     'scroll_container[17.75, 1.25;7.25, 10.75;p_scroll;vertical;' ..
+                     0.85 .. ']'
+            local yi, yl
+            for i, v in pairs(plants_ik) do
+                yi = tostring(i - 1 - 0.25)
+                yl = tostring(i - 1)
+                fs =
+                    fs .. 'item_image[' .. '0,' .. yi .. ';1,1;' .. blocks[v] ..
+                        ']'
+                fs = fs .. 'label[1,' .. yl .. ';plants.' .. v .. ']'
+            end
+            fs = fs .. 'scroll_container_end[]'
+
+        elseif meta.help == 'wools' then
+
+            fs = fs .. 'scrollbaroptions[min=0;max=' .. #wools_ik - 1 ..
+                     ';smallstep=1;largestep=5]'
+            fs = fs .. 'scrollbar[19.5, 1;0.3, 9.25;vertical;w_scroll;' ..
+                     meta.scroll_w .. ']'
+            fs = fs ..
+                     'scroll_container[17.75, 1.25;7.25, 10.75;w_scroll;vertical;' ..
+                     0.5 .. ']'
+            local yi, yl
+            for i, v in pairs(wools_ik) do
+                yi = tostring(i - 1 - 0.25)
+                yl = tostring(i - 1)
+                fs = fs .. 'item_image[' .. '0,' .. yi .. ';1,1;' ..
+                         blocks[wools[v]] .. ']'
+                fs = fs .. 'label[1,' .. yl .. ';wools.' .. v .. ']'
+            end
+            fs = fs .. 'scroll_container_end[]'
+
+        elseif meta.help == 'commands' then
+
+            fs = fs .. 'hypertext[14.5,1;5.75,10.75;commands_html;' ..
+                     codeblock.utils.html_commands .. ']'
+
         end
 
         return fs
@@ -258,6 +347,27 @@ local file_editor = {
                 open(i)
                 update()
             end
+        elseif fields.help_cubes then
+            meta.help = 'cubes'
+            update()
+        elseif fields.help_plants then
+            meta.help = 'plants'
+            update()
+        elseif fields.help_wools then
+            meta.help = 'wools'
+            update()
+        elseif fields.help_cmds then
+            meta.help = 'commands'
+            update()
+        elseif fields.c_scroll then
+            meta.scroll_c = minetest.explode_scrollbar_event(fields.c_scroll)
+                                .value
+        elseif fields.p_scroll then
+            meta.scroll_p = minetest.explode_scrollbar_event(fields.p_scroll)
+                                .value
+        elseif fields.w_scroll then
+            meta.scroll_w = minetest.explode_scrollbar_event(fields.w_scroll)
+                                .value
         elseif fields.quit == 'true' then -- fields.content cannot be accessed here
             if meta.loe then load_active() end
             save_editor_state()

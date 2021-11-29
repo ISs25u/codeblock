@@ -8,17 +8,17 @@
 - [x] In-game lua code editor
 - [ ] Blockly web-based editor
 
-### v.later
+### v.next
 
 - [ ] option to set drone default block to place
 - [ ] add help next to code editor (commands and block list)
-- [ ] full compat with windows paths (init.lua)
+- [ ] full compat with windows paths if necessary? (init.lua)
 - [x] optional depends on vector3, worldedit, wool, etc
 - [x] added max number of functions/loops calls before yield
 - [x] get block at drone position
 - [x] function that returns a block at random in a list of blocks
 
-#### Low priority
+### v.oneday
 
 - [ ] option to pause the drone a certain time?
 - [ ] make mod configurable (see https://github.com/AntumMT/mod-hovercraft/)
@@ -76,7 +76,6 @@
 - [x] drone label with program
 - [x] remove drone on leave
 
-
 ## Other ideas
 
 - minetest.set_timeofday(val)
@@ -88,8 +87,9 @@
 - format lua when saving ? https://github.com/LuaDevelopmentTools/luaformatter/blob/master/formatter.lua
 - render code with html widget? (highlight)
 - show line error on save?
+- colored concrete instead of wool? : https://github.com/nikolaus-albinger/colored_concrete
 
-Game
+### Game
 
 - [ ] generate flat clean world https://github.com/srifqi/superflat
 - [ ] teleport function?
