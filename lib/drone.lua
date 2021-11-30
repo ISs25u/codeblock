@@ -43,7 +43,7 @@ local instance_mt = {
     },
 
     __tostring = function(self)
-        return S('cmd @1 call @2 vol @3 time @4', self.commands, self.calls,
+        return S('commands@=@1 volume@=@3m³ calls@=@2 duration@=@4s', self.commands, self.calls,
                  self.volume, (os.clock() - (self.tstart or os.clock())))
     end
 }

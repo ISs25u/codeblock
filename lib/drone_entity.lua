@@ -64,13 +64,13 @@ local entity_mt = {
                         local success, ret = coroutine.resume(drone.cor)
                         if not success then
                             chat_send_player(drone.name, S(
-                                                 'runtime error in @1',
+                                                 'Runtime error in @1:',
                                                  drone.file) .. '\n' .. ret)
                         end
                     elseif status == 'dead' then
-                        chat_send_player(drone.name, S('program @1 ended @2',
-                                                       drone.file,
-                                                       tostring(drone)))
+                        chat_send_player(drone.name, S(
+                                             'Program \'1\' completed: @2',
+                                             drone.file, tostring(drone)))
                         drone_rmv(drone.name)
                     end
                 end
@@ -91,8 +91,9 @@ local entity_mt = {
             -- check drone existence, not the cached value
             local drone = drone_get(self._data.name)
             if drone ~= nil then
-                chat_send_player(drone.name, S('drone entity removed'))
-                chat_send_player(drone.name, S('program @1 ended @2',
+                chat_send_player(drone.name, S(
+                                     'The drone has disappeared, program stopped'))
+                chat_send_player(drone.name, S('Program \'@1\' completed: @2',
                                                drone.file, tostring(drone)))
                 drone_rmv(drone.name)
             end
@@ -117,12 +118,12 @@ function DroneEntity.on_place(name, pos)
     local drone = drone_get(name)
 
     if drone ~= nil and drone.cor ~= nil then
-        chat_send_player(name, S('drone busy'))
+        chat_send_player(name, S('Drone is busy, please wait!'))
         return
     end
 
     if not pos then
-        chat_send_player(name, S("Please target node"))
+        chat_send_player(name, S("Please target a node"))
         return {}
     end
 
@@ -147,11 +148,11 @@ function DroneEntity.on_run(name)
     local drone = drone_get(name)
 
     if drone == nil then
-        chat_send_player(name, S("drone does not exist"))
+        chat_send_player(name, S("Error, drone does not exist"))
         return
     else
         if drone.cor ~= nil then
-            chat_send_player(name, S('drone busy'))
+            chat_send_player(name, S('Drone is busy, please wait!'))
             return
         end
     end
@@ -159,7 +160,7 @@ function DroneEntity.on_run(name)
     local file = drone.file
 
     if not file then
-        chat_send_player(name, S("no file selected"))
+        chat_send_player(name, S("Not a valid file"))
         return
     end
 
@@ -182,8 +183,8 @@ function DroneEntity.on_remove(name)
 
     if drone ~= nil then
         if drone.cor ~= nil then
-            chat_send_player(drone.name, S('program @1 ended @2', drone.file,
-                                           tostring(drone)))
+            chat_send_player(drone.name, S('Program \'@1\' completed: @2',
+                                           drone.file, tostring(drone)))
             drone_rmv(name)
         else
             drone_rmv(name)

@@ -97,8 +97,8 @@ local function read_file(name, filename, forceRefresh)
             file:close()
             if content then
                 if content:byte(1) == 27 then
-                    return nil, S("Error in @1", file) ..
-                               S('binary bytecode prohibited')
+                    return nil, S("Compilation error in @1: ", file) ..
+                               S('Binary bytecode prohibited')
                 end
                 user_data[name].ftc[filename] = content
                 return content
@@ -106,7 +106,7 @@ local function read_file(name, filename, forceRefresh)
                 user_data[name].ftc[filename] = nil
             end
         end
-        return nil, S('cannot read file') .. ' ' .. filename
+        return nil, S('Cannot read file') .. ' ' .. filename
     else
         -- we care if ftc is nil or not, if it is nil it means
         -- the file exists in user_data but the content has not
@@ -126,8 +126,8 @@ local function read_file(name, filename, forceRefresh)
                 file:close()
                 if content then
                     if content:byte(1) == 27 then
-                        return nil, S("Error in @1", file) ..
-                                   S('binary bytecode prohibited')
+                        return nil, S("Compilation error in @1: ", file) ..
+                                   S('Binary bytecode prohibited')
                     end
                     user_data[name].ftc[filename] = content
                     return content
@@ -135,7 +135,7 @@ local function read_file(name, filename, forceRefresh)
                     user_data[name].ftc[filename] = nil
                 end
             end
-            return nil, S('cannot read file') .. ' ' .. filename
+            return nil, S('Cannot read file') .. ' ' .. filename
         end
     end
 end
@@ -156,7 +156,7 @@ local function write_file(name, filename, content)
             end
         end
     end
-    return S('cannot write file') .. ' ' .. filename
+    return S('Cannot write file') .. ' ' .. filename
 end
 
 local function exists(name, filename, forceRefresh)
@@ -164,7 +164,7 @@ local function exists(name, filename, forceRefresh)
     if exists then
         return nil
     else
-        return S('no such file @1', filename)
+        return S('File @1 does not exists', filename)
     end
 end
 
@@ -172,7 +172,7 @@ local function remove_file(name, filename)
     if user_data[name].ftp[filename] then
         local nul, err = os.remove(get_file_path(name, filename))
         if err then
-            return S('failed remove file @1', filename)
+            return S('Failed to remove @1', filename)
         else
             get_user_data(name, true)
             return nil
@@ -183,7 +183,7 @@ end
 local function make_user_dir(name)
     local path = path_join(data_path, name)
     local success = mkdir(path)
-    if not success then return S('Cannot create @1', path) end
+    if not success then return S('Cannot create directory @1', path) end
 end
 
 -------------------------------------------------------------------------------

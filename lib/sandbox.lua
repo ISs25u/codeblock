@@ -72,10 +72,10 @@ local function getVector3Error()
     else
         return setmetatable({}, {
             __index = function(self, index)
-                error(S('vector3 not enabled'), 2)
+                error(S('vector3 mod is not enabled'), 2)
             end,
             __call = function(self, ...)
-                error(S('vector3 not enabled'), 2)
+                error(S('vector3 mod is not enabled'), 2)
             end
         })
     end
@@ -85,7 +85,7 @@ local function getWorldEditError()
     if codeblock.is_worldedit_enabled then
         return nil
     else
-        return function() error(S('worldedit not enabled'), 2) end
+        return function() error(S('WorldEdit mod is not enabled'), 2) end
     end
 end
 
@@ -95,16 +95,16 @@ local function getWoolOrError()
     else
         return setmetatable({}, {
             __index = function(self, index)
-                error('wool not enabled', 2)
+                error('wool mod is not enabled', 2)
             end,
-            __call = function(self, ...) error('wool not enabled', 2) end
+            __call = function(self, ...) error('wool mod is not enabled', 2) end
         })
     end
 end
 
 local function getScriptEnv(drone)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     local name = drone.name
 
@@ -280,7 +280,7 @@ local function check_code(code)
     -- "while ", "for ", "do ","goto ",  
     local bad_code = {"repeat", "until", "_c_", "_G", "while%(", "while{"} -- ,"\\\"", "%[=*%[","--[["}, "%.%.[^%.]"
     for _, v in pairs(bad_code) do
-        if string.find(code, v) then return S('@1 is not allowed', v) end
+        if string.find(code, v) then return S('@1 is not allowed!', v) end
     end
 end
 
@@ -451,19 +451,19 @@ function codeblock.sandbox.get_safe_coroutine(drone, filename)
     local untrusted_code = codeblock.filesystem.read_file(name, filename, true)
 
     if not untrusted_code then
-        return false, S("Error in @1", filename) .. S('@1 not found', filename)
+        return false, S("Compilation error in @1: ", filename) .. S('@1 not found.', filename)
     end
 
     if untrusted_code:byte(1) == 27 then
         return false,
-               S("Error in @1", filename) .. S("binary bytecode prohibited")
+               S("Compilation error in @1: ", filename) .. S("binary bytecode prohibited")
     end
 
     -- checking forbiden things
 
     local err = check_code(untrusted_code);
 
-    if err then return false, S("Error in @1", filename) .. '\n' .. err end
+    if err then return false, S("Compilation error in @1: ", filename) .. '\n' .. err end
 
     -- preprocessing code
 
@@ -473,7 +473,7 @@ function codeblock.sandbox.get_safe_coroutine(drone, filename)
 
     local bytecode, message = loadstring(safe_code)
     if not bytecode then
-        return false, S("Error in @1", filename) .. '\n' .. message
+        return false, S("Compilation error in @1: ", filename) .. '\n' .. message
     end
 
     -- return it

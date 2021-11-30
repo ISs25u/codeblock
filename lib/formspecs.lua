@@ -75,36 +75,36 @@ local file_editor = {
 
         -- new file
         fs = fs .. 'field_close_on_enter[newfile;false]'
-        fs = fs .. 'field[0.27, 9.5;2.5, 1;newfile;' .. S('new file') .. ';' ..
+        fs = fs .. 'field[0.27, 9.5;2.5, 1;newfile;' .. S('New file:') .. ';' ..
                  formspec_escape(meta.newfile) .. ']'
         fs = fs .. 'button[2.25, 9.20;1, 1;create;+]'
 
         -- buttons
         if meta.active ~= 0 then
-            fs = fs .. 'button[3.25 ,0 ;2 ,0.75;save;' .. S('save') .. ']'
-            fs = fs .. 'button[5.25 ,0 ;3 ,0.75;load;' .. S('load and close') ..
+            fs = fs .. 'button[3.25 ,0 ;2 ,0.75;save;' .. S('Save') .. ']'
+            fs = fs .. 'button[5.25 ,0 ;3 ,0.75;load;' .. S('Load and close') ..
                      ']'
-            fs = fs .. 'button[8.25 ,0 ;3, 0.75;remove;' .. S('remove file') ..
+            fs = fs .. 'button[8.25 ,0 ;3, 0.75;remove;' .. S('Remove file') ..
                      ']'
-            fs = fs .. 'button[11.25,0;2.83, 0.75;close;' .. S('close tab') ..
+            fs = fs .. 'button[11.25,0;2.83, 0.75;close;' .. S('Close file') ..
                      ']'
 
-            fs = fs .. 'button[14,0;1.5, 0.75;help_cubes;' .. S('help cubes') ..
+            fs = fs .. 'button[14,0;1.5, 0.75;help_cubes;' .. S('Blocks') ..
                      ']'
             fs = fs .. 'button[15.5,0;1.5, 0.75;help_plants;' ..
-                     S('help plants') .. ']'
-            fs = fs .. 'button[17,0;1.5, 0.75;help_wools;' .. S('help wools') ..
+                     S('Plants') .. ']'
+            fs = fs .. 'button[17,0;1.5, 0.75;help_wools;' .. S('Wools') ..
                      ']'
             fs = fs .. 'button[18.5,0;1.5, 0.75;help_cmds;' ..
-                     S('help commands') .. ']'
+                     S('API') .. ']'
         end
 
         -- checkboxes
         -- fs = fs .. 'checkbox[0,10;soe;Save on exit;' ..
         --          (meta.soe == 0 and 'false' or 'true') .. ']'
-        fs = fs .. 'checkbox[0,10;loe;' .. S('load and exit') .. ';' ..
+        fs = fs .. 'checkbox[0,10;loe;' .. S('Load program on exit') .. ';' ..
                  (meta.loe == 0 and 'false' or 'true') .. ']'
-        fs = fs .. 'checkbox[5,10;sos;' .. S('Save on switch') .. ';' ..
+        fs = fs .. 'checkbox[5,10;sos;' .. S('Save on tab switch') .. ';' ..
                  (meta.sos == 0 and 'false' or 'true') .. ']'
 
         -- textarea
@@ -113,9 +113,9 @@ local file_editor = {
             local etext = formspec_escape(text)
             fs = fs .. 'textarea[3.5,0.75;10.85,11;content;;' .. etext .. ']'
         elseif meta.active == 0 then
-            fs = fs .. 'label[4.5,3;' .. S('click to select a file') .. ']'
+            fs = fs .. 'label[4.5,3;' .. S('Double click a file to open it') .. ']'
         else
-            fs = fs .. 'label[4.5,3;' .. S('cannot read file') .. ']'
+            fs = fs .. 'label[4.5,3;' .. S('Cannot read file') .. ']'
         end
 
         -- help
@@ -396,10 +396,10 @@ local file_chooser = {
         end
         files_txt = table.concat(files_txt, ',')
         return 'formspec_version[4]' .. 'size[6,6]' .. 'label[0.5,0.5;' ..
-                   S('choose a file') .. ']' .. 'textlist[0.5,1;5,3;file;' ..
+                   S('Choose a file:') .. ']' .. 'textlist[0.5,1;5,3;file;' ..
                    files_txt .. ']' .. 'button[0.5,4.5;2,1;choose;' ..
-                   S('choose') .. ']' .. 'button[3.5,4.5;2,1;cancel;' ..
-                   S('cancel') .. ']'
+                   S('Choose') .. ']' .. 'button[3.5,4.5;2,1;cancel;' ..
+                   S('Cancel') .. ']'
     end,
 
     on_close = function(meta, player, fields)

@@ -71,7 +71,7 @@ end
 --------------------------------------------------------------------------------
 
 minetest.register_tool("codeblock:poser", {
-    description = S("Drone Poser"),
+    description = S("Drone placer"),
     inventory_image = "drone_poser.png",
     range = 128,
     stack_max = 1,
@@ -92,7 +92,7 @@ minetest.register_tool("codeblock:poser", {
 })
 
 minetest.register_tool("codeblock:setter", {
-    description = S("Drone Setter"),
+    description = S("Drone setter"),
     inventory_image = "drone_setter.png",
     range = 0,
     stack_max = 1,
@@ -207,7 +207,7 @@ minetest.register_chatcommand("codelevel", {
             end
         elseif type(pname) == 'string' and type(pal) == 'string' then
             if pname == '' and pal == '' then
-                chat_send_player(name, S('codelevel usage'))
+                chat_send_player(name, S('Usage: codelevel <playername> <level> OR codelevel <level>'))
                 return
             else
                 pal = tonumber(pal)
@@ -220,12 +220,12 @@ minetest.register_chatcommand("codelevel", {
             local player = get_player_by_name(pname or '')
             if player then
                 player:get_meta():set_int('codeblock:auth_level', al)
-                return true, S('@1 auth_level set to @2', pname, al)
+                return true, S('@1 codelevel set to @2', pname, al)
             else
                 return false, S('Player not found')
             end
         else
-            return false, S('Invalid authlevel')
+            return false, S('Invalid codelevel')
         end
 
     end
@@ -248,9 +248,9 @@ minetest.register_chatcommand("codegenerate", {
         if player then
             local err = generate_examples(name)
             if err then
-                return false, S('error')
+                return false, S('Une erreur est survenue')
             else
-                return true, S('examples generated')
+                return true, S('Examples generated')
             end
         else
             return false, S('Player not found')

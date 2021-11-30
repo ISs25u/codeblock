@@ -54,7 +54,7 @@ local function use_volume(drone, v_used)
     if volume <= max_volume[al] then
         drone.volume = volume
     else
-        error(S('out of available volume (@1)', max_volume[al]), 4);
+        error(S('Maximum volume of blocks exceeded (@1)', max_volume[al]), 4);
     end
 
 end
@@ -68,7 +68,7 @@ local function use_call(drone)
         if (calls % calls_before_yield[al] == 0) then coroutine.yield() end
         drone.calls = calls
     else
-        error(S('call limit (@1) exeeded', max_calls[al]), 4);
+        error(S('Call limit exeeded (@1)', max_calls[al]), 4);
     end
 
 end
@@ -104,7 +104,7 @@ local function check_drone_yield(drone, op_level)
         drone.commands = commands
 
     else
-        error(S('ops limit (@1) exeeded', max_commands[al]), 4);
+        error(S('Maximum number of commands reached (@1)', max_commands[al]), 4);
     end
 
 end
@@ -115,7 +115,7 @@ local function check_dimensions(drone, ...)
 
     local M = max(...)
     if M > max_dimension[al] then
-        error(S('max dim @1 exeeded', max_dimension[al]), 4)
+        error(S('Maximum dimension exceeded (@1)', max_dimension[al]), 4)
     end
 
 end
@@ -128,7 +128,7 @@ local function check_distance(drone, x, y, z)
     local dz = z - s[3]
     local d = dx * dx + dy * dy + dz * dz
     if d > max_distance[drone.auth_level] then
-        error(S('too far away (@1)', sqrt(d)), 4)
+        error(S('The drone is too far away (@1)', sqrt(d)), 4)
     end
 
 end
@@ -139,7 +139,7 @@ end
 
 local function drone_move(drone, x, y, z)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     local x = (type(x) == 'number') and round0(x) or 0
     local y = (type(y) == 'number') and round0(y) or 0
@@ -173,7 +173,7 @@ end
 
 local function drone_forward(drone, n)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     local n = (type(n) == 'number') and round0(n) or 1
 
@@ -197,7 +197,7 @@ end
 
 local function drone_back(drone, n)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     local n = (type(n) == 'number') and round0(n) or 1
 
@@ -221,7 +221,7 @@ end
 
 local function drone_right(drone, n)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     local n = (type(n) == 'number') and round0(n) or 1
 
@@ -245,7 +245,7 @@ end
 
 local function drone_left(drone, n)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     local n = (type(n) == 'number') and round0(n) or 1
 
@@ -269,7 +269,7 @@ end
 
 local function drone_up(drone, n)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     local n = (type(n) == 'number') and round0(n) or 1
 
@@ -283,7 +283,7 @@ end
 
 local function drone_down(drone, n)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     local n = (type(n) == 'number') and round0(n) or 1
 
@@ -297,7 +297,7 @@ end
 
 local function drone_turn_left(drone)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     drone.dir = (drone.dir + tmp2) % tmp1
 
@@ -308,7 +308,7 @@ end
 
 local function drone_turn_right(drone)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     drone.dir = (drone.dir - tmp2) % tmp1
 
@@ -319,7 +319,7 @@ end
 
 local function drone_turn(drone, quarters)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     local quarters = (type(quarters) == 'number') and round0(quarters) or 0
 
@@ -336,11 +336,11 @@ end
 
 local function drone_place_block(drone, block)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed'), 3) end
+    if not real_block then error(S('Cannot place this block'), 3) end
 
     use_volume(drone, 1)
 
@@ -351,7 +351,7 @@ end
 
 local function drone_place_relative(drone, x, y, z, block, chkpt)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     local x = (type(x) == 'number') and round0(x) or 0
     local y = (type(y) == 'number') and round0(y) or 0
@@ -359,10 +359,10 @@ local function drone_place_relative(drone, x, y, z, block, chkpt)
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed'), 3) end
+    if not real_block then error(S('Cannot place this block'), 3) end
 
     local chkpt = (type(chkpt) == 'string') and chkpt or 'spawn'
-    if not drone.checkpoints[chkpt] then error(S("no chkpt @1", chkpt)) end
+    if not drone.checkpoints[chkpt] then error(S('Checkpoint @1 does not exists', chkpt)) end
     local cp = drone.checkpoints[chkpt]
 
     use_volume(drone, 1)
@@ -404,11 +404,11 @@ end
 
 local function drone_place_cube(drone, w, h, l, block, hollow)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed'), 3) end
+    if not real_block then error(S('Cannot place this block'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local w = (type(w) == 'number') and round0(abs(w)) or 10
@@ -449,11 +449,11 @@ end
 
 local function drone_place_ccube(drone, w, h, l, block, hollow)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed'), 3) end
+    if not real_block then error(S('Cannot place this block'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local w = (type(w) == 'number') and round0(abs(w)) or 10
@@ -483,11 +483,11 @@ end
 
 local function drone_place_sphere(drone, r, block, hollow)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed'), 3) end
+    if not real_block then error(S('Cannot place this block'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local r = (type(r) == 'number') and round0(abs(r)) or 5
@@ -522,11 +522,11 @@ end
 
 local function drone_place_csphere(drone, r, block, hollow)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed'), 3) end
+    if not real_block then error(S('Cannot place this block'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local r = (type(r) == 'number') and round0(abs(r)) or 5
@@ -542,11 +542,11 @@ end
 
 local function drone_place_dome(drone, r, block, hollow)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed'), 3) end
+    if not real_block then error(S('Cannot place this block'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local r = (type(r) == 'number') and round0(abs(r)) or 5
@@ -581,11 +581,11 @@ end
 
 local function drone_place_cdome(drone, r, block, hollow)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed'), 3) end
+    if not real_block then error(S('Cannot place this block'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local r = (type(r) == 'number') and round0(abs(r)) or 5
@@ -601,11 +601,11 @@ end
 
 local function drone_place_cylinder(drone, o, l, r, block, hollow)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed'), 3) end
+    if not real_block then error(S('Cannot place this block'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local o = (type(o) == 'string') and upper(o) or 'V'
@@ -667,11 +667,11 @@ end
 
 local function drone_place_ccylinder(drone, o, l, r, block, hollow)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
-    if not real_block then error(S('block not allowed'), 3) end
+    if not real_block then error(S('Cannot place this block'), 3) end
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local o = (type(o) == 'string') and upper(o) or 'V'
@@ -725,9 +725,9 @@ end
 
 local function drone_save_checkpoint(drone, chkpt)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
-    if type(chkpt) ~= 'string' then error(S("no chkpt name")) end
+    if type(chkpt) ~= 'string' then error(S('Checkpoint name is incorrect')) end
 
     drone.checkpoints[chkpt] = {
         x = drone.x,
@@ -742,14 +742,14 @@ end
 
 local function drone_goto_checkpoint(drone, chkpt, x, y, z)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     local x = (type(x) == 'number') and round0(x) or 0
     local y = (type(y) == 'number') and round0(y) or 0
     local z = (type(z) == 'number') and round0(z) or 0
 
     local chkpt = (type(chkpt) == 'string') and chkpt or 'spawn'
-    if not drone.checkpoints[chkpt] then error(S("no chkpt @1", chkpt)) end
+    if not drone.checkpoints[chkpt] then error(S('Checkpoint @1 does not exists', chkpt)) end
     local cp = drone.checkpoints[chkpt]
 
     local angle = drone:angle()
@@ -784,7 +784,7 @@ end
 
 local function drone_get_block(drone)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     local block_name = get_node({x = drone.x, y = drone.y, z = drone.z}).name
 
@@ -809,7 +809,7 @@ end
 
 local function drone_send_message(drone, string)
 
-    assert(drone, S("drone does not exist"))
+    assert(drone, S("Error, drone does not exist"))
 
     chat_send_player(drone.name, '> ' .. tostring(string))
     check_drone_yield(drone, 1)
