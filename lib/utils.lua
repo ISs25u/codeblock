@@ -52,6 +52,8 @@ function codeblock.utils.table_randomizer(tbl)
     return function() return tbl[keys[random(#keys)]] end
 end
 
+function codeblock.utils.scroll_max(tbl) return #tbl * 2.32 - 20.56 end
+
 --------------------------------------------------------------------------------
 -- Allowed blocks
 --------------------------------------------------------------------------------

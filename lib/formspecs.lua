@@ -15,6 +15,7 @@ local destroy_form = minetest.destroy_form
 local update_form = minetest.update_form
 local explode_textlist_event = minetest.explode_textlist_event
 local get_player_by_name = minetest.get_player_by_name
+local scroll_max = codeblock.utils.scroll_max
 local blocks = codeblock.utils.blocks
 local cubes = codeblock.utils.cubes_names
 local plants = codeblock.utils.plants_names
@@ -119,13 +120,14 @@ local file_editor = {
 
         -- help
         if meta.help == 'cubes' then
-            fs = fs .. 'scrollbaroptions[min=0;max=' .. #cubes_ik - 1 ..
+
+            fs = fs .. 'scrollbaroptions[min=0;max=' .. scroll_max(cubes_ik) ..
                      ';smallstep=1;largestep=5]'
             fs = fs .. 'scrollbar[19.5, 1;0.3, 9.25;vertical;c_scroll;' ..
                      meta.scroll_c .. ']'
             fs = fs ..
                      'scroll_container[17.75, 1.25;7.25, 10.75;c_scroll;vertical;' ..
-                     1.04 .. ']'
+                     0.5 .. ']'
             local yi, yl
             for i, v in pairs(cubes_ik) do
                 yi = tostring(i - 1 - 0.25)
@@ -139,13 +141,13 @@ local file_editor = {
 
         elseif meta.help == 'plants' then
 
-            fs = fs .. 'scrollbaroptions[min=0;max=' .. #plants_ik - 1 ..
+            fs = fs .. 'scrollbaroptions[min=0;max=' .. scroll_max(plants_ik) ..
                      ';smallstep=1;largestep=5]'
             fs = fs .. 'scrollbar[19.5, 1;0.3, 9.25;vertical;p_scroll;' ..
                      meta.scroll_p .. ']'
             fs = fs ..
                      'scroll_container[17.75, 1.25;7.25, 10.75;p_scroll;vertical;' ..
-                     0.85 .. ']'
+                     0.5 .. ']'
             local yi, yl
             for i, v in pairs(plants_ik) do
                 yi = tostring(i - 1 - 0.25)
@@ -159,7 +161,7 @@ local file_editor = {
 
         elseif meta.help == 'wools' then
 
-            fs = fs .. 'scrollbaroptions[min=0;max=' .. #wools_ik - 1 ..
+            fs = fs .. 'scrollbaroptions[min=0;max=' .. scroll_max(wools_ik) ..
                      ';smallstep=1;largestep=5]'
             fs = fs .. 'scrollbar[19.5, 1;0.3, 9.25;vertical;w_scroll;' ..
                      meta.scroll_w .. ']'
