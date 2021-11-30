@@ -10,7 +10,7 @@ Drone capacities depends on the user's _codelevel_ which can be set with the `/c
 | max_distance          |         150 |       300 |            700 |        1500 | max drone distance from drone spawn-point                            |
 | max_dimension         |          15 |        30 |             70 |         150 | max dimension of shapes (either width, length, height or radius)     |
 | commands_before_yield |           1 |        10 |             20 |          40 | number of codeblock commands before releasing control to Minetest    |
-| calls_before_yield    |           1 |        10 |             20 |          40 | number of function/loop calls before releasing control to Minetest   |
+| calls_before_yield    |           1 |       100 |            250 |         600 | number of function/loop calls before releasing control to Minetest   |
 
 Codelevel definitions can be modified by editing `lib/config.lua`.
 
