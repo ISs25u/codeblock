@@ -8,4 +8,5 @@ cat doc/commands.md |\
     perl -0777 -pe 's|`(.+)`|<b><style color=#264653 font=mono size=12>\1</style></b>|gm' |\
     perl -0777 -pe 's|\n\n|\n|gs' |\
     perl -0777 -pe 's|\[|\\[|gs' |\
-    perl -0777 -pe 's|\]|\\]|gs' > doc/commands.html
+    perl -0777 -pe 's|\]|\\]|gs' |\
+    xsel -ibps

@@ -1,6 +1,6 @@
-## TODO
+# TODO
 
-### v1.0.0
+# v1.0.0 goals
 
 - [x] User associated filesystem to store programs
 - [x] Allow to set drone's file with in-game interface + remember last program started
@@ -8,17 +8,11 @@
 - [x] In-game lua code editor
 - [ ] Blockly web-based editor
 
-### v.next
+# next intermediate version goals
 
 - [ ] option to set drone default block to place
-- [ ] add help next to code editor (commands and block list)
-- [ ] full compat with windows paths if necessary? (init.lua)
-- [x] optional depends on vector3, worldedit, wool, etc
-- [x] added max number of functions/loops calls before yield
-- [x] get block at drone position
-- [x] function that returns a block at random in a list of blocks
 
-### v.oneday
+# maybe
 
 - [ ] option to pause the drone a certain time?
 - [ ] make mod configurable (see https://github.com/AntumMT/mod-hovercraft/)
@@ -29,54 +23,7 @@
     - minetest.compare_block_status(pos, condition)
 - [ ] fix color(v,m,M) function (or remove)
 
-### v0.5.0
-
-- [x] update README (commands, directory)
-- [x] check player meta state on join
-- [x] editor : add options to create/remove files
-- [x] change to 'close file'
-- [x] checkboxes translations
-- [x] editor : add checkboxes to save/load on exit (fix bug?)
-- [x] filesystem : change to file names instead of indexes
-- [x] file : put an initial simple example.lua ready to use
-- [x] filesystem : handle removed/added files when restoring editor state
-
-### v0.4.0
-
-- [x] set drone limits/speed with authlevel (volume, calls, commands, dimension)
-- [x] api now have a custom vector library
-- [x] corrected centered shapes placement
-- [x] tool fixes/textures
-
-### v0.3.0
-
-- [x] add cylinder() and dome()
-- [x] WE center placing functions
-- [x] separate H and V cylinder and centered funcitons
-- [x] sanity checks of input types -> abs values !
-- [x] fix trad
-- [x] fix centered cylinders placement
-- [x] rewrite programs with appropriate functions
-- [x] review max volume allowed
-- [x] update list of commands in README and contentDB
-
-### v0.2.0
-
-- [x] safe formspecs
-- [x] check compatible versions of minetest
-- [x] add turn(n) ?
-- [x] add sphere()
-- [x] add cube()
-- [x] add move(r,f,u)
-- [x] relative positioning
-- [x] checkpoint saves drone dir
-- [x] use minetest.write
-- [x] remove error() when possible
-- [x] default drone move by 1
-- [x] drone label with program
-- [x] remove drone on leave
-
-## Other ideas
+# Other ideas
 
 - minetest.set_timeofday(val)
 - minetest.fix_light(pos1, pos2)
@@ -89,7 +36,7 @@
 - show line error on save?
 - colored concrete instead of wool? : https://github.com/nikolaus-albinger/colored_concrete
 
-### Game
+# Game ideas
 
 - [ ] generate flat clean world https://github.com/srifqi/superflat
 - [ ] teleport function?
