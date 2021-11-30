@@ -69,7 +69,7 @@ local entity_mt = {
                         end
                     elseif status == 'dead' then
                         chat_send_player(drone.name, S(
-                                             'Program \'1\' completed: @2',
+                                             "Program '@1' completed: @2",
                                              drone.file, tostring(drone)))
                         drone_rmv(drone.name)
                     end
@@ -93,7 +93,7 @@ local entity_mt = {
             if drone ~= nil then
                 chat_send_player(drone.name, S(
                                      'The drone has disappeared, program stopped'))
-                chat_send_player(drone.name, S('Program \'@1\' completed: @2',
+                chat_send_player(drone.name, S("Program '@1' completed: @2",
                                                drone.file, tostring(drone)))
                 drone_rmv(drone.name)
             end
@@ -183,7 +183,7 @@ function DroneEntity.on_remove(name)
 
     if drone ~= nil then
         if drone.cor ~= nil then
-            chat_send_player(drone.name, S('Program \'@1\' completed: @2',
+            chat_send_player(drone.name, S("Program '@1' completed: @2",
                                            drone.file, tostring(drone)))
             drone_rmv(name)
         else

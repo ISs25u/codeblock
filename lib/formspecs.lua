@@ -89,14 +89,11 @@ local file_editor = {
             fs = fs .. 'button[11.25,0;2.83, 0.75;close;' .. S('Close file') ..
                      ']'
 
-            fs = fs .. 'button[14,0;1.5, 0.75;help_cubes;' .. S('Blocks') ..
+            fs = fs .. 'button[14,0;1.5, 0.75;help_cubes;' .. S('Blocks') .. ']'
+            fs = fs .. 'button[15.5,0;1.5, 0.75;help_plants;' .. S('Plants') ..
                      ']'
-            fs = fs .. 'button[15.5,0;1.5, 0.75;help_plants;' ..
-                     S('Plants') .. ']'
-            fs = fs .. 'button[17,0;1.5, 0.75;help_wools;' .. S('Wools') ..
-                     ']'
-            fs = fs .. 'button[18.5,0;1.5, 0.75;help_cmds;' ..
-                     S('API') .. ']'
+            fs = fs .. 'button[17,0;1.5, 0.75;help_wools;' .. S('Wools') .. ']'
+            fs = fs .. 'button[18.5,0;1.5, 0.75;help_cmds;' .. S('API') .. ']'
         end
 
         -- checkboxes
@@ -113,7 +110,9 @@ local file_editor = {
             local etext = formspec_escape(text)
             fs = fs .. 'textarea[3.5,0.75;10.85,11;content;;' .. etext .. ']'
         elseif meta.active == 0 then
-            fs = fs .. 'label[4.5,3;' .. S('Double click a file to open it') .. ']'
+            fs =
+                fs .. 'label[5.5,4.5;' .. S('Double click a file to open it') ..
+                    ']'
         else
             fs = fs .. 'label[4.5,3;' .. S('Cannot read file') .. ']'
         end

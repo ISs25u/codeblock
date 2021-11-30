@@ -10,4 +10,4 @@ codeblock.config.max_commands = {1e4, 1e5, 1e6, 1e7}
 codeblock.config.max_distance = {150 ^ 2, 300 ^ 2, 700 ^ 2, 1500 ^ 2}
 codeblock.config.max_dimension = {15, 30, 70, 150}
 codeblock.config.commands_before_yield = {1, 10, 20, 40}
-codeblock.config.calls_before_yield = {1, 10, 20, 40}
+codeblock.config.calls_before_yield = {1, 100, 250, 600}
