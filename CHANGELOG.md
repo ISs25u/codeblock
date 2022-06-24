@@ -1,3 +1,12 @@
+# v0.7.0
+
+- [x] Minetest v5.5 compatible
+- [x] UI Fixes
+- [x] Refactoring (blocks, examples)
+- [x] Players now start with codelevel=4
+- [x] Examples are generated when newplayer join
+- [x] Moved optional dependencies to dependencies
+
 # v0.6.0
 
 - [x] add call yield

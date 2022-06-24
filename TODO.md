@@ -8,12 +8,6 @@
 - [x] In-game lua code editor
 - [ ] Blockly web-based editor
 
-# next intermediate version goals
-
-- [x] fix contrast in ingame API Help
-- [x] move allowed blocks to config + procedurally generate them
-- [x] create examples folder and generate them
-
 # maybe
 
 - [ ] option to set drone default block to place

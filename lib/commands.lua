@@ -44,8 +44,6 @@ local function place_block(x, y, z, block)
     set_node({x = x, y = y, z = z}, {name = block})
 end
 
-local function get_block(x, y, z) return get_node({x = x, y = y, z = z}) end
-
 local function use_volume(drone, v_used)
 
     local al = drone.auth_level
@@ -852,4 +850,4 @@ codeblock.commands.drone_place_ccylinder = drone_place_ccylinder
 -- utilities
 codeblock.commands.drone_send_message = drone_send_message
 codeblock.commands.drone_use_call = use_call
-codeblock.commands.drone_get_block = get_block
+codeblock.commands.drone_get_block = drone_get_block
