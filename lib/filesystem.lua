@@ -190,11 +190,6 @@ end
 -- export
 -------------------------------------------------------------------------------
 
-codeblock.filesystem.get_files = get_files
-codeblock.filesystem.get_file_from_index = get_file_from_index
-codeblock.filesystem.read = read
-codeblock.filesystem.write = write
-
 codeblock.filesystem.get_user_data = get_user_data
 codeblock.filesystem.remove_user_data = remove_user_data
 codeblock.filesystem.read_file = read_file

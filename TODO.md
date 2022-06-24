@@ -11,6 +11,7 @@
 # next intermediate version goals
 
 - [ ] option to set drone default block to place
+- [ ] fix contrast in ingame API Help
 
 # maybe
 
@@ -22,6 +23,7 @@
     - minetest.emerge_area(pos1, pos2, [callback], [param]) (does not trigger emerge)
     - minetest.compare_block_status(pos, condition)
 - [ ] fix color(v,m,M) function (or remove)
+- [ ] rebuild construction when re-running code (save previous area) 
 
 # Other ideas
 
