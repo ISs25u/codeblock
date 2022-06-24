@@ -19,6 +19,8 @@ local write_file = codeblock.filesystem.write_file
 local remove_user_data = codeblock.filesystem.remove_user_data
 local make_user_dir = codeblock.filesystem.make_user_dir
 
+local examples = codeblock.examples.examples
+
 --------------------------------------------------------------------------------
 -- private
 --------------------------------------------------------------------------------
@@ -41,7 +43,7 @@ local function generate_examples(name)
 
     local err = make_user_dir(name)
     if not err then
-        for ex_name, content in pairs(codeblock.examples) do
+        for ex_name, content in pairs(examples) do
             local filename = ex_name .. '.lua'
             write_file(name, filename, content)
         end
@@ -57,7 +59,7 @@ local function generate_simple_example(name)
     local err = make_user_dir(name)
     if not err then
         local filename = 'example.lua'
-        local content = codeblock.examples.example
+        local content = examples.example
         write_file(name, filename, content)
         return nil
     else

@@ -84,7 +84,7 @@ end
 local function read_file(name, filename, forceRefresh)
     local ud = get_user_data(name, forceRefresh)
     if forceRefresh then
-        -- we don't care if ftc is nil or not, we force read the file if it 
+        -- we don't care if ftc is nil or not, we force read the file if it
         -- *exists* in the user_data ftp
         -- as we forceRefresh ftp/fti/idf should be up to date
         -- but... we never know. Maybe we can read the file content
