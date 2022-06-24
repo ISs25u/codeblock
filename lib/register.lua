@@ -88,7 +88,7 @@ minetest.register_tool("codeblock:poser", {
         drone_on_place(name, pos)
         return itemstack
     end,
-    on_secondary_use = function(itemstack, user, pointed_thing) return end
+    on_secondary_use = function(itemstack, user, pointed_thing) end
 })
 
 minetest.register_tool("codeblock:setter", {
@@ -207,7 +207,8 @@ minetest.register_chatcommand("codelevel", {
             end
         elseif type(pname) == 'string' and type(pal) == 'string' then
             if pname == '' and pal == '' then
-                chat_send_player(name, S('Usage: codelevel <playername> <level> OR codelevel <level>'))
+                chat_send_player(name, S(
+                                     'Usage: codelevel <playername> <level> OR codelevel <level>'))
                 return
             else
                 pal = tonumber(pal)
