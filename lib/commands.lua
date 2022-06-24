@@ -16,10 +16,10 @@ local set_node = minetest.set_node
 local get_node = minetest.get_node
 
 local S = codeblock.S
-local cubes_names = codeblock.utils.cubes_names
-local blocks = codeblock.utils.blocks
 local table_reverse = codeblock.utils.table_reverse
 
+local cubes_names = codeblock.config.allowed_blocks.cubes
+local blocks = codeblock.config.allowed_blocks.all
 local max_calls = codeblock.config.max_calls
 local max_volume = codeblock.config.max_volume
 local max_commands = codeblock.config.max_commands
@@ -337,6 +337,8 @@ end
 local function drone_place_block(drone, block)
 
     assert(drone, S("Error, drone does not exist"))
+
+    minetest.chat_send_all(block)
 
     block = block or cubes_names.stone
     local real_block = blocks[block]
@@ -850,4 +852,4 @@ codeblock.commands.drone_place_ccylinder = drone_place_ccylinder
 -- utilities
 codeblock.commands.drone_send_message = drone_send_message
 codeblock.commands.drone_use_call = use_call
-codeblock.commands.drone_get_block = drone_get_block
+codeblock.commands.drone_get_block = get_block

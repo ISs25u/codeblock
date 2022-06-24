@@ -1,5 +1,9 @@
 codeblock.config = {}
 
+--------------------------------------------------------------------------------
+-- General config
+--------------------------------------------------------------------------------
+
 ----------------------- 1:limited 2:standard 3:privileged 4:trusted
 codeblock.config.lua_dir = 'codeblock_files'
 codeblock.config.default_auth_level = 4
@@ -13,10 +17,10 @@ codeblock.config.commands_before_yield = {1, 10, 20, 40}
 codeblock.config.calls_before_yield = {1, 100, 250, 600}
 
 --------------------------------------------------------------------------------
--- Allowed blocks
+-- Allowed blocks with their names
 --------------------------------------------------------------------------------
 
-codeblock.config.allowed_blocks = {
+local allowed_blocks = {
     cubes = {
         air = 'air',
         stone = 'default:stone',
@@ -146,20 +150,23 @@ codeblock.config.allowed_blocks = {
         wool_red = 'wool:red',
         wool_magenta = 'wool:magenta',
         wool_pink = 'wool:pink'
-    },
-    iwools = {
-        'wool:red', 'wool:brown', 'wool:orange', 'wool:yellow', 'wool:green',
-        'wool:dark_green', 'wool:cyan', 'wool:blue', 'wool:violet',
-        'wool:magenta', 'wool:pink'
     }
 }
 
-codeblock.config.allowed_blocks.all = codeblock.config.allowed_blocks.cubes
+codeblock.config.allowed_blocks = {
+    all = {},
+    iwools = {
+        'wool_red', 'wool_brown', 'wool_orange', 'wool_yellow', 'wool_green',
+        'wool_dark_green', 'wool_cyan', 'wool_blue', 'wool_violet',
+        'wool_magenta', 'wool_pink'
+    }
+}
 
-for _, v in pairs(codeblock.config.allowed_blocks.plants) do
-    table.insert(codeblock.config.allowed_blocks.all, v)
-end
+for category, blocks in pairs(allowed_blocks) do
+    codeblock.config.allowed_blocks[category] = {}
+    for k, v in pairs(blocks) do
+        codeblock.config.allowed_blocks[category][k] = k
+        codeblock.config.allowed_blocks.all[k] = v
+    end
 
-for _, v in pairs(codeblock.config.allowed_blocks.wools) do
-    table.insert(codeblock.config.allowed_blocks.all, v)
 end

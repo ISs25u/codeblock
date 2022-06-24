@@ -11,7 +11,7 @@
 # next intermediate version goals
 
 - [x] fix contrast in ingame API Help
-- [ ] move allowed blocks to config + procedurally generate them
+- [x] move allowed blocks to config + procedurally generate them
 - [x] create examples folder and generate them
 
 # maybe

@@ -36,10 +36,10 @@ local send_message = codeblock.commands.drone_send_message
 local use_call = codeblock.commands.drone_use_call
 local drone_get_block = codeblock.commands.drone_get_block
 
-local cubes = codeblock.utils.cubes_names
-local plants = codeblock.utils.plants_names
-local wools = codeblock.utils.wools_names
-local iwools = codeblock.utils.iwools_names
+local cubes = codeblock.config.allowed_blocks.cubes
+local plants = codeblock.config.allowed_blocks.plants
+local wools = codeblock.config.allowed_blocks.wools
+local iwools = codeblock.config.allowed_blocks.iwools
 local niwools = #iwools
 local table_randomizer = codeblock.utils.table_randomizer
 
