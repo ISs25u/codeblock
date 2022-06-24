@@ -6,16 +6,15 @@ codeblock.examples = {}
 
 local get_dir_list = minetest.get_dir_list
 local path_join = codeblock.utils.path_join
-local examples_path = path_join(codeblock.modpath, 'examples')
+local examples_path = path_join(codeblock.modpath, 'lib', 'examples')
 
 -------------------------------------------------------------------------------
 -- private
 -------------------------------------------------------------------------------
 
-local examples = {}
+local function read_examples_at_init()
 
-local function load_examples()
-
+    local examples = {}
     local files = get_dir_list(examples_path, false)
     table.sort(files)
 
@@ -27,11 +26,12 @@ local function load_examples()
 
     end
 
+    return examples
+
 end
 
 -------------------------------------------------------------------------------
 -- export
 -------------------------------------------------------------------------------
 
-codeblock.examples.load_examples = load_examples
-codeblock.examples.examples = examples
+codeblock.examples.examples = read_examples_at_init()

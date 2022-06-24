@@ -12,8 +12,7 @@
 
 - [x] fix contrast in ingame API Help
 - [ ] move allowed blocks to config + procedurally generate them
-- [ ] create examples folder and generate them
-- [ ] add exit button for beginners
+- [x] create examples folder and generate them
 
 # maybe
 

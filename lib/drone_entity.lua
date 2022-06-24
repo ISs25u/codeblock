@@ -134,6 +134,7 @@ function DroneEntity.on_place(name, pos)
 
     if (not last_file) or last_file == "" or
         (not get_user_data(name).ftp[last_file]) then
+
         DroneEntity.show_set_file_form(name)
     else
         DroneEntity.set_file(name, last_file)
@@ -222,7 +223,6 @@ end
 
 function DroneEntity.show_set_file_form(name)
 
-    local ud = get_user_data(name)
     local meta = {name = name, selectedIndex = 0}
     local fs = codeblock.formspecs.file_chooser
     minetest.create_form(meta, name, fs.get_form(meta), fs.on_close)

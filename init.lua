@@ -7,7 +7,7 @@ dofile(codeblock.modpath .. "/lib/pathjoin.lua")
 dofile(codeblock.modpath .. "/lib/filesystem.lua")
 dofile(codeblock.modpath .. "/lib/examples.lua")
 --
-codeblock.examples.load_examples() -- read at init time
+-- codeblock.examples.load_examples() -- read at init time
 --
 dofile(codeblock.modpath .. "/lib/commands.lua")
 dofile(codeblock.modpath .. "/lib/sandbox.lua")
