@@ -3,6 +3,7 @@
         "minetest",
         "worldedit",
         "vector3",
-        "ItemStack"
+        "ItemStack",
+        "codeblock"
     ]
 }

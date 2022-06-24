@@ -10,11 +10,15 @@
 
 # next intermediate version goals
 
-- [ ] option to set drone default block to place
-- [ ] fix contrast in ingame API Help
+- [x] fix contrast in ingame API Help
+- [ ] move allowed blocks to config + procedurally generate them
+- [ ] create examples folder and generate them
+- [ ] add exit button for beginners
 
 # maybe
 
+- [ ] option to set drone default block to place
+- [ ] open copy of program
 - [ ] option to pause the drone a certain time?
 - [ ] make mod configurable (see https://github.com/AntumMT/mod-hovercraft/)
 - [ ] fix place() in non-loaded chunks

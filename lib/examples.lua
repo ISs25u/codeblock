@@ -139,14 +139,6 @@ codeblock.examples.plot3D = [[
 function plot3D(XMIN, XMAX, ZMIN, ZMAX, FMIN, FMAX, NPOINTS, SIZE, fun)
 
     local visited = {}
-    for x = 1, NPOINTS do
-        for y = 1, NPOINTS do
-            for z = 1, NPOINTS do
-                visited[x + y * NPOINTS + z * NPOINTS ^ 2] = false
-            end
-        end
-    end
-
     local increment = (XMAX - XMIN) / (NPOINTS - 1)
     local rx, ry, rz, y, i
     for x = XMIN, XMAX, increment do

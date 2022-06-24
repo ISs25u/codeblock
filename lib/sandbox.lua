@@ -97,7 +97,9 @@ local function getWoolOrError()
             __index = function(self, index)
                 error('wool mod is not enabled', 2)
             end,
-            __call = function(self, ...) error('wool mod is not enabled', 2) end
+            __call = function(self, ...)
+                error('wool mod is not enabled', 2)
+            end
         })
     end
 end
@@ -110,50 +112,17 @@ local function getScriptEnv(drone)
 
     local env = {
         -- movements
-        move = function(x, y, z)
-            move(drone, x, y, z)
-            return
-        end,
-        forward = function(n)
-            forward(drone, n)
-            return
-        end,
-        back = function(n)
-            back(drone, n)
-            return
-        end,
-        left = function(n)
-            left(drone, n)
-            return
-        end,
-        right = function(n)
-            right(drone, n)
-            return
-        end,
-        up = function(n)
-            up(drone, n)
-            return
-        end,
-        down = function(n)
-            down(drone, n)
-            return
-        end,
-        turn_left = function()
-            turn_left(drone)
-            return
-        end,
-        turn_right = function()
-            turn_right(drone)
-            return
-        end,
-        turn = function(quarters)
-            turn(drone, quarters)
-            return
-        end,
-        place = function(block)
-            place_block(drone, block)
-            return
-        end,
+        move = function(x, y, z) move(drone, x, y, z) end,
+        forward = function(n) forward(drone, n) end,
+        back = function(n) back(drone, n) end,
+        left = function(n) left(drone, n) end,
+        right = function(n) right(drone, n) end,
+        up = function(n) up(drone, n) end,
+        down = function(n) down(drone, n) end,
+        turn_left = function() turn_left(drone) end,
+        turn_right = function() turn_right(drone) end,
+        turn = function(quarters) turn(drone, quarters) end,
+        place = function(block) place_block(drone, block) end,
         place_relative = function(x, y, z, block, chkpt)
             place_relative(drone, x, y, z, block, chkpt)
         end,
@@ -451,19 +420,22 @@ function codeblock.sandbox.get_safe_coroutine(drone, filename)
     local untrusted_code = codeblock.filesystem.read_file(name, filename, true)
 
     if not untrusted_code then
-        return false, S("Compilation error in @1: ", filename) .. S('@1 not found.', filename)
+        return false, S("Compilation error in @1: ", filename) ..
+                   S('@1 not found.', filename)
     end
 
     if untrusted_code:byte(1) == 27 then
-        return false,
-               S("Compilation error in @1: ", filename) .. S("binary bytecode prohibited")
+        return false, S("Compilation error in @1: ", filename) ..
+                   S("binary bytecode prohibited")
     end
 
     -- checking forbiden things
 
     local err = check_code(untrusted_code);
 
-    if err then return false, S("Compilation error in @1: ", filename) .. '\n' .. err end
+    if err then
+        return false, S("Compilation error in @1: ", filename) .. '\n' .. err
+    end
 
     -- preprocessing code
 
@@ -473,7 +445,8 @@ function codeblock.sandbox.get_safe_coroutine(drone, filename)
 
     local bytecode, message = loadstring(safe_code)
     if not bytecode then
-        return false, S("Compilation error in @1: ", filename) .. '\n' .. message
+        return false,
+               S("Compilation error in @1: ", filename) .. '\n' .. message
     end
 
     -- return it
