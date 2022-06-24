@@ -1,6 +1,6 @@
 # Codelevel
 
-Drone capacities depends on the user's _codelevel_ which can be set with the `/codelevel` [command](https://github.com/gigaturbo/codeblock#chat-commands) (see below). High codelevels should be given carefully to users as program could overload the server and crash it. Default codelevel is `1`.
+Drone capacities depends on the user's _codelevel_ which can be set with the `/codelevel` [command](https://github.com/gigaturbo/codeblock#chat-commands) (see below). High codelevels should be given carefully to users as program could overload the server and crash it. Default codelevel is `4`, use with care and change this if you don't trust users!
 
 | codelevel             | 1 (limited) | 2 (basic) | 3 (privileged) | 4 (trusted) | description                                                          |
 |-----------------------|-------------|-----------|----------------|-------------|----------------------------------------------------------------------|

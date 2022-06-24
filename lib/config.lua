@@ -2,7 +2,7 @@ codeblock.config = {}
 
 ----------------------- 1:limited 2:standard 3:privileged 4:trusted
 codeblock.config.lua_dir = 'codeblock_files'
-codeblock.config.default_auth_level = 1
+codeblock.config.default_auth_level = 4
 codeblock.config.auth_levels = {1, 2, 3, 4}
 codeblock.config.max_calls = {1e6, 1e7, 1e8, 1e9}
 codeblock.config.max_volume = {1e5, 1e6, 1e7, 1e8}
