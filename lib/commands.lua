@@ -362,7 +362,9 @@ local function drone_place_relative(drone, x, y, z, block, chkpt)
     if not real_block then error(S('Cannot place this block'), 3) end
 
     local chkpt = (type(chkpt) == 'string') and chkpt or 'spawn'
-    if not drone.checkpoints[chkpt] then error(S('Checkpoint @1 does not exists', chkpt)) end
+    if not drone.checkpoints[chkpt] then
+        error(S('Checkpoint @1 does not exists', chkpt))
+    end
     local cp = drone.checkpoints[chkpt]
 
     use_volume(drone, 1)
@@ -442,7 +444,7 @@ local function drone_place_cube(drone, w, h, l, block, hollow)
 
     local pos = {x = x, y = y, z = z}
 
-    count = worldedit.cube(pos, w, h, l, real_block, hollow)
+    worldedit.cube(pos, w, h, l, real_block, hollow)
     check_drone_yield(drone, 2)
 
 end
@@ -476,7 +478,7 @@ local function drone_place_ccube(drone, w, h, l, block, hollow)
 
     local pos = {x = drone.x, y = drone.y - floor(0.5 * (h - 1)), z = drone.z}
 
-    count = worldedit.cube(pos, w, h, l, real_block, hollow)
+    worldedit.cube(pos, w, h, l, real_block, hollow)
     check_drone_yield(drone, 2)
 
 end
@@ -515,7 +517,7 @@ local function drone_place_sphere(drone, r, block, hollow)
 
     local pos = {x = x, y = y, z = z}
 
-    count = worldedit.sphere(pos, r, real_block, hollow)
+    worldedit.sphere(pos, r, real_block, hollow)
     check_drone_yield(drone, 2)
 
 end
@@ -535,7 +537,7 @@ local function drone_place_csphere(drone, r, block, hollow)
     check_dimensions(drone, r * 2)
     use_volume(drone, round0(tmp3 * (r + 0.514) ^ 3))
 
-    count = worldedit.sphere(pos, r, real_block, hollow)
+    worldedit.sphere(pos, r, real_block, hollow)
     check_drone_yield(drone, 2)
 
 end
@@ -574,7 +576,7 @@ local function drone_place_dome(drone, r, block, hollow)
 
     local pos = {x = x, y = y, z = z}
 
-    count = worldedit.dome(pos, r, real_block, hollow)
+    worldedit.dome(pos, r, real_block, hollow)
     check_drone_yield(drone, 2)
 
 end
@@ -594,7 +596,7 @@ local function drone_place_cdome(drone, r, block, hollow)
     check_dimensions(drone, r * 2)
     use_volume(drone, round0(tmp4 * (r + 0.514) ^ 3))
 
-    count = worldedit.dome(pos, r, real_block, hollow)
+    worldedit.dome(pos, r, real_block, hollow)
     check_drone_yield(drone, 2)
 
 end
@@ -660,7 +662,7 @@ local function drone_place_cylinder(drone, o, l, r, block, hollow)
 
     local pos = {x = x, y = y, z = z}
 
-    count = worldedit.cylinder(pos, axis, l, r, r, real_block, hollow)
+    worldedit.cylinder(pos, axis, l, r, r, real_block, hollow)
     check_drone_yield(drone, 2)
 
 end
@@ -714,7 +716,7 @@ local function drone_place_ccylinder(drone, o, l, r, block, hollow)
 
     local pos = {x = x, y = y, z = z}
 
-    count = worldedit.cylinder(pos, axis, l, r, r, real_block, hollow)
+    worldedit.cylinder(pos, axis, l, r, r, real_block, hollow)
     check_drone_yield(drone, 2)
 
 end
@@ -749,7 +751,9 @@ local function drone_goto_checkpoint(drone, chkpt, x, y, z)
     local z = (type(z) == 'number') and round0(z) or 0
 
     local chkpt = (type(chkpt) == 'string') and chkpt or 'spawn'
-    if not drone.checkpoints[chkpt] then error(S('Checkpoint @1 does not exists', chkpt)) end
+    if not drone.checkpoints[chkpt] then
+        error(S('Checkpoint @1 does not exists', chkpt))
+    end
     local cp = drone.checkpoints[chkpt]
 
     local angle = drone:angle()

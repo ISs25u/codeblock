@@ -54,20 +54,6 @@ local function generate_examples(name)
     end
 end
 
-local function generate_simple_example(name)
-
-    local err = make_user_dir(name)
-    if not err then
-        local filename = 'example.lua'
-        local content = examples.example
-        write_file(name, filename, content)
-        return nil
-    else
-        chat_send_player(name, err)
-        return err
-    end
-end
-
 --------------------------------------------------------------------------------
 -- tools
 --------------------------------------------------------------------------------
@@ -90,7 +76,7 @@ minetest.register_tool("codeblock:poser", {
         drone_on_place(name, pos)
         return itemstack
     end,
-    on_secondary_use = function(itemstack, user, pointed_thing) end
+    on_secondary_use = function() end
 })
 
 minetest.register_tool("codeblock:setter", {
@@ -98,18 +84,18 @@ minetest.register_tool("codeblock:setter", {
     inventory_image = "drone_setter.png",
     range = 0,
     stack_max = 1,
-    on_drop = function(itemstack, dropper, pos) return itemstack end,
-    on_use = function(itemstack, user, pointed_thing)
+    on_drop = function(itemstack) return itemstack end,
+    on_use = function(itemstack, user)
         local name = user:get_player_name()
         drone_on_remove(name)
         return itemstack
     end,
-    on_place = function(itemstack, placer, pointed_thing)
+    on_place = function(itemstack, placer)
         local name = placer:get_player_name()
         drone_show_file_editor_form(name)
         return itemstack
     end,
-    on_secondary_use = function(itemstack, user, pointed_thing)
+    on_secondary_use = function(itemstack, user)
         local name = user:get_player_name()
         drone_show_file_editor_form(name)
         return itemstack
@@ -134,7 +120,7 @@ minetest.register_on_newplayer(function(player)
     get_user_data(name)
 
     -- example
-    generate_simple_example(name)
+    generate_examples(name)
 
     -- privs
     local privs = minetest.get_player_privs(player:get_player_name())

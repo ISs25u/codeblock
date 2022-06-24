@@ -66,44 +66,6 @@ do
     end
 end
 
-local function getVector3Error()
-    if codeblock.is_vector3_enabled then
-        return nil
-    else
-        return setmetatable({}, {
-            __index = function(self, index)
-                error(S('vector3 mod is not enabled'), 2)
-            end,
-            __call = function(self, ...)
-                error(S('vector3 mod is not enabled'), 2)
-            end
-        })
-    end
-end
-
-local function getWorldEditError()
-    if codeblock.is_worldedit_enabled then
-        return nil
-    else
-        return function() error(S('WorldEdit mod is not enabled'), 2) end
-    end
-end
-
-local function getWoolOrError()
-    if codeblock.is_wool_enabled then
-        return nil
-    else
-        return setmetatable({}, {
-            __index = function(self, index)
-                error('wool mod is not enabled', 2)
-            end,
-            __call = function(self, ...)
-                error('wool mod is not enabled', 2)
-            end
-        })
-    end
-end
-
 local function getScriptEnv(drone)
 
     assert(drone, S("Error, drone does not exist"))
@@ -131,64 +93,60 @@ local function getScriptEnv(drone)
             goto_checkpoint(drone, chkpt, x, y, z)
         end,
         -- worldedit commands
-        cube = getWorldEditError() or function(w, h, l, block, hollow)
+        cube = function(w, h, l, block, hollow)
             place_cube(drone, w, h, l, block, hollow)
         end,
-        sphere = getWorldEditError() or
-            function(r, block, hollow)
-                place_sphere(drone, r, block, hollow)
-            end,
-        dome = getWorldEditError() or
-            function(r, block, hollow)
-                place_dome(drone, r, block, hollow)
-            end,
-        cylinder = getWorldEditError() or function(l, r, block, hollow)
+        sphere = function(r, block, hollow)
+            place_sphere(drone, r, block, hollow)
+        end,
+        dome = function(r, block, hollow)
+            place_dome(drone, r, block, hollow)
+        end,
+        cylinder = function(l, r, block, hollow)
             place_cylinder(drone, 'V', l, r, block, hollow)
         end,
         vertical = {
-            cylinder = getWorldEditError() or function(l, r, block, hollow)
+            cylinder = function(l, r, block, hollow)
                 place_cylinder(drone, 'V', l, r, block, hollow)
             end
         },
         horizontal = {
-            cylinder = getWorldEditError() or function(l, r, block, hollow)
+            cylinder = function(l, r, block, hollow)
                 place_cylinder(drone, 'H', l, r, block, hollow)
             end
         },
         centered = {
-            cube = getWorldEditError() or function(w, h, l, block, hollow)
+            cube = function(w, h, l, block, hollow)
                 place_ccube(drone, w, h, l, block, hollow)
             end,
-            sphere = getWorldEditError() or
-                function(r, block, hollow)
-                    place_csphere(drone, r, block, hollow)
-                end,
-            dome = getWorldEditError() or
-                function(r, block, hollow)
-                    place_cdome(drone, r, block, hollow)
-                end,
-            cylinder = getWorldEditError() or function(l, r, block, hollow)
+            sphere = function(r, block, hollow)
+                place_csphere(drone, r, block, hollow)
+            end,
+            dome = function(r, block, hollow)
+                place_cdome(drone, r, block, hollow)
+            end,
+            cylinder = function(l, r, block, hollow)
                 place_ccylinder(drone, 'V', l, r, block, hollow)
             end,
             vertical = {
-                cylinder = getWorldEditError() or function(l, r, block, hollow)
+                cylinder = function(l, r, block, hollow)
                     place_ccylinder(drone, 'V', l, r, block, hollow)
                 end
             },
             horizontal = {
-                cylinder = getWorldEditError() or function(l, r, block, hollow)
+                cylinder = function(l, r, block, hollow)
                     place_ccylinder(drone, 'H', l, r, block, hollow)
                 end
             }
         },
         -- blocks: wools
-        wools = getWoolOrError() or wools,
-        iwools = getWoolOrError() or iwools,
+        wools = wools,
+        iwools = iwools,
         -- blocks: default
         blocks = cubes,
         plants = plants,
         -- vector3 commands
-        vector = getVector3Error() or vector3,
+        vector = vector3,
         -- utilities
         get_block = function() return drone_get_block(drone) end,
         print = function(str) return send_message(drone, str) end,

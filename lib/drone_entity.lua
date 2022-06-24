@@ -77,15 +77,14 @@ local entity_mt = {
 
             end
 
-            return
         end,
 
-        on_rightclick = function(self, clicker) return end,
+        on_rightclick = function(self, clicker) end,
 
         on_punch = function(self, puncher, time_from_last_punch,
                             tool_capabilities, dir, damage) return {} end,
 
-        on_blast = function(self, damage) return end,
+        on_blast = function(self, damage) end,
 
         on_deactivate = function(self, ...)
             -- check drone existence, not the cached value
@@ -98,7 +97,6 @@ local entity_mt = {
                 drone_rmv(drone.name)
             end
 
-            return
         end
 
     }
