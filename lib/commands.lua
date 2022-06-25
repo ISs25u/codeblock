@@ -336,8 +336,6 @@ local function drone_place_block(drone, block)
 
     assert(drone, S("Error, drone does not exist"))
 
-    minetest.chat_send_all(block)
-
     block = block or cubes_names.stone
     local real_block = blocks[block]
     if not real_block then error(S('Cannot place this block'), 3) end
