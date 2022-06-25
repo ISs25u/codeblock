@@ -12,11 +12,9 @@ printf \
         "education",
         "tools"
     ],
-    "content_warnings": null,
+    "content_warnings": [],
     "license": "GPL-3.0-only",
     "media_license": "GPL-3.0-only",
     "repo": "https://github.com/gigaturbo/codeblock",
-    "website": null,
     "issue_tracker": "https://github.com/gigaturbo/codeblock/issues",
-    "forums": null
 }' "$(perl -0777 -pe 's|\n|\\n|gs' README.md)" > .cdb.json
