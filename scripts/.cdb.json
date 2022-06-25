@@ -1,13 +1,10 @@
-#!/usr/bin/env bash
-
-printf \
-'{
+{
     "type": "MOD",
     "title": "CodeBlock",
     "name": "codeblock",
     "dev_state": "ACTIVELY_DEVELOPED",
     "short_description": "Use lua code to build anything you want",
-    "long_description": "%s",
+    "long_description": "",
     "tags": [
         "education",
         "tools"
@@ -19,4 +16,4 @@ printf \
     "website": null,
     "issue_tracker": "https://github.com/gigaturbo/codeblock/issues",
     "forums": null
-}' "$(perl -0777 -pe 's|\n|\\n|gs' README.md)" > .cdb.json
+}
