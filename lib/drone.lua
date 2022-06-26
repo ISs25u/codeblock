@@ -118,6 +118,7 @@ local drone_mt = {
             Drone.remove(k)
             return rawset(Drone.instances, k, v)
         end,
+
         remove = function(k)
             local d = rawget(Drone.instances, k)
             if d ~= nil then
@@ -129,6 +130,7 @@ local drone_mt = {
             end
             return nil
         end,
+
         on_place = function(name, pos)
 
             local player = get_player_by_name(name)
@@ -164,6 +166,7 @@ local drone_mt = {
             end
 
         end,
+
         on_run = function(name)
 
             local drone = Drone.get(name)
@@ -197,6 +200,7 @@ local drone_mt = {
             drone.cor = res
 
         end,
+
         on_remove = function(name)
 
             local drone = Drone.get(name)
@@ -212,6 +216,7 @@ local drone_mt = {
             end
 
         end,
+
         set_file = function(name, filename)
 
             assert(filename)
@@ -240,6 +245,7 @@ local drone_mt = {
             return nil
 
         end,
+
         show_set_file_form = function(name)
 
             local meta = {name = name, selectedIndex = 0}
@@ -247,6 +253,7 @@ local drone_mt = {
             minetest.create_form(meta, name, fs.get_form(meta), fs.on_close)
 
         end,
+
         show_file_editor_form = function(name)
 
             local ud = get_user_data(name, true)
@@ -305,24 +312,22 @@ local drone_mt = {
             }
             local fe = codeblock.formspecs.file_editor
             minetest.create_form(meta, name, fe.get_form(meta), fe.on_close)
-            -- minetest.get_form_timer(name).start(1)
-
         end
 
     },
 
     __tostring = function()
-
         local s = ''
         for k, v in pairs(Drone.instances) do
             s = s .. k .. ': ' .. tostring(v) .. '\n'
         end
         return s
-
     end
 
 }
 
---- Export
+--------------------------------------------------------------------------------
+-- export
+--------------------------------------------------------------------------------
 
 codeblock.Drone = setmetatable(Drone, drone_mt)

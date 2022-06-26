@@ -27,8 +27,8 @@ local DroneEntity = {
         static_save = false
     },
     nametag = nil,
-    _data = nil,
-    owner = nil
+    owner = nil,
+    _data = nil
 }
 
 local entity_mt = {
