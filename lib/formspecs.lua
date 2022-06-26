@@ -31,7 +31,7 @@ local remove_file = codeblock.filesystem.remove_file
 local get_itf = codeblock.filesystem.get_itf
 local get_fti = codeblock.filesystem.get_fti
 
-local set_file = codeblock.DroneEntity.set_file
+local set_file = codeblock.Drone.set_file
 
 --------------------------------------------------------------------------------
 -- private
@@ -257,8 +257,12 @@ local file_editor = {
                 if #filename == 0 then return end
                 filename = filename .. '.lua'
                 if not get_user_data(name).ftp[filename] then
-                    write_file(name, filename, '-- ' .. filename .. '\n\n' ..
-                                   codeblock.examples.example .. '\n')
+                    write_file(name, filename,
+                               '-- ' .. filename .. '\n\n' ..
+                                   "for i = 1, 10 do\n" ..
+                                   "  place(blocks.obsidian)\n" .. "  up(1)\n" ..
+                                   "end\n")
+
                     meta.newfile = ''
                     return filename
                 end

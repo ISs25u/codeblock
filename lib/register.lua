@@ -6,11 +6,10 @@ local get_player_by_name = minetest.get_player_by_name
 local get_pointed_thing_position = minetest.get_pointed_thing_position
 local chat_send_player = minetest.chat_send_player
 
-local drone_on_run = codeblock.DroneEntity.on_run
-local drone_on_place = codeblock.DroneEntity.on_place
-local drone_on_remove = codeblock.DroneEntity.on_remove
-local drone_show_set_file_form = codeblock.DroneEntity.show_set_file_form
-local drone_show_file_editor_form = codeblock.DroneEntity.show_file_editor_form
+local drone_on_run = codeblock.Drone.on_run
+local drone_on_place = codeblock.Drone.on_place
+local drone_on_remove = codeblock.Drone.on_remove
+local drone_show_file_editor_form = codeblock.Drone.show_file_editor_form
 
 local check_auth_level = codeblock.utils.check_auth_level
 
