@@ -1,0 +1,17 @@
+{
+    "runtime.version": "Lua 5.1",
+    "diagnostics": {
+        "enable": true,
+        "globals": [
+            "minetest",
+            "worldedit",
+            "ItemStack",
+            "vector3"
+        ]
+    },
+    "workspace": {
+        "ignoreDir": [
+            "lib/examples/*.lua"
+        ]
+    }
+}
