@@ -70,8 +70,6 @@ local function getScriptEnv(drone)
 
     assert(drone, S("Error, drone does not exist"))
 
-    local name = drone.name
-
     local env = {
         -- movements
         move = function(x, y, z) move(drone, x, y, z) end,
@@ -278,7 +276,6 @@ local function is_inside_string(strings, pos) -- is position inside one of the s
 end
 
 local function find_outside_string(script, pattern, pos, strings)
-    local length = string.len(script)
     local found = true;
     local i1 = pos;
     while found do
