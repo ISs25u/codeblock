@@ -152,15 +152,15 @@ minetest.register_on_joinplayer(function(player)
     get_user_data(name)
 
     -- tools
-    set_tools(player)
+    -- set_tools(player)
 
     -- overrides
     -- TODO: TEMP fix
-    player:override_day_night_ratio(1)
-    player:set_stars({visible = false})
-    player:set_sun({visible = false})
-    player:set_moon({visible = false})
-    player:set_clouds({density = 0})
+    -- player:override_day_night_ratio(1)
+    -- player:set_stars({visible = false})
+    -- player:set_sun({visible = false})
+    -- player:set_moon({visible = false})
+    -- player:set_clouds({density = 0})
 
 end)
 
