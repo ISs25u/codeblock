@@ -122,11 +122,11 @@ minetest.register_on_newplayer(function(player)
     generate_examples(name)
 
     -- privs
-    local privs = minetest.get_player_privs(player:get_player_name())
-    privs.fly = true
-    privs.fast = true
-    privs.noclip = true
-    minetest.set_player_privs(player:get_player_name(), privs)
+    -- local privs = minetest.get_player_privs(player:get_player_name())
+    -- privs.fly = true
+    -- privs.fast = true
+    -- privs.noclip = true
+    -- minetest.set_player_privs(player:get_player_name(), privs)
 
     -- meta
     local meta = player:get_meta()

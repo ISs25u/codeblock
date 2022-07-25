@@ -35,6 +35,11 @@ local goto_checkpoint = codeblock.commands.drone_goto_checkpoint
 local send_message = codeblock.commands.drone_send_message
 local use_call = codeblock.commands.drone_use_call
 local drone_get_block = codeblock.commands.drone_get_block
+local override_day_night_ratio = codeblock.commands.drone_override_day_night_ratio
+local set_clouds = codeblock.commands.drone_set_clouds
+local set_stars = codeblock.commands.drone_set_stars
+local set_sun = codeblock.commands.drone_set_sun
+local set_moon = codeblock.commands.drone_set_moon
 
 local cubes = codeblock.config.allowed_blocks.cubes
 local plants = codeblock.config.allowed_blocks.plants
@@ -145,6 +150,12 @@ local function getScriptEnv(drone)
         plants = plants,
         -- vector3 commands
         vector = vector3,
+        -- environments
+        override_day_night_ratio = function(ratio) return override_day_night_ratio(drone, ratio) end,
+        set_clouds = function(value) return set_clouds(drone, value) end,
+        set_stars = function(value) return set_stars(drone, value) end,
+        set_sun = function(value) return set_sun(drone, value) end,
+        set_moon = function(value) return set_moon(drone, value) end,
         -- utilities
         get_block = function() return drone_get_block(drone) end,
         print = function(str) return send_message(drone, str) end,
@@ -202,7 +213,7 @@ end
 --------------------------------------------------------------------------------
 
 local function check_code(code)
-    -- "while ", "for ", "do ","goto ",  
+    -- "while ", "for ", "do ","goto ",
     local bad_code = {"repeat", "until", "_c_", "_G", "while%(", "while{"} -- ,"\\\"", "%[=*%[","--[["}, "%.%.[^%.]"
     for _, v in pairs(bad_code) do
         if string.find(code, v) then return S('@1 is not allowed!', v) end

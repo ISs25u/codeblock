@@ -14,6 +14,7 @@ local sqrt = math.sqrt
 local chat_send_player = minetest.chat_send_player
 local set_node = minetest.set_node
 local get_node = minetest.get_node
+local get_player_by_name = minetest.get_player_by_name
 
 local S = codeblock.S
 local table_reverse = codeblock.utils.table_reverse
@@ -129,6 +130,15 @@ local function check_distance(drone, x, y, z)
         error(S('The drone is too far away (@1)', sqrt(d)), 4)
     end
 
+end
+
+local function get_real_block(drone, block)
+    local al = drone.auth_level
+    block = block or cubes_names.stone
+    local real_block = blocks[block]
+    if al >= 4 and real_block == nil then real_block = block end
+    if not real_block then error(S('Cannot place this block'), 3) end
+    return real_block
 end
 
 -------------------------------------------------------------------------------
@@ -336,9 +346,7 @@ local function drone_place_block(drone, block)
 
     assert(drone, S("Error, drone does not exist"))
 
-    block = block or cubes_names.stone
-    local real_block = blocks[block]
-    if not real_block then error(S('Cannot place this block'), 3) end
+    local real_block = get_real_block(drone, block)
 
     use_volume(drone, 1)
 
@@ -355,9 +363,7 @@ local function drone_place_relative(drone, x, y, z, block, chkpt)
     local y = (type(y) == 'number') and round0(y) or 0
     local z = (type(z) == 'number') and round0(z) or 0
 
-    block = block or cubes_names.stone
-    local real_block = blocks[block]
-    if not real_block then error(S('Cannot place this block'), 3) end
+    local real_block = get_real_block(drone, block)
 
     local chkpt = (type(chkpt) == 'string') and chkpt or 'spawn'
     if not drone.checkpoints[chkpt] then
@@ -406,9 +412,7 @@ local function drone_place_cube(drone, w, h, l, block, hollow)
 
     assert(drone, S("Error, drone does not exist"))
 
-    block = block or cubes_names.stone
-    local real_block = blocks[block]
-    if not real_block then error(S('Cannot place this block'), 3) end
+    local real_block = get_real_block(drone, block)
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local w = (type(w) == 'number') and round0(abs(w)) or 10
@@ -451,9 +455,7 @@ local function drone_place_ccube(drone, w, h, l, block, hollow)
 
     assert(drone, S("Error, drone does not exist"))
 
-    block = block or cubes_names.stone
-    local real_block = blocks[block]
-    if not real_block then error(S('Cannot place this block'), 3) end
+    local real_block = get_real_block(drone, block)
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local w = (type(w) == 'number') and round0(abs(w)) or 10
@@ -485,9 +487,7 @@ local function drone_place_sphere(drone, r, block, hollow)
 
     assert(drone, S("Error, drone does not exist"))
 
-    block = block or cubes_names.stone
-    local real_block = blocks[block]
-    if not real_block then error(S('Cannot place this block'), 3) end
+    local real_block = get_real_block(drone, block)
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local r = (type(r) == 'number') and round0(abs(r)) or 5
@@ -524,9 +524,7 @@ local function drone_place_csphere(drone, r, block, hollow)
 
     assert(drone, S("Error, drone does not exist"))
 
-    block = block or cubes_names.stone
-    local real_block = blocks[block]
-    if not real_block then error(S('Cannot place this block'), 3) end
+    local real_block = get_real_block(drone, block)
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local r = (type(r) == 'number') and round0(abs(r)) or 5
@@ -544,9 +542,7 @@ local function drone_place_dome(drone, r, block, hollow)
 
     assert(drone, S("Error, drone does not exist"))
 
-    block = block or cubes_names.stone
-    local real_block = blocks[block]
-    if not real_block then error(S('Cannot place this block'), 3) end
+    local real_block = get_real_block(drone, block)
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local r = (type(r) == 'number') and round0(abs(r)) or 5
@@ -583,9 +579,7 @@ local function drone_place_cdome(drone, r, block, hollow)
 
     assert(drone, S("Error, drone does not exist"))
 
-    block = block or cubes_names.stone
-    local real_block = blocks[block]
-    if not real_block then error(S('Cannot place this block'), 3) end
+    local real_block = get_real_block(drone, block)
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local r = (type(r) == 'number') and round0(abs(r)) or 5
@@ -603,9 +597,7 @@ local function drone_place_cylinder(drone, o, l, r, block, hollow)
 
     assert(drone, S("Error, drone does not exist"))
 
-    block = block or cubes_names.stone
-    local real_block = blocks[block]
-    if not real_block then error(S('Cannot place this block'), 3) end
+    local real_block = get_real_block(drone, block)
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local o = (type(o) == 'string') and upper(o) or 'V'
@@ -669,9 +661,7 @@ local function drone_place_ccylinder(drone, o, l, r, block, hollow)
 
     assert(drone, S("Error, drone does not exist"))
 
-    block = block or cubes_names.stone
-    local real_block = blocks[block]
-    if not real_block then error(S('Cannot place this block'), 3) end
+    local real_block = get_real_block(drone, block)
 
     local hollow = (hollow == nil) and false or (hollow and true or false)
     local o = (type(o) == 'string') and upper(o) or 'V'
@@ -788,6 +778,8 @@ local function drone_get_block(drone)
 
     assert(drone, S("Error, drone does not exist"))
 
+    local al = drone.auth_level
+
     local block_name = get_node({x = drone.x, y = drone.y, z = drone.z}).name
 
     if block_name == 'ignore' then
@@ -795,14 +787,107 @@ local function drone_get_block(drone)
         return nil
     else
         check_drone_yield(drone, 0)
-        local rblock = rev_blocks[block_name]
-        if rblock then
-            return rblock
+        if al < 4 then
+            local rblock = rev_blocks[block_name]
+            if rblock then
+                return rblock
+            else
+                return false
+            end
         else
-            return false
+            return block_name
         end
     end
 
+end
+
+-------------------------------------------------------------------------------
+-- environments
+-------------------------------------------------------------------------------
+
+local function drone_override_day_night_ratio(drone, ratio)
+    assert(drone, S("Error, drone does not exist"))
+
+    local al = drone.auth_level
+    assert(al >= 4, S("Error, can not override_day_night_ratio for auth_level < 4"))
+
+    if ratio < 0 then ratio = 0 elseif ratio > 1 then ratio = 1 end
+    local player = get_player_by_name(drone.name)
+    minetest.log("action", ("[codeblock::set_day_night@%s] %s's day-night ratio set to %s")
+    :format(minetest.pos_to_string(drone), drone.name, ratio))
+    player:override_day_night_ratio(ratio)
+end
+
+local function drone_set_clouds(drone, new_value)
+    assert(drone, S("Error, drone does not exist"))
+
+    local al = drone.auth_level
+    assert(al >= 4, S("Error, can not set_clouds for auth_level < 4"))
+
+    local player = get_player_by_name(drone.name)
+    local existing_value = player:get_clouds()
+    minetest.log("action", ("[codeblock::set_clouds@%s] %s's clouds changed from %s to %s")
+    :format(
+        minetest.pos_to_string(drone),
+        drone.name,
+        minetest.serialize(existing_value):sub(8),
+        minetest.serialize(new_value):sub(8)
+    ))
+    player:set_clouds(new_value)
+end
+
+local function drone_set_stars(drone, new_value)
+    assert(drone, S("Error, drone does not exist"))
+
+    local al = drone.auth_level
+    assert(al >= 4, S("Error, can not set_stars for auth_level < 4"))
+
+    local player = get_player_by_name(drone.name)
+    local existing_value = player:get_stars()
+    minetest.log("action", ("[codeblock::set_stars@%s] %s's stars changed from %s to %s")
+    :format(
+        minetest.pos_to_string(drone),
+        drone.name,
+        minetest.serialize(existing_value):sub(8),
+        minetest.serialize(new_value):sub(8)
+    ))
+    player:set_stars(new_value)
+end
+
+local function drone_set_sun(drone, new_value)
+    assert(drone, S("Error, drone does not exist"))
+
+    local al = drone.auth_level
+    assert(al >= 4, S("Error, can not set_sun for auth_level < 4"))
+
+    local player = get_player_by_name(drone.name)
+    local existing_value = player:get_sun()
+    minetest.log("action", ("[codeblock::set_sun@%s] %s's sun changed from %s to %s")
+    :format(
+        minetest.pos_to_string(drone),
+        drone.name,
+        minetest.serialize(existing_value):sub(8),
+        minetest.serialize(new_value):sub(8)
+    ))
+    player:set_sun(new_value)
+end
+
+local function drone_set_moon(drone, new_value)
+    assert(drone, S("Error, drone does not exist"))
+
+    local al = drone.auth_level
+    assert(al >= 4, S("Error, can not set_moon for auth_level < 4"))
+
+    local player = get_player_by_name(drone.name)
+    local existing_value = player:get_moon()
+    minetest.log("action", ("[codeblock::set_moon@%s] %s's moon changed from %s to %s")
+    :format(
+        minetest.pos_to_string(drone),
+        drone.name,
+        minetest.serialize(existing_value):sub(8),
+        minetest.serialize(new_value):sub(8)
+    ))
+    player:set_moon(new_value)
 end
 
 -------------------------------------------------------------------------------
@@ -849,3 +934,9 @@ codeblock.commands.drone_place_ccylinder = drone_place_ccylinder
 codeblock.commands.drone_send_message = drone_send_message
 codeblock.commands.drone_use_call = use_call
 codeblock.commands.drone_get_block = drone_get_block
+-- environments
+codeblock.commands.drone_override_day_night_ratio = drone_override_day_night_ratio
+codeblock.commands.drone_set_clouds = drone_set_clouds
+codeblock.commands.drone_set_stars = drone_set_stars
+codeblock.commands.drone_set_sun = drone_set_sun
+codeblock.commands.drone_set_moon = drone_set_moon
