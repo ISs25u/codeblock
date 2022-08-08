@@ -370,6 +370,50 @@ local function preprocess_code(script)
 
 end
 
+local function loadScript(filename, droneName)
+    local untrusted_code = codeblock.filesystem.read_file(droneName, filename, true)
+
+    if not untrusted_code then
+        return false, S("Compilation error in @1: ", filename) ..
+                   S('@1 not found.', filename)
+    end
+
+    if untrusted_code:byte(1) == 27 then
+        return false, S("Compilation error in @1: ", filename) ..
+                   S("binary bytecode prohibited")
+    end
+
+    return true, untrusted_code
+end
+
+local function inlcudeFile(script, droneName)
+    local errs = {}
+    script = script:gsub("%-%-+%s*include%s+(%S+)\n", function(filename)
+        local result = filename:gsub("^%s*(.-)%s*$", "%1") --trim spaces
+        local char = result:sub(1,1)
+        if char == '(' or char == '[' or char == '{' or char == "'" or char == '"' then
+            result = result:sub(2, #result - 1)
+        end
+        if result ~= "" then
+            if result:sub(-4) ~= ".lua" then result = result .. ".lua" end
+            local ok
+            ok, result = loadScript(result, droneName)
+            if not ok then
+                table.insert(errs, result)
+                result = filename
+            end
+        else
+            result = filename
+        end
+        return result
+    end)
+    if #errs > 0 then
+        return false, table.concat(errs, "\n")
+    else
+        return true, script
+    end
+end
+
 --------------------------------------------------------------------------------
 -- public
 --------------------------------------------------------------------------------
@@ -383,17 +427,10 @@ function codeblock.sandbox.get_safe_coroutine(drone, filename)
     local filename = drone.file
 
     -- loading file
-    local untrusted_code = codeblock.filesystem.read_file(name, filename, true)
-
-    if not untrusted_code then
-        return false, S("Compilation error in @1: ", filename) ..
-                   S('@1 not found.', filename)
-    end
-
-    if untrusted_code:byte(1) == 27 then
-        return false, S("Compilation error in @1: ", filename) ..
-                   S("binary bytecode prohibited")
-    end
+    local ok, untrusted_code = loadScript(filename, name)
+    if not ok then return ok, untrusted_code end
+    ok, untrusted_code = inlcudeFile(untrusted_code, name)
+    if not ok then return ok, untrusted_code end
 
     -- checking forbiden things
 
