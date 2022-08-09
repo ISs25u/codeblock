@@ -162,6 +162,7 @@ local function getScriptEnv(drone)
         color = color,
         ipairs = ipairs,
         pairs = pairs,
+        type = type,
         random = setmetatable({}, {
             __index = {
                 block = table_randomizer(cubes),
