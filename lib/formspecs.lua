@@ -46,7 +46,7 @@ local file_editor = {
         local ud = get_user_data(meta.name)
         local fs = "size[20,10.5]"
 
-        -- styles 
+        -- styles
         fs = fs .. 'style[remove;bgcolor=red]'
         fs = fs .. 'style[content;font=mono;font_size=-2;textcolor=#115555]'
         fs = fs .. 'style[create;bgcolor=green]'
@@ -190,6 +190,8 @@ local file_editor = {
     on_close = function(meta, player, fields)
 
         local name = player:get_player_name()
+        local update_active_content
+        local save_active
 
         local function update()
             update_form(name, codeblock.formspecs.file_editor.get_form(meta))
@@ -205,10 +207,13 @@ local file_editor = {
             end
         end
 
-        local function save_active()
-            local err = write_file(name, meta.tabs[meta.active],
-                                   meta.contents[meta.active])
-            if err then chat_send_player(name, err) end
+        function save_active()
+            local filename = meta.tabs[meta.active]
+            if filename then
+                local err = write_file(name, filename,
+                                    meta.contents[meta.active])
+                if err then chat_send_player(name, err) end
+            end
         end
 
         local function remove_active()
@@ -229,7 +234,7 @@ local file_editor = {
             end
         end
 
-        local function update_active_content(content)
+        function update_active_content(content)
             meta.contents[meta.active] = content
         end
 
@@ -353,15 +358,31 @@ local file_editor = {
                 update()
             end
         elseif fields.help_cubes then
+            if meta.sos then
+                update_active_content(fields.content)
+                save_active()
+            end
             meta.help = 'cubes'
             update()
         elseif fields.help_plants then
+            if meta.sos then
+                update_active_content(fields.content)
+                save_active()
+            end
             meta.help = 'plants'
             update()
         elseif fields.help_wools then
+            if meta.sos then
+                update_active_content(fields.content)
+                save_active()
+            end
             meta.help = 'wools'
             update()
         elseif fields.help_cmds then
+            if meta.sos then
+                update_active_content(fields.content)
+                save_active()
+            end
             meta.help = 'commands'
             update()
         elseif fields.c_scroll then
