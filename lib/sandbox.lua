@@ -371,6 +371,8 @@ local function preprocess_code(script)
 
 end
 
+local inlcudeFile
+
 local function loadScript(filename, droneName)
     local untrusted_code = codeblock.filesystem.read_file(droneName, filename, true)
 
@@ -384,10 +386,12 @@ local function loadScript(filename, droneName)
                    S("binary bytecode prohibited")
     end
 
-    return true, untrusted_code
+    return inlcudeFile(untrusted_code, droneName)
+
+    -- return true, untrusted_code
 end
 
-local function inlcudeFile(script, droneName)
+function inlcudeFile(script, droneName)
     local errs = {}
     script = script:gsub("%-%-+%s*include%s+(%S+)\n", function(filename)
         local result = filename:gsub("^%s*(.-)%s*$", "%1") --trim spaces
@@ -425,12 +429,9 @@ function codeblock.sandbox.get_safe_coroutine(drone, filename)
     assert(filename)
 
     local name = drone.name
-    local filename = drone.file
 
     -- loading file
     local ok, untrusted_code = loadScript(filename, name)
-    if not ok then return ok, untrusted_code end
-    ok, untrusted_code = inlcudeFile(untrusted_code, name)
     if not ok then return ok, untrusted_code end
 
     -- checking forbiden things
