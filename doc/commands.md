@@ -88,6 +88,8 @@
 `ipairs(table)`
 `pairs(table)`
 `table.randomizer(t)`
+`type(v)`
+`--include lua_file_name`
 
 # Vectors
 

@@ -125,6 +125,8 @@ codeblock.utils.html_commands = [[
     <b><style color=#888888 font=mono size=12>ipairs</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>table</style><style font=mono size=12>)</style></b>
     <b><style color=#888888 font=mono size=12>pairs</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>table</style><style font=mono size=12>)</style></b>
     <b><style color=#888888 font=mono size=12>table.randomizer</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>t</style><style font=mono size=12>)</style></b>
+    <b><style color=#888888 font=mono size=12>type</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>v</style><style font=mono size=12>)</style></b>
+    <b><style color=#888888 font=mono size=12>--include lua_file_name</style></b>
     <b><style font=normal size=16>Vectors</style></b>
     <b><style color=#888888 font=mono size=12>See https://github.com/ISs25u/vector3 for details</style></b>
     Operations + - * /
