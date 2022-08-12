@@ -80,6 +80,8 @@ go('place2', 10, -50, 1) -- go to checkpoint with offsets
 
 Placing blocks and building shapes requires a `block` parameter, which can be obtained using the following tables.
 
+Placing any blocks("default:stone") requires `trusted` codelevel(>=4).
+
 ### `blocks`
 
 String-indexed table with the following values:
@@ -268,4 +270,17 @@ include another file:
 --include line
 
 line(4, blocks.brick)
+```
+
+
+## Environments
+
+requires trusted level(>=4)
+
+```lua
+override_day_night_ratio(ratio)
+set_clouds(new_cloud)
+set_stars(new_star)
+set_sun(new_sun)
+set_moon(new_moon)
 ```
