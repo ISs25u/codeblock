@@ -46,7 +46,6 @@ local allowed_blocks = {
         obsidian_block = 'default:obsidian_block',
         dirt = 'default:dirt',
         dirt_with_grass = 'default:dirt_with_grass',
-        dirt_with_grass_footsteps = 'default:dirt_with_grass_footsteps',
         dirt_with_dry_grass = 'default:dirt_with_dry_grass',
         dirt_with_snow = 'default:dirt_with_snow',
         dirt_with_rainforest_litter = 'default:dirt_with_rainforest_litter',
@@ -59,7 +58,6 @@ local allowed_blocks = {
         clay = 'default:clay',
         snowblock = 'default:snowblock',
         ice = 'default:ice',
-        cave_ice = 'default:cave_ice',
         tree = 'default:tree',
         wood = 'default:wood',
         leaves = 'default:leaves',
@@ -135,30 +133,30 @@ local allowed_blocks = {
         pine_bush_sapling = 'default:pine_bush_sapling'
     },
     wools = {
-        wool_white = 'wool:white',
-        wool_grey = 'wool:grey',
-        wool_dark_grey = 'wool:dark_grey',
-        wool_black = 'wool:black',
-        wool_violet = 'wool:violet',
-        wool_blue = 'wool:blue',
-        wool_cyan = 'wool:cyan',
-        wool_dark_green = 'wool:dark_green',
-        wool_green = 'wool:green',
-        wool_yellow = 'wool:yellow',
-        wool_brown = 'wool:brown',
-        wool_orange = 'wool:orange',
-        wool_red = 'wool:red',
-        wool_magenta = 'wool:magenta',
-        wool_pink = 'wool:pink'
+        white = 'wool:white',
+        grey = 'wool:grey',
+        dark_grey = 'wool:dark_grey',
+        black = 'wool:black',
+        violet = 'wool:violet',
+        blue = 'wool:blue',
+        cyan = 'wool:cyan',
+        dark_green = 'wool:dark_green',
+        green = 'wool:green',
+        yellow = 'wool:yellow',
+        brown = 'wool:brown',
+        orange = 'wool:orange',
+        red = 'wool:red',
+        magenta = 'wool:magenta',
+        pink = 'wool:pink'
     }
 }
 
 codeblock.config.allowed_blocks = {
     all = {},
     iwools = {
-        'wool_red', 'wool_brown', 'wool_orange', 'wool_yellow', 'wool_green',
-        'wool_dark_green', 'wool_cyan', 'wool_blue', 'wool_violet',
-        'wool_magenta', 'wool_pink'
+        'red', 'brown', 'orange', 'yellow', 'green',
+        'dark_green', 'cyan', 'blue', 'violet',
+        'magenta', 'pink'
     }
 }
 
