@@ -236,7 +236,7 @@ minetest.register_chatcommand("codegenerate", {
         if player then
             local err = generate_examples(name)
             if err then
-                return false, S('Une erreur est survenue')
+                return false, S('An error occured when generating example')
             else
                 return true, S('Examples generated')
             end
