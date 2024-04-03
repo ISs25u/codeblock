@@ -77,6 +77,7 @@ codeblock.utils.html_commands = [[
     <b><style color=#888888 font=mono size=12>get_block</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12></style><style font=mono size=12>)</style></b>
     <b><style font=normal size=16>Placing one block</style></b>
     <b><style color=#888888 font=mono size=12>place</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>block</style><style font=mono size=12>)</style></b>
+    <b><style color=#888888 font=mono size=12>place</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>"default:stone")<b><style color=#888888 font=mono size=12> <b><style color=#888888 font=mono size=12>:requires trusted level</style></style></b>(>=4</style><style font=mono size=12>)</style></b>
     <b><style color=#888888 font=mono size=12>place_relative</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>n_right</style><style font=mono size=12>,</style><style color=#e9c46a font=mono size=12> n_up</style><style font=mono size=12>,</style><style color=#e9c46a font=mono size=12> n_forward</style><style font=mono size=12>,</style><style color=#e9c46a font=mono size=12> block</style><style font=mono size=12>,</style><style color=#e9c46a font=mono size=12> checkpoint</style><style font=mono size=12>)</style></b>
     <b><style font=normal size=16>Shapes</style></b>
     <b><style color=#888888 font=mono size=12>cube</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>width</style><style font=mono size=12>,</style><style color=#e9c46a font=mono size=12> height</style><style font=mono size=12>,</style><style color=#e9c46a font=mono size=12> length</style><style font=mono size=12>,</style><style color=#e9c46a font=mono size=12> block</style><style font=mono size=12>,</style><style color=#e9c46a font=mono size=12> hollow</style><style font=mono size=12>)</style></b>
@@ -125,6 +126,8 @@ codeblock.utils.html_commands = [[
     <b><style color=#888888 font=mono size=12>ipairs</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>table</style><style font=mono size=12>)</style></b>
     <b><style color=#888888 font=mono size=12>pairs</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>table</style><style font=mono size=12>)</style></b>
     <b><style color=#888888 font=mono size=12>table.randomizer</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>t</style><style font=mono size=12>)</style></b>
+    <b><style color=#888888 font=mono size=12>type</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>v</style><style font=mono size=12>)</style></b>
+    <b><style color=#888888 font=mono size=12>--include lua_file_name</style></b>
     <b><style font=normal size=16>Vectors</style></b>
     <b><style color=#888888 font=mono size=12>See https://github.com/ISs25u/vector3 for details</style></b>
     Operations + - * /
@@ -150,4 +153,11 @@ codeblock.utils.html_commands = [[
     <b><style color=#888888 font=mono size=12>v1:cross</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>v2</style><style font=mono size=12>)</style></b>
     <b><style color=#888888 font=mono size=12>v1:rotate_around</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>v</style><style font=mono size=12>,</style><style color=#e9c46a font=mono size=12> angle</style><style font=mono size=12>)</style></b>
     <b><style color=#888888 font=mono size=12>v1:unpack</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12></style><style font=mono size=12>)</style></b>
+    <b><style font=normal size=16>Environments</style></b>
+    <b><style color=#888888 font=mono size=12>requires trusted level</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>>=4</style><style font=mono size=12>)</style></b>
+    <b><style color=#888888 font=mono size=12>override_day_night_ratio</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>ratio</style><style font=mono size=12>)</style></b>
+    <b><style color=#888888 font=mono size=12>set_clouds</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>new_cloud</style><style font=mono size=12>)</style></b>
+    <b><style color=#888888 font=mono size=12>set_stars</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>new_star</style><style font=mono size=12>)</style></b>
+    <b><style color=#888888 font=mono size=12>set_sun</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>new_sun</style><style font=mono size=12>)</style></b>
+    <b><style color=#888888 font=mono size=12>set_moon</style><style font=mono size=12>(</style><style color=#e9c46a font=mono size=12>new_moon</style><style font=mono size=12>)</style></b>
 ]]

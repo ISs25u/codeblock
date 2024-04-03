@@ -35,6 +35,11 @@ local goto_checkpoint = codeblock.commands.drone_goto_checkpoint
 local send_message = codeblock.commands.drone_send_message
 local use_call = codeblock.commands.drone_use_call
 local drone_get_block = codeblock.commands.drone_get_block
+local override_day_night_ratio = codeblock.commands.drone_override_day_night_ratio
+local set_clouds = codeblock.commands.drone_set_clouds
+local set_stars = codeblock.commands.drone_set_stars
+local set_sun = codeblock.commands.drone_set_sun
+local set_moon = codeblock.commands.drone_set_moon
 
 local cubes = codeblock.config.allowed_blocks.cubes
 local plants = codeblock.config.allowed_blocks.plants
@@ -145,12 +150,19 @@ local function getScriptEnv(drone)
         plants = plants,
         -- vector3 commands
         vector = vector3,
+        -- environments
+        override_day_night_ratio = function(ratio) return override_day_night_ratio(drone, ratio) end,
+        set_clouds = function(value) return set_clouds(drone, value) end,
+        set_stars = function(value) return set_stars(drone, value) end,
+        set_sun = function(value) return set_sun(drone, value) end,
+        set_moon = function(value) return set_moon(drone, value) end,
         -- utilities
         get_block = function() return drone_get_block(drone) end,
         print = function(str) return send_message(drone, str) end,
         color = color,
         ipairs = ipairs,
         pairs = pairs,
+        type = type,
         random = setmetatable({}, {
             __index = {
                 block = table_randomizer(cubes),
@@ -202,7 +214,7 @@ end
 --------------------------------------------------------------------------------
 
 local function check_code(code)
-    -- "while ", "for ", "do ","goto ",  
+    -- "while ", "for ", "do ","goto ",
     local bad_code = {"repeat", "until", "_c_", "_G", "while%(", "while{"} -- ,"\\\"", "%[=*%[","--[["}, "%.%.[^%.]"
     for _, v in pairs(bad_code) do
         if string.find(code, v) then return S('@1 is not allowed!', v) end
@@ -359,20 +371,10 @@ local function preprocess_code(script)
 
 end
 
---------------------------------------------------------------------------------
--- public
---------------------------------------------------------------------------------
+local inlcudeFile
 
-function codeblock.sandbox.get_safe_coroutine(drone, filename)
-
-    assert(drone)
-    assert(filename)
-
-    local name = drone.name
-    local filename = drone.file
-
-    -- loading file
-    local untrusted_code = codeblock.filesystem.read_file(name, filename, true)
+local function loadScript(filename, droneName)
+    local untrusted_code = codeblock.filesystem.read_file(droneName, filename, true)
 
     if not untrusted_code then
         return false, S("Compilation error in @1: ", filename) ..
@@ -383,6 +385,54 @@ function codeblock.sandbox.get_safe_coroutine(drone, filename)
         return false, S("Compilation error in @1: ", filename) ..
                    S("binary bytecode prohibited")
     end
+
+    return inlcudeFile(untrusted_code, droneName)
+
+    -- return true, untrusted_code
+end
+
+function inlcudeFile(script, droneName)
+    local errs = {}
+    script = script:gsub("%-%-+%s*include%s+(%S+)\n", function(filename)
+        local result = filename:gsub("^%s*(.-)%s*$", "%1") --trim spaces
+        local char = result:sub(1,1)
+        if char == '(' or char == '[' or char == '{' or char == "'" or char == '"' then
+            result = result:sub(2, #result - 1)
+        end
+        if result ~= "" then
+            if result:sub(-4) ~= ".lua" then result = result .. ".lua" end
+            local ok
+            ok, result = loadScript(result, droneName)
+            if not ok then
+                table.insert(errs, result)
+                result = filename
+            end
+        else
+            result = filename
+        end
+        return result
+    end)
+    if #errs > 0 then
+        return false, table.concat(errs, "\n")
+    else
+        return true, script
+    end
+end
+
+--------------------------------------------------------------------------------
+-- public
+--------------------------------------------------------------------------------
+
+function codeblock.sandbox.get_safe_coroutine(drone, filename)
+
+    assert(drone)
+    assert(filename)
+
+    local name = drone.name
+
+    -- loading file
+    local ok, untrusted_code = loadScript(filename, name)
+    if not ok then return ok, untrusted_code end
 
     -- checking forbiden things
 

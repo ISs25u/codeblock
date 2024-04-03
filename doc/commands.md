@@ -32,6 +32,7 @@
 # Placing one block
 
 `place(block)`
+`place("default:stone")` `:requires trusted level(>=4)`
 `place_relative(n_right, n_up, n_forward, block, checkpoint)`
 
 # Shapes
@@ -88,6 +89,8 @@
 `ipairs(table)`
 `pairs(table)`
 `table.randomizer(t)`
+`type(v)`
+`--include lua_file_name`
 
 # Vectors
 
@@ -117,3 +120,13 @@ Operations + - * /
 `v1:cross(v2)`
 `v1:rotate_around(v, angle)`
 `v1:unpack()`
+
+# Environments
+
+`requires trusted level(>=4)`
+
+`override_day_night_ratio(ratio)`
+`set_clouds(new_cloud)`
+`set_stars(new_star)`
+`set_sun(new_sun)`
+`set_moon(new_moon)`

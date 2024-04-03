@@ -36,7 +36,7 @@ The parameter `n` denotes an integer describing how much to move in the specifie
 ### Moving the drone
 
 ```lua
-up(n) 
+up(n)
 down(n)
 forward(n)
 back(n)
@@ -79,6 +79,8 @@ go('place2', 10, -50, 1) -- go to checkpoint with offsets
 ## Block types
 
 Placing blocks and building shapes requires a `block` parameter, which can be obtained using the following tables.
+
+Placing any blocks("default:stone") requires `trusted` codelevel(>=4).
 
 ### `blocks`
 
@@ -187,7 +189,7 @@ centered.vertical.cylinder(height, radius, block, hollow)
 centered.horizontal.cylinder(length, radius, block, hollow)
 ```
 
-## Math 
+## Math
 
 ```lua
 random([m [, n]])
@@ -230,7 +232,7 @@ local w = (5 * u + u:dot(v) * u:cross(v:scale(5))):norm()
 local x, y, z = w:unpack()
 ```
 
-## Misc 
+## Misc
 
 ```lua
 print(message) -- print `message` in minetest chat
@@ -244,7 +246,41 @@ Example:
 ```lua
 local my_random = table.randomizer({blocks.ice, blocks.brick})
 for i = 1, 10 do
-    place(my_random()) 
+    place(my_random())
     up()
 end
+```
+
+```lua
+-- line.lua
+
+function line(length, mat)
+    for i=1, length do
+        up(1)
+        place(mat)
+end
+```
+
+
+include another file:
+
+```lua
+-- another.lua
+
+--include line
+
+line(4, blocks.brick)
+```
+
+
+## Environments
+
+requires trusted level(>=4)
+
+```lua
+override_day_night_ratio(ratio)
+set_clouds(new_cloud)
+set_stars(new_star)
+set_sun(new_sun)
+set_moon(new_moon)
 ```
